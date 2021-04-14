@@ -2,7 +2,9 @@
 
 If you want to get to the part about building the app and the code walk-through, skip the first 3 paragraphs ;). But in all seriousness, I welcome you to read the introduction, just so you understand why this is important.
 
-                                                                   .
+                                                        .
+                                                                   
+                                                                   
 Whether you notice at first glance or not, machine learning based functionalities have become a core component of numerous digital products you regularly consume. Similarly, these often complex algorithms have made their way into business processes in many organizations that have a huge impact on your life. In my experience alone, I have seen algorithms as complex as gradient boosting and deep neural networks in production at financial institutions and retailers, tightly integrated with business processes. In financial services in particular, a prediction from a model could be part of a loan or credit card approval process. In both cases, the output from these models have a significant impact on people’s lives.
 
 Given this widespread adoption, for regulatory purposes and to ensure that customers get the best possible experience, it’s important to be able to explain why a certain prediction was made for a given set of input features. In other words, for an observation, how did the values of each of the features affect the predicted value? So if you’re a lender you’d better be able to explain why Bob’s loan was approved and John’s wasn’t!
