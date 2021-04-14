@@ -25,6 +25,8 @@ This could be downloaded at https://support.sas.com/documentation/onlinedoc/viya
 
 Download this dataset to the same directory as your notebook environment for training the model. Install SWAT if you haven’t already. Then import all the required modules as shown below:
 
+![Blog logo](images/exml/carbon (3).png)
+
 Connect to the CAS server (the in-memory compute engine that powers SAS Viya) and load the relevant action sets. Action sets are related groups of algorithms baked into the CAS runtime, which in turn are called, CAS actions. For example the ‘decisionTree’ action set has multiple actions. Some of these actions are for training and scoring various tree based algorithms such as random forests and gradient boosting models.
 
 Please note that the host, port, username and password are strings that are specific to your environment.
