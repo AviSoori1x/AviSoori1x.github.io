@@ -2,6 +2,7 @@ Hi, Welcome to my blog. I am Avi Sooriyarachchi and I write about my work in the
 
 ![Blog logo](images/blogImage.png)
 
-## This is a title
+## You can check out my other projects in Github
 
-And you can include links, like this [link to fast.ai](https://www.fast.ai). Posts will appear after this file. 
+Github:  [link to Github](https://github.com/AviSoori1x). 
+LinkedIn: [link to LinkedIn](https://www.linkedin.com/in/avinash-sooriyarachchi-104b45100/). 
