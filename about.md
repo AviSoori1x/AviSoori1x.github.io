@@ -1,4 +1,3 @@
 # About
 
-This is where you put the contents of your *About* page. Like all your pages, it's in [Markdown](https://guides.github.com/features/mastering-markdown/) format.
-
+I am Solutions Architect with an emphasis on building systems that leverage SAS AI and ML capabilities, combining SAS APIs, open source web and machine learning frameworks, and cloud services, to solve business problems. Before joining SAS, I tried my hand at tech entrepreneurship by establishing a startup with a focus on Natural Language Processing(NLP), specifically for natural language querying. Currently at SAS, I focus mostly on supporting opportunities related to applications of artificial intelligence and machine learning in mid-market healthcare, financial services and retail organizations.
