@@ -68,9 +68,9 @@ Then execute the following instructions.
 
 1. Run the notebook from the first cell to the last (at https://github.com/AviSoori1x/Explainable-ML-with-SAS-Viya/blob/main/SAS_Viya_Explainable_ML.ipynb). If you have been coding along as you were reading, you must have done this by now. This creates and promotes the analytical base table and the final trained model as an astore in CAS. Now go to the streamlitApp directory with all the files. Dockerfile is here.
 2. Run the following commands at the command line (I’m assuming you have Docker installed. If not, install Docker!). Your present working directory should be the streamlitApp folder.
-  1. First run at the terminal: docker build -f Dockerfile -t app:latest .
-  2. Then run: docker run -p 8501:8501 app:latest
-  3. Then test out your app at: http://localhost:8501/
+    1. First run at the terminal: docker build -f Dockerfile -t app:latest .
+    2. Then run: docker run -p 8501:8501 app:latest
+    3. Then test out your app at: http://localhost:8501/
 
 
 Make sure both the model training (notebook) and the connection to the CAS server is to the same host with the permissions to access CAS tables in the global scope.
