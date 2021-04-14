@@ -2,7 +2,7 @@ Hi, Welcome to my blog. I am Avi Sooriyarachchi and I write about my work in the
 
 ![Blog logo](images/blogImage.png)
 
-## You can check out my other projects in Github
+## You can check out my other projects on Github
 
 Github:  [Github](https://github.com/AviSoori1x).
 
