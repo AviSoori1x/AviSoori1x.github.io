@@ -1,6 +1,7 @@
 
 # Interactive Explainable Machine Learning with SAS Viya, Streamlit, and Docker
 
+![exml UI](images/exml_UI.png)
 
 > youtube: https://youtu.be/-pKKt6QZkCs
 
@@ -608,6 +609,8 @@ The entire logic of the app is all present in a single file with the .py extensi
 The instructions are as follows.
 
 Download the files from the Github to your machine. The folder structure should look like this:
+
+![exml tree](images/exml_tree.png)
 
 Then execute the following instructions.
 
