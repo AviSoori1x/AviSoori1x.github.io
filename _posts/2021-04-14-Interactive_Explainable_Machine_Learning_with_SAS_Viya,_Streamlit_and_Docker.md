@@ -5,7 +5,7 @@ You can checkout the app we are going to build in action here:
 https://youtu.be/-pKKt6QZkCs
 
 If you want to get to the part about building the app and the code walk-through, skip the first 3 paragraphs ;). But in all seriousness, I welcome you to read the introduction, just so you understand why this is important.
-                                                -
+
 Whether you notice at first glance or not, machine learning based functionalities have become a core component of numerous digital products you regularly consume. Similarly, these often complex algorithms have made their way into business processes in many organizations that have a huge impact on your life. In my experience alone, I have seen algorithms as complex as gradient boosting and deep neural networks in production at financial institutions and retailers, tightly integrated with business processes. In financial services in particular, a prediction from a model could be part of a loan or credit card approval process. In both cases, the output from these models have a significant impact on people’s lives.
 
 Given this widespread adoption, for regulatory purposes and to ensure that customers get the best possible experience, it’s important to be able to explain why a certain prediction was made for a given set of input features. In other words, for an observation, how did the values of each of the features affect the predicted value? So if you’re a lender you’d better be able to explain why Bob’s loan was approved and John’s wasn’t!
@@ -607,11 +607,16 @@ The entire logic of the app is all present in a single file with the .py extensi
 The instructions are as follows.
 
 Download the files from the Github to your machine. The folder structure should look like this:
--streamlitApp
-    -Dockerfile
-    -SessionState.Py
-    -app.py
-    -requirements.py
+
+
+```python
+#-streamlitApp 
+#    -Dockerfile  
+#    -SessionState.py  
+#    -app.py  
+#    -requirements.py 
+```
+
 Then execute the following instructions.
 
 
@@ -632,3 +637,4 @@ This is not the most straightforward Streamlit app as we have to persist the CAS
 Now you have built a machine learning based application that not only allows you to predict new observations and explanations, but it’s also deployed in a containerized manner which makes it portable. In a future blog post, I will walk you through deploying it on GCP Compute Engine, AWS Fargate and Azure App Engine.
 
 I hope you enjoyed this article and developed an appreciation for making machine learning related explorations more interactive!
+
