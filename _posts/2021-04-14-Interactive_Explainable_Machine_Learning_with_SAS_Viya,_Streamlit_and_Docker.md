@@ -2,7 +2,7 @@
 # Interactive Explainable Machine Learning with SAS Viya, Streamlit, and Docker
 
 You can checkout the app we are going to build in action here:
-https://youtu.be/-pKKt6QZkCs
+[video](https://youtu.be/-pKKt6QZkCs)
 
 If you want to get to the part about building the app and the code walk-through, skip the first 3 paragraphs ;). But in all seriousness, I welcome you to read the introduction, just so you understand why this is important.
 
@@ -17,9 +17,9 @@ In this blog post, I will use SAS SWAT package for Python to train a gradient bo
 
 You must have SAS Viya 3.4 or later and SAS Visual Data Mining and Machine Learning 8.3 or later available in your SAS deployment.
 
-The notebook for training the model is at: https://github.com/AviSoori1x/Explainable-ML-with-SAS-Viya/blob/main/SAS_Viya_Explainable_ML.ipynb
+The notebook for training the model is at: [notebook](https://github.com/AviSoori1x/Explainable-ML-with-SAS-Viya/blob/main/SAS_Viya_Explainable_ML.ipynb)
 
-The code for the Streamlit app and Docker file are at: https://github.com/AviSoori1x/Explainable-ML-with-SAS-Viya
+The code for the Streamlit app and Docker file are at: [app code](https://github.com/AviSoori1x/Explainable-ML-with-SAS-Viya)
 
 Feel free to follow along.
 
@@ -602,7 +602,7 @@ Now we move onto the fun part. Wrapping this up as an app with an interactive UI
 
 Why Streamlit? Streamlit lets you build a UI for any API using pure Python. All you have to do is install streamlit in your environment, import Streamlit at the top of your script and start declaring UI components. I have added comments line by line describing exactly what I’m doing and why I’m doing it.
 
-The entire logic of the app is all present in a single file with the .py extension. Let’s call this file app.py. I welcome you to go to the source at https://github.com/AviSoori1x/Explainable-ML-with-SAS-Viya , read the instructions and get the app running locally.
+The entire logic of the app is all present in a single file with the .py extension. Let’s call this file app.py. I welcome you to go to the [source](https://github.com/AviSoori1x/Explainable-ML-with-SAS-Viya), read the instructions and get the app running locally.
 
 The instructions are as follows.
 
@@ -620,7 +620,7 @@ Download the files from the Github to your machine. The folder structure should 
 Then execute the following instructions.
 
 
-1. Run the notebook from the first cell to the last (at https://github.com/AviSoori1x/Explainable-ML-with-SAS-Viya/blob/main/SAS_Viya_Explainable_ML.ipynb). If you have been coding along as you were reading, you must have done this by now. This creates and promotes the analytical base table and the final trained model as an astore in CAS. Now go to the streamlitApp directory with all the files. Dockerfile is here.
+1. Run the notebook from the first cell to the [last](https://github.com/AviSoori1x/Explainable-ML-with-SAS-Viya/blob/main/SAS_Viya_Explainable_ML.ipynb). If you have been coding along as you were reading, you must have done this by now. This creates and promotes the analytical base table and the final trained model as an astore in CAS. Now go to the streamlitApp directory with all the files. Dockerfile is here.
 
 2.  Run the following commands at the command line (I’m assuming you have Docker installed. If not, install Docker!). Your present working directory should be the streamlitApp folder.
 
@@ -632,7 +632,7 @@ iii. Then test out your app at: http://localhost:8501/
 
 Make sure both the model training (notebook) and the connection to the CAS server is to the same host with the permissions to access CAS tables in the global scope.
 
-This is not the most straightforward Streamlit app as we have to persist the CAS connection over the selective execution of functions for scoring and generating explanations. There are several other things we need to persist as well. So I use the wonderful SessionState.py gist (https://gist.github.com/FranzDiebold/898396a6be785d9b5ca6f3706ef9b0bc) created by Thiago Teixeira and modified by Franz Diebold. You will find this in the files you have already downloaded and is visible in the directory tree.
+This is not the most straightforward Streamlit app as we have to persist the CAS connection over the selective execution of functions for scoring and generating explanations. There are several other things we need to persist as well. So I use the wonderful SessionState.py [gist](https://gist.github.com/FranzDiebold/898396a6be785d9b5ca6f3706ef9b0bc) created by Thiago Teixeira and modified by Franz Diebold. You will find this in the files you have already downloaded and is visible in the directory tree.
 
 Now you have built a machine learning based application that not only allows you to predict new observations and explanations, but it’s also deployed in a containerized manner which makes it portable. In a future blog post, I will walk you through deploying it on GCP Compute Engine, AWS Fargate and Azure App Engine.
 
