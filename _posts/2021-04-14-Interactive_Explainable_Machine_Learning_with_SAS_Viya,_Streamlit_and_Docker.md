@@ -2,7 +2,7 @@
 
 If you want to get to the part about building the app and the code walk-through, skip the first 3 paragraphs ;). But in all seriousness, I welcome you to read the introduction, just so you understand why this is important.
 
-                                                         .
+                                                         
                                                                    
                                                                    
 Whether you notice at first glance or not, machine learning based functionalities have become a core component of numerous digital products you regularly consume. Similarly, these often complex algorithms have made their way into business processes in many organizations that have a huge impact on your life. In my experience alone, I have seen algorithms as complex as gradient boosting and deep neural networks in production at financial institutions and retailers, tightly integrated with business processes. In financial services in particular, a prediction from a model could be part of a loan or credit card approval process. In both cases, the output from these models have a significant impact on people’s lives.
@@ -18,6 +18,7 @@ The notebook for training the model is at: https://github.com/AviSoori1x/Explain
 The code for the Streamlit app and Docker file are at: https://github.com/AviSoori1x/Explainable-ML-with-SAS-Viya
 
 Feel free to follow along.
+
 Alright let’s get started! My dataset for this walkthrough is titled HMEQ and the goal is to classify whether an individual is likely to default on a home loan or not, based on a number of factors. This outcome is recorded as a binary flag in the field titled BAD (Binary Attribute indicating Default: 0 for no default, 1 for default). This could be downloaded at https://support.sas.com/documentation/onlinedoc/viya/exampledatasets/hmeq.csv . Also, I keep referring to a ‘notebook’ in the data and model training portion as I used a Jupyter notebook here to write my code. Feel free to use any IDE or even the Python interpreter if you prefer. I will switch to Visual Studio code for the Streamlit and Docker portion, but there also, the choice is entirely yours :)
 
 Download this dataset to the same directory as your notebook environment for training the model. Install SWAT if you haven’t already. Then import all the required modules as shown below:
@@ -69,13 +70,18 @@ Download the files from the Github to your machine. The folder structure should 
 Then execute the following instructions.
 
 1. Run the notebook from the first cell to the last (at https://github.com/AviSoori1x/Explainable-ML-with-SAS-Viya/blob/main/SAS_Viya_Explainable_ML.ipynb). If you have been coding along as you were reading, you must have done this by now. This creates and promotes the analytical base table and the final trained model as an astore in CAS. Now go to the streamlitApp directory with all the files. Dockerfile is here.
+
 2. Run the following commands at the command line (I’m assuming you have Docker installed. If not, install Docker!). Your present working directory should be the streamlitApp folder.
+    
     1. First run at the terminal: docker build -f Dockerfile -t app:latest .
     2. Then run: docker run -p 8501:8501 app:latest
     3. Then test out your app at: http://localhost:8501/
 
 
 Make sure both the model training (notebook) and the connection to the CAS server is to the same host with the permissions to access CAS tables in the global scope.
+
 This is not the most straightforward Streamlit app as we have to persist the CAS connection over the selective execution of functions for scoring and generating explanations. There are several other things we need to persist as well. So I use the wonderful SessionState.py gist (https://gist.github.com/FranzDiebold/898396a6be785d9b5ca6f3706ef9b0bc) created by Thiago Teixeira and modified by Franz Diebold. You will find this in the files you have already downloaded and is visible in the directory tree.
+
 Now you have built a machine learning based application that not only allows you to predict new observations and explanations, but it’s also deployed in a containerized manner which makes it portable. In a future blog post, I will walk you through deploying it on GCP Compute Engine, AWS Fargate and Azure App Engine.
+
 I hope you enjoyed this article and developed an appreciation for making machine learning related explorations more interactive!
