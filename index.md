@@ -1,4 +1,4 @@
-Hello and welcome to this blog. Edit the `index.md` file to change this content. All pages on the blog, including this one, use [Markdown](https://guides.github.com/features/mastering-markdown/). You can include images:
+Hi, Welcome to my blog. I am Avi Sooriyarachchi and I write about my work in the data and AI space here. Some of these are work related and some are about projects I do out of interest.
 
 ![Blog logo](images/blogImage.png)
 
