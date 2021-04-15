@@ -4,6 +4,6 @@ Hi, Welcome to my blog. I am Avi Sooriyarachchi and I write about my work in the
 
 ## You can check out my other projects on Github
 
- [Github](https://github.com/AviSoori1x).
+ [Github](https://github.com/AviSoori1x)
 
- [LinkedIn](https://www.linkedin.com/in/avinash-sooriyarachchi-104b45100/). 
+ [LinkedIn](https://www.linkedin.com/in/avinash-sooriyarachchi-104b45100/)
