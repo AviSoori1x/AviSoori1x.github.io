@@ -2,9 +2,8 @@
 # Interactive Explainable Machine Learning with SAS Viya, Streamlit, and Docker
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/-pKKt6QZkCs" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+The app we will build in this blog
 
-You can checkout the app we are going to build in action here:
-[video](https://youtu.be/-pKKt6QZkCs)
 
 If you want to get to the part about building the app and the code walk-through, skip the first 3 paragraphs ;). But in all seriousness, I welcome you to read the introduction, just so you understand why this is important.
 
