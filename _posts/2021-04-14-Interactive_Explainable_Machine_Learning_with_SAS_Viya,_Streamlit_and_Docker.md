@@ -1,7 +1,7 @@
 
 # Interactive Explainable Machine Learning with SAS Viya, Streamlit, and Docker
 
-<iframe width="100%" height="300%" src="https://www.youtube.com/embed/-pKKt6QZkCs" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="100%" height="300" src="https://www.youtube.com/embed/-pKKt6QZkCs" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 _The app we will build in this blog_
 
 
@@ -24,7 +24,7 @@ The code for the Streamlit app and Docker file are at: [app code](https://github
 
 Feel free to follow along.
 
-Alright let’s get started! My dataset for this walkthrough is titled HMEQ and the goal is to classify whether an individual is likely to default on a home loan or not, based on a number of factors. This outcome is recorded as a binary flag in the field titled BAD (Binary Attribute indicating Default: 0 for no default, 1 for default). This could be downloaded at https://support.sas.com/documentation/onlinedoc/viya/exampledatasets/hmeq.csv . Also, I keep referring to a ‘notebook’ in the data and model training portion as I used a Jupyter notebook here to write my code. Feel free to use any IDE or even the Python interpreter if you prefer. I will switch to Visual Studio code for the Streamlit and Docker portion, but there also, the choice is entirely yours :)
+Alright let’s get started! My dataset for this walkthrough is titled HMEQ and the goal is to classify whether an individual is likely to default on a home loan or not, based on a number of factors. This outcome is recorded as a binary flag in the field titled BAD (Binary Attribute indicating Default: 0 for no default, 1 for default). This could be downloaded [here](https://support.sas.com/documentation/onlinedoc/viya/exampledatasets/hmeq.csv) . Also, I keep referring to a ‘notebook’ in the data and model training portion as I used a Jupyter notebook here to write my code. Feel free to use any IDE or even the Python interpreter if you prefer. I will switch to Visual Studio code for the Streamlit and Docker portion, but there also, the choice is entirely yours :)
 
 Download this dataset to the same directory as your notebook environment for training the model. Install SWAT if you haven’t already. Then import all the required modules as shown below:
 
