@@ -448,7 +448,7 @@ learn.lr_find(stop_div=False, num_it=200)
 
 
 
-![png](output_36_2.png)
+![image](output_36_2.png)
 
 
 They don't particularly agree. However, in this case I will go with what we found in the hyperparamter search. I prefer not to risk going with too large a learning rate as it could risk overstepping global minima and bouncing around in the parameter space.
