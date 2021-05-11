@@ -1,5 +1,5 @@
 
-# Bayesian optimization for neural architecture search
+# Bayesian Optimization for Neural Architecture Search
 
 In this blog I will be using bayes_opt, a general purpose bayesian optimization framework to optimize hyperparameters of a fastai tabular learner with categorical embedding layers. I will do my best to account for the evaluation metric along the way. The links to the notebooks which this is based on, including Jeremy Howard's lecture, Zachary Mueller's repo and the bayes_opt repo as well as some other resources are provided at the end.
 
