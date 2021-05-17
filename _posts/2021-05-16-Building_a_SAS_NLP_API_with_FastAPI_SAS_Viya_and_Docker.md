@@ -1,7 +1,7 @@
 
 # Building a SAS NLP API with FastAPI, SAS Viya, and Docker
 
-<iframe width="100%" height="300" src="https://youtu.be/OQuFlayCdh8" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="100%" height="300" src="https://www.youtube.com/embed/OQuFlayCdh8" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 _Interactively testing the service we will build in this blog_
 
 The notebook for training the topic model and obtaining sentiments is at: [notebook](https://github.com/AviSoori1x/Building_a_SAS_NLP_API_with_FastAPI/blob/main/Building_a_SAS_Viya_NLP_API_using_FastAPI.ipynb)
@@ -78,9 +78,14 @@ and connect to CAS, the in-memory highly parallel compute engine that powers Viy
 
 ```python
 host_name, user_name, pass_word = login()
-
+#If pre-Viya 2020
 s = CAS(hostname=host_name, protocol='cas', 
             username=user_name, password=pass_word)
+#if Viya 2020.x
+host_name = host_name + '/cas-shared-default-http/'
+port_number = 4443
+s = CAS(host_name, port_number, username=user_name,  password=pass_word)
+
 s.loadActionSet(actionSet="textMining")
 s.loadActionSet(actionSet="sentimentAnalysis")
 s.loadactionset('table')
