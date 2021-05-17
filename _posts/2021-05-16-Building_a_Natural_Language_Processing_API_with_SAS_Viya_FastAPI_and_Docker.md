@@ -104,7 +104,7 @@ def list_to_castable(text_list, table_name):
     s.upload(textpd,casout={'name' : table_name, 'caslib' : 'public','replace' : True})
 ```
 
-Subsequently define a function to generate sentiment scores from text in an in-memory CAS Table and returns a cleaned up pandas dataframe with a unique ID column, the sentiment class and the text itself. We pass in the name of the table we want to subject to this action and the number of rows in that table we want to process
+Subsequently define a function to generate sentiment scores from text in an in-memory CAS Table and returns a cleaned up pandas data frame with a unique ID column, the sentiment class and the text itself. We pass in the name of the table we want to subject to this action and the number of rows in that table we want to process
 
 
 ```python
@@ -125,7 +125,7 @@ def get_sentiments(table_name, total_rows):
     return result_pd
 ```
 
-Then define a function to perform topic modeling utilizing the aforementioned LSA (Latent Semantic Analysis) which functions by performing Singular Value Decomposition on the Document-Term matrix. Here, the previously defined table_name is passed in to the tmMine CAS action in the textMining action set. The number of topics is assigned to the num_topics variable. For reach piece of text, the topic with the highest weight is assigned as the relevant topic. Note that the analytics that requires significant compute is handled in the CAS server and all the post processing is performed in the python runtime. Finally, a neat little pandas dataframe with a unique id, the text and the topic with the highest weight is returned.
+Then define a function to perform topic modeling utilizing the aforementioned LSA (Latent Semantic Analysis) which functions by performing Singular Value Decomposition on the Document-Term matrix. Here, the previously defined table_name is passed in to the tmMine CAS action in the textMining action set. The number of topics is assigned to the num_topics variable. For reach piece of text, the topic with the highest weight is assigned as the relevant topic. Note that the analytics that requires significant compute is handled in the CAS server and all the post processing is performed in the python runtime. Finally, a neat little pandas data frame with a unique id, the text and the topic with the highest weight is returned.
 
 
 ```python
@@ -258,7 +258,7 @@ docker run -d --name mycontainer -p 80:80 myimage
 
 I really recommend that you download Docker Desktop which allows you to peer inside the container you just spun up. FastAPI is nice in that it comes with automatic documentation. You can test our deployed service with interactive API documentation using the Swagger UI at http://127.0.0.1:80/docs. You can also check out the redoc based UI at http://127.0.0.1:80/redoc
 
-Also please note that the list of strings passed in the body of the request should be devoid of any escape characters and should be enclosed in double quotation marks to be conformant with json formatting. For your convenience, use the following python code to create this list of strings from the text column of your dataframe. In this snippet, the dataframe is assigned to a variable 'df' and the text column in 'df' is 'text'.
+Also please note that the list of strings passed in the body of the request should be devoid of any escape characters and should be enclosed in double quotation marks to be conformant with json formatting. For your convenience, use the following python code to create this list of strings from the text column of your data frame. In this snippet, the data frame is assigned to a variable 'df' and the text column in 'df' is 'text'.
 
 
 ```python
