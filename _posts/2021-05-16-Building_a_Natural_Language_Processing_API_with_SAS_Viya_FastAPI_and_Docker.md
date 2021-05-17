@@ -11,7 +11,7 @@ The code for the FastAPI service and Docker file are at: [service code](https://
 
 Making sense of text data is a challenge that businesses have faced for decades. Even before the dawn of the machine learning age, there was a significant body of work dedicated to extracting some insights from structured data at scale, but that process for text has constantly lagged behind. With machine learning and associated developments in natural language processing, there has been a transformation in the industry with respect to understanding vast volumes of documents. Needless to say, SAS Viya comes with a variety of analytical capabilities to make this process easier.
 
-SAS Viya has two sets of APIs i.e. lower level CAS APIs for directly calling CAS actions that represent very granular machine learning/ analytics functionaity and SAS Viya APIs that offer a higher level of abstraction. These two levels of abstraction open up a world of possibilities to creative developer teams who want to create enterprise grade ML/AI Apps for internal or external users.
+SAS Viya has two sets of APIs i.e., lower level CAS APIs for directly calling CAS actions that represent very granular machine learning/ analytics functionaity and SAS Viya APIs that offer a higher level of abstraction. These two levels of abstraction open up a world of possibilities to creative developer teams who want to create enterprise grade ML/AI Apps for internal or external users.
 
 Here I have used FastAPI and Docker to build a document exploration API that combines several CAS actions. More specifically, with a single HTTP request to this service, an end application would receive the topic distribution in a corpus (NLP speak for body of text) and the sentiment scores, with two levels of granularity. 
 
@@ -19,7 +19,7 @@ I know what you're thinking. What are these topics and why would we even need th
 
 The topics I refer to here are semantic grouping of separate documents (NLP speak for pieces of text: think strings) using unsupervised machine learning methods i.e. clusters of similar documents. The measures of semantic similarity are calculated by different algorithms differently. SAS Viya provides Latent Semantic Analysis (LSA) in the SAS Visual Text Analytics Topic node and in the Text Mining Action Set. LSA uses Singular Value Decomposition of the document-term matrix to yield topic weights. SAS Viya also provides Latent Dirichlet Allocation (LDA) in the LDA Topic Modeling Action Set. LDA is a probabilistic approach to topic modeling and is more compute intensive/ relatively slower compared to LSA (which is basically factorizing a big matrix, something computers are pretty efficient at).
 
-The levels of verbosity/ granularity in this context is a reference to the amount of information a request to the service returns. Believe it or not, developers don't want all the pieces of results an algorithm spits out. So it's important to design APIs to give the developer the freedom to choose. Here for the sake of simplicity, you can pass a verbosity flag that will indicate whether to return the sentiment and the topic assignment on a document-by-document basis or just return aggregate values for the entire corpus.
+The levels of verbosity/ granularity in this context is a reference to the amount of information a request to the service returns. Believe it or not, developers don't want all the pieces of results an algorithm spits out. So, it's important to design APIs to give the developer the freedom to choose. Here for the sake of simplicity, you can pass a verbosity flag that will indicate whether to return the sentiment and the topic assignment on a document-by-document basis or just return aggregate values for the entire corpus.
 
 Note: To follow this blog from begining to end, you must have SAS Viya 3.4 or later and SAS Visual Data Mining and Machine Learning 8.3 or later available in your SAS deployment.
 
@@ -56,7 +56,7 @@ def login():
 
 Let's take the app.py file apart, this is where all the action happens
 
-First we import the modules we need. This includes FastAPI, the web framework that facilitates the API serving and of course, SWAT the Scripting Wrapper for Analytics Transfer which allows us to directly call CAS actions using Python syntax (There's a version for R too!).
+First, we import the modules we need. This includes FastAPI, the web framework that facilitates the API serving and of course, SWAT the Scripting Wrapper for Analytics Transfer which allows us to directly call CAS actions using Python syntax (There's a version for R too!).
 
 
 ```python
@@ -184,7 +184,7 @@ app = FastAPI(
 
 ```
 
-Then we use pydantic's Basemodel to define a model for the post request. I choose to include the sole paramter I will pass in the request body i.e. text_list which is a list of strings
+Then we use pydantic's Basemodel to define a model for the post request. I choose to include the sole paramter I will pass in the request body i.e., text_list which is a list of strings
 
 
 ```python
@@ -224,7 +224,7 @@ def analyze_text(num_topics: int, total_rows: int, table_name: str, verbose: int
 ```
 
 FastAPI uses type hints and is quite useful in defining the API parameters. Note that each parameter, including the one defined above indicates the type of the argument. I have written some logic to ensure that the total_rows is at less than or equal to length of the list of strings or else, assign the length of the list of strings as the maximum number of rows for analysis.
-I call the functions I've defined above to get the sentiment and most relevant topic and join the tables to give an analysis on each string, with respect to sentiment and theme. Then I add a feature that gives the developer the freedome to define the level of detail desired. i.e. verbosity. If verbosity is 1, a call to this end point will result in a verbose return with sentiment and relevant topic for each string. If verbosity is 0, only the aggregate number of tweets belonging to each sentiment classification and topic will be returned. i.e. positive, neutral and negative and sum of tweets for each topic.
+I call the functions I've defined above to get the sentiment and most relevant topic and join the tables to give an analysis on each string, with respect to sentiment and theme. Then I add a feature that gives the developer the freedom to define the level of detail desired which I represent here as verbosity. If verbosity is 1, a call to this end point will result in a verbose return with sentiment and relevant topic for each string. If verbosity is 0, only the aggregate number of tweets belonging to each sentiment classification and topic will be returned. i.e., positive, neutral and negative and sum of tweets for each topic.
 
 Now you've gone through the entire .py file with the API logic. For you to test out the API, I recommend building the container image and running the container. For that you need the Dockerfile, which I have provided in my repository. It reads as follows:
 
@@ -240,9 +240,9 @@ COPY ./app /app
 CMD ["uvicorn", "app:app","--reload", "--host", "0.0.0.0", "--port", "80"]
 ```
 
-Note that we build the container from the base image provided by the creator of FastAPI(He's done some really nice work with Typer too, check it out!). The COPY instruction copies (Docker is pretty straightforward, no cryptic commands) from the source i.e. the directory structure you probably got on your system when you downloaded the files from the repository, to the container file system. This way we copy requirement.txt which lists all the dependencies to run FastAPI, connect to CAS (with SWAT) etc. and install them in the container with the RUN instruction. Then we copy the app folder contents to the container file system and finally run the command to start FastAPI
+Note that we build the container from the base image provided by the creator of FastAPI(He's done some really nice work with Typer too, check it out!). The COPY instruction copies (Docker is pretty straightforward, no cryptic commands) from the source i.e., the directory structure you probably got on your system when you downloaded the files from the repository, to the container file system. This way we copy requirement.txt which lists all the dependencies to run FastAPI, connect to CAS (with SWAT) etc. and install them in the container with the RUN instruction. Then we copy the app folder contents to the container file system and finally run the command to start FastAPI
 
-Now that you understand what all these lines are in the Dockerfile, let's build the image and start up the container, Finally! First run(at the command line):
+Now that you understand what all these lines are in the Dockerfile, let's build the image and start up the container, Finally! First run (at the command line):
 
 
 ```python
@@ -258,7 +258,7 @@ docker run -d --name mycontainer -p 80:80 myimage
 
 I really recommend that you download Docker Desktop which allows you to peer inside the container you just spun up. FastAPI is nice in that it comes with automatic documentation. You can test our deployed service with interactive API documentation using the Swagger UI at http://127.0.0.1:80/docs. You can also check out the redoc based UI at http://127.0.0.1:80/redoc
 
-Also please note that the list of strings passed int the body of the request should be devoid of any escape characters and should be enclosed in double quotation marks to be conformant with json formatting. For your convenience, use the following python code to create this list of strings from the text column of your dataframe. In this snippet, the dataframe is assigned to a variable 'df' and the text column in 'df' is 'text'.
+Also please note that the list of strings passed in the body of the request should be devoid of any escape characters and should be enclosed in double quotation marks to be conformant with json formatting. For your convenience, use the following python code to create this list of strings from the text column of your dataframe. In this snippet, the dataframe is assigned to a variable 'df' and the text column in 'df' is 'text'.
 
 
 ```python
