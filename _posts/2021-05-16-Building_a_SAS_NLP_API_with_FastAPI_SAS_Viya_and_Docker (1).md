@@ -1,7 +1,12 @@
 
 # Building a SAS NLP API with FastAPI, SAS Viya, and Docker
 
-All the code related to this blog and instructions for deployment can be found at: https://github.com/AviSoori1x/Building_a_SAS_NLP_API_with_FastAPI
+<iframe width="100%" height="300" src="https://youtu.be/OQuFlayCdh8" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+_Interactively testing the service we will build in this blog_
+
+The notebook for training the topic model and obtaining sentiments is at: [notebook](https://github.com/AviSoori1x/Building_a_SAS_NLP_API_with_FastAPI/blob/main/Building_a_SAS_Viya_NLP_API_using_FastAPI.ipynb)
+
+The code for the FastAPI service and Docker file are at: [service code](https://github.com/AviSoori1x/Building_a_SAS_NLP_API_with_FastAPI)
         
 
 Making sense of text data is a challenge that businesses have faced for decades. Even before the dawn of the machine learning age, there was a significant body of work dedicated to extracting some insights from structured data at scale, but that process for text has constantly lagged behind. With machine learning and associated developments in natural language processing, there has been a transformation in the industry with respect to understanding vast volumes of documents. Needless to say, SAS Viya comes with a variety of analytical capabilities to make this process easier.
@@ -15,6 +20,8 @@ I know what you're thinking,what are these topics and why would we even need thi
 The topics I refer to here are semantic grouping of separate documents (NLP speak for pieces of text: think strings) using unsupervised machine learning methods i.e. clusters of similar documents. The measures of semantic similarity are calculated by different algorithms differently. SAS Viya provides Latent Semantic Analysis (LSA) in the SAS Visual Text Analytics Topic node and in the Text Mining Action Set. LSA uses Singular Value Decomposition of the document-term matrix to yield topic weights. SAS Viya also provides Latent Dirichlet Allocation (LDA) in the LDA Topic Modeling Action Set. LDA is a probabilistic approach to topic modeling and is more compute intensive/ relatively slower compared to LSA (which is basically factorizing a big matrix, something computers are pretty efficient at).
 
 The levels of verbosity/ granularity in this context is a reference to the amount of information a request to the service returns. Believe it or not, developers don't want all the pieces of results an algorithms spits out. So it's important to design APIs to give the developer the freedom to chose. Here for the sake of simplicity, you can pass a verbosity flag that will indicate whether to return the sentiment and the topic assignment on a document by document basis or just return aggregate values for the entire corpus.
+
+Note: To follow this blog from begining to end, you must have SAS Viya 3.4 or later and SAS Visual Data Mining and Machine Learning 8.3 or later available in your SAS deployment.
 
 # Let's Deconstruct the Code
 
