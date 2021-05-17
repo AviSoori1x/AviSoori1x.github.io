@@ -1,7 +1,7 @@
 
 # Building a SAS NLP API with FastAPI, SAS Viya, and Docker
 
-<iframe width="100%" height="300" src="https://www.youtube.com/watch?v=OQuFlayCdh8" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe> _The app we will build in this blog_
+<iframe width="100%" height="300" src="https://www.youtube.com/watch?v=OQuFlayCdh8" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe> _Interactively testing the service we will build in this blog_
 
 All the code related to this blog and instructions for deployment can be found at: https://github.com/AviSoori1x/Building_a_SAS_NLP_API_with_FastAPI
         
