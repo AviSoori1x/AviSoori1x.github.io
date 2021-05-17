@@ -1,5 +1,5 @@
 
-# Building a SAS NLP API with FastAPI, SAS Viya, and Docker
+# Building a Natural Language Processing API with FastAPI, SAS Viya, and Docker
 
 <iframe width="100%" height="300" src="https://www.youtube.com/embed/OQuFlayCdh8" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 _Interactively testing the service we will build in this blog_
