@@ -25,7 +25,7 @@ Note: To follow this blog from begining to end, you must have SAS Viya 3.4 or la
 
 # Let's Deconstruct the Code
 
-I have provided a comprehensive walkthrough of using the Text Mining Action Set and Sentiment Analysis Action in the Jupyter notebook at https://github.com/AviSoori1x/Building_a_SAS_NLP_API_with_FastAPI/blob/main/Building_a_SAS_Viya_NLP_API_using_FastAPI.ipynb . Please do go through it, as it is very well documented. We will concentrate on the building the service that will serve the API endpoint here.
+I have provided a comprehensive walkthrough of using the Text Mining Action Set and Sentiment Analysis Action in the Jupyter notebook [Jupyter notebook](https://github.com/AviSoori1x/Building_a_SAS_NLP_API_with_FastAPI/blob/main/Building_a_SAS_Viya_NLP_API_using_FastAPI.ipynb). Please do go through it, as it is very well documented. We will concentrate on the building the service that will serve the API endpoint here.
 
 
 The folder structure of the project will be as follows
