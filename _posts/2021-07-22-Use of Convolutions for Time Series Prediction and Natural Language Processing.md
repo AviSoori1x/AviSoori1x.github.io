@@ -29,7 +29,7 @@ You could think of 1D and 2D convolutions as feature engineering sub-units of a 
 
 A code snippet for a neural network leveraging 1D Convolutions implemented using TensorFlow looks like follows.
 
-<img src="https://miro.medium.com/max/2000/1*DtFgAsk-TIvOs9UlqKu7Vw.png" width=150% height=150%/>
+<img src="https://miro.medium.com/max/2000/1*DtFgAsk-TIvOs9UlqKu7Vw.png" width="150%" height="150%"/>
 
 There are 64 filters, each of 3 elements in length (kernel_size). The padding we use in this case is ‘valid’ (i.e., no padding) and the stride is 1 (just like in the example). The specific example is from a time series use case where a windowed dataset is created for time series prediction, but the same general architecture could be mapped to a natural language processing use case.
 
