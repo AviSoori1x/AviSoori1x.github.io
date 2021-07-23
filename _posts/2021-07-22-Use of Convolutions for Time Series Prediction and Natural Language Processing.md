@@ -1,6 +1,9 @@
 
 Disclaimer: I assume familiarity with machine learning and a general sense of how feed forward (i.e., the most basic type of) neural networks work for the contents of this article to be particularly valuable to the reader.
 
+![](https://image.flaticon.com/icons/svg/36/36686.svg)
+
+
 Predicting the next item in a sequence is the central theme of several natural language processing and time series prediction tasks. All the data concerned could be considered as sequences of numbers or characters (which are usually encoded as numbers in several ways). Whether forecasting weather, commodity prices or predicting the aggregate sentiment with respect to a consumer brand, this type of machine learning problem is widely seen in industry. Let’s look at how convolutions, normally associated with convolutional neural nets for computer vision, work with respect to sequence data.
 
 The idea of convolutions is most often encountered in the context of Convolutional neural networks for computer vision related tasks e.g., convolutional neural nets for image classification, localization, and regression (yes regression, that’s not a typo. e.g., predicting weight of a dog/ fruit based on an image)
