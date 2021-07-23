@@ -15,12 +15,12 @@ Now I want to illustrate how this process can be applied for series (or sequence
 
 Series data is 1D. So, the filter would be 1D as well. The element-wise multiplication would look like this
 
-<img src="https://miro.medium.com/max/1400/1*V7xDn6HGniGW2-VGJLrESg.png" width="800" height="300"/>
+<img src="https://miro.medium.com/max/1400/1*V7xDn6HGniGW2-VGJLrESg.png" width="00" height="300"/>
 
 
 As in the case of 2D convolutions, the filter is moved by a certain step i.e., a stride. When the stride is 1 and the entire convolution operation looks like this
 
-<img src="https://miro.medium.com/max/2400/1*o610XFHevKm5eKFoUyn34Q.png" width="832" height="510"/>
+<img src="https://miro.medium.com/max/2400/1*o610XFHevKm5eKFoUyn34Q.png" width="900" height="510"/>
 
 
 Usually, multiple filters are applied and the output, i.e., the distilled series features, are fed into a fully connected layer for the actual prediction. The actual weights of the filters, which are randomly initialized, are learned during the training of the neural net.
@@ -29,7 +29,7 @@ You could think of 1D and 2D convolutions as feature engineering sub-units of a 
 
 A code snippet for a neural network leveraging 1D Convolutions implemented using TensorFlow looks like follows.
 
-<img src="https://miro.medium.com/max/2000/1*DtFgAsk-TIvOs9UlqKu7Vw.pngg" width="1100" height="380"/>
+<img src="https://miro.medium.com/max/2000/1*DtFgAsk-TIvOs9UlqKu7Vw.png" width="1000" height="380"/>
 
 There are 64 filters, each of 3 elements in length (kernel_size). The padding we use in this case is ‘valid’ (i.e., no padding) and the stride is 1 (just like in the example). The specific example is from a time series use case where a windowed dataset is created for time series prediction, but the same general architecture could be mapped to a natural language processing use case.
 
