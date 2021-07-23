@@ -1,9 +1,6 @@
 
 Disclaimer: I assume familiarity with machine learning and a general sense of how feed forward (i.e., the most basic type of) neural networks work for the contents of this article to be particularly valuable to the reader.
 
-![](https://image.flaticon.com/icons/svg/36/36686.svg)
-
-
 Predicting the next item in a sequence is the central theme of several natural language processing and time series prediction tasks. All the data concerned could be considered as sequences of numbers or characters (which are usually encoded as numbers in several ways). Whether forecasting weather, commodity prices or predicting the aggregate sentiment with respect to a consumer brand, this type of machine learning problem is widely seen in industry. Let’s look at how convolutions, normally associated with convolutional neural nets for computer vision, work with respect to sequence data.
 
 The idea of convolutions is most often encountered in the context of Convolutional neural networks for computer vision related tasks e.g., convolutional neural nets for image classification, localization, and regression (yes regression, that’s not a typo. e.g., predicting weight of a dog/ fruit based on an image)
@@ -18,7 +15,12 @@ Now I want to illustrate how this process can be applied for series (or sequence
 
 Series data is 1D. So, the filter would be 1D as well. The element-wise multiplication would look like this
 
+![](https://github.com/AviSoori1x/AviSoori1x.github.io/blob/master/images/conv_img_1.png)
+
 As in the case of 2D convolutions, the filter is moved by a certain step i.e., a stride. When the stride is 1 and the entire convolution operation looks like this
+
+![](https://github.com/AviSoori1x/AviSoori1x.github.io/blob/master/images/conv_img_2.png)
+
 
 Usually, multiple filters are applied and the output, i.e., the distilled series features, are fed into a fully connected layer for the actual prediction. The actual weights of the filters, which are randomly initialized, are learned during the training of the neural net.
 
@@ -26,4 +28,8 @@ You could think of 1D and 2D convolutions as feature engineering sub-units of a 
 
 A code snippet for a neural network leveraging 1D Convolutions implemented using TensorFlow looks like follows.
 
+![](https://github.com/AviSoori1x/AviSoori1x.github.io/blob/master/images/conv_code.png)
+
 There are 64 filters, each of 3 elements in length (kernel_size). The padding we use in this case is ‘valid’ (i.e., no padding) and the stride is 1 (just like in the example). The specific example is from a time series use case where a windowed dataset is created for time series prediction, but the same general architecture could be mapped to a natural language processing use case.
+
+In practice, I would recommend trying this approach and using a hyperparameter optimization framework like Keras Tuner, Hyperopt or Optuna to experiment with the number of convolution layers, kernel sizes and stride lengths.
