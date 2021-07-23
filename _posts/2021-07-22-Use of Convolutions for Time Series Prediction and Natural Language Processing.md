@@ -15,6 +15,9 @@ Now I want to illustrate how this process can be applied for series (or sequence
 
 Series data is 1D. So, the filter would be 1D as well. The element-wise multiplication would look like this
 
+<img src="https://github.com/AviSoori1x/AviSoori1x.github.io/blob/master/images/conv_img_1.png" width="800" height="600"/>
+
+
 ![](https://github.com/AviSoori1x/AviSoori1x.github.io/blob/master/images/conv_img_1.png)
 
 As in the case of 2D convolutions, the filter is moved by a certain step i.e., a stride. When the stride is 1 and the entire convolution operation looks like this
