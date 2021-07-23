@@ -15,7 +15,7 @@ Now I want to illustrate how this process can be applied for series (or sequence
 
 Series data is 1D. So, the filter would be 1D as well. The element-wise multiplication would look like this
 
-<img src="./images/conv_img_1.png" width="800" height="300"/>
+<img src="https://miro.medium.com/max/1400/1*V7xDn6HGniGW2-VGJLrESg.png" width="800" height="300"/>
 
 
 ![](https://github.com/AviSoori1x/AviSoori1x.github.io/blob/master/images/conv_img_1.png)
