@@ -7,7 +7,7 @@ TL;DR: In  this blog I implement a vision language model consisting of an image 
  <img src="https://github.com/AviSoori1x/seemore/blob/main/images/seemorelogo.png?raw=true" width="300" height="300" alt="seemore">
 </div>
 
-The Github repo here provides the end-to-end implementation: https://github.com/AviSoori1x/seemore
+The Github repo here provides the end-to-end implementation: [Repo](https://github.com/AviSoori1x/seemore)
 
 #### Motivation
 
@@ -390,7 +390,7 @@ That being said, what I’ve done here is an interesting exercise in that it all
 Essentially the text generation is conditioned on the initial image input. This can be modified in a number of ways to work with interleaved text and images, which will be useful for multi-turn conversation i.e. chat scenarios using the finetuned VLM.
 
 
-The crucial parts of this decoder implementation is given below. Note how the is_decoder flag is passed as ‘True’ to use the masked version of the self attention blocks, resulting in causal scaled dot product self attention in the language decoder. Please refer to the GitHub repo linked above for the full implementation.
+The crucial parts of this decoder implementation is given below. Note how the is_decoder flag is passed as ‘True’ to use the masked version of the self attention blocks, resulting in causal scaled dot product self attention in the language decoder. Please refer to the GitHub [Repo](https://github.com/AviSoori1x/seemore) linked above for the full implementation.
 
 ```python
 class DecoderLanguageModel(nn.Module):
@@ -521,7 +521,7 @@ And now we've implemented everything we set out to implement:
  <img src="https://github.com/AviSoori1x/seemore/blob/main/images/vlm.png?raw=true" width="600" height="600" alt="seemore">
 </div>
 
-The repo (here: https://github.com/AviSoori1x/seemore) has some mock data, data loaders implemented mostly from scratch and a simple training loop with cross-entropy loss calculation. Please note that in this simple example, we are training the entire system end to end, much like Kosmos-1 from Microsoft Research. I left it at this for convenience. In practice, the commonly observed sequence is:
+The [repo](https://github.com/AviSoori1x/seemore) has some mock data, data loaders implemented mostly from scratch and a simple training loop with cross-entropy loss calculation. Please note that in this simple example, we are training the entire system end to end, much like Kosmos-1 from Microsoft Research. I left it at this for convenience. In practice, the commonly observed sequence is:
 
 1. Get pretrained vision encoder from SigLIP or CLIP (both come in difference sizes). Freeze weights (i.e. don’t update during backward pass in training)
    
@@ -534,4 +534,4 @@ The repo (here: https://github.com/AviSoori1x/seemore) has some mock data, data 
 I developed this on Databricks using a single T4 GPU and MLFlow for tracking loss (during the training process). I wanted to set this up this way so that I can scale up to a GPU cluster of any size I want quite easily on Databricks, should I decide to adapt this to a more performance oriented implementation. However, you can run this anywhere, with or without a GPU. Please note that even the toy training loop with 90 samples will be painfully slow on a CPU. 
 
 
-Please check out the repo (https://github.com/AviSoori1x/seemore), run the code yourself, and have fun! 
+Please check out the [repo](https://github.com/AviSoori1x/seemore), run the code yourself, and have fun! 
