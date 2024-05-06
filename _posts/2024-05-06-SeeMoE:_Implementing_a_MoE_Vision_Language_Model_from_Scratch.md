@@ -4,6 +4,7 @@
 TL;DR: In  this blog I implement a mixture of experts vision language model consisting of an image encoder, a multimodal projection module and a mixture of experts decoder language model in pure pytorch. Thus, the resulting implementation could be thought of as a scaled down version of Grok 1.5 Vision and GPT-4 Vision (both have vision encoders connected to a MoE Decoder model via a projection module). The name ‘seeMoE’ is my way of paying homage to Andrej Karpathy’s project ‘makemore’ because for the decoder used here I implement a character level autoregressive language model much like in his nanoGPT/ makemore implementation but with a twist. The twist being that it's a mixture of experts Decoder (much like DBRX, Mixtral and Grok). My goal is for you to have an intuitive understanding of how this seemingly state of the art implementation works so that you can improve upon it or use the key takeaways to build more useful systems.
 
 The entire implementation can be found in seeMoE_from_Scratch.ipynb in the following repo: https://github.com/AviSoori1x/seemore
+
 <div align="center">
   <img src="https://github.com/AviSoori1x/seemore/blob/main/images/seeMoE.png?raw=true" width="500" height="300" alt="seemore">
 </div>
