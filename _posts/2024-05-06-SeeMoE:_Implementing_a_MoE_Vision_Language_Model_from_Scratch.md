@@ -31,7 +31,7 @@ Now let's revisit the components of a sparse mixture of experts module:
 2. A gating/ routing mechanism
 3. weighted summation of activated experts based on the routing mechanism
 
-  <img src="https://raw.githubusercontent.com/AviSoori1x/makeMoE/main/images/experts.png" width="700" height="700" alt="seemore">
+  <img src="https://raw.githubusercontent.com/AviSoori1x/makeMoE/main/images/experts.png" width="900" height="700" alt="seemore">
 
 
 First, the 'Expert' which is just an MLP like we saw earlier when implementing the Encoder. 
@@ -56,7 +56,7 @@ class Expert(nn.Module):
 
 The routing module decides which experts will be activated. Noisy top k gating/ routing adds a bit of gaussian noise to ensure that there's a fine balance between exploration and exploitation in picking the top-k experts for each token. This reduces the odds of the same n experts getting picked everytime, which defeats the purpose of having a larger parameter count with sparse activation for better generalizability.
 
-  <img src="https://raw.githubusercontent.com/AviSoori1x/makeMoE/main/images/noisytopkgating.png" width="700" height="700" alt="seemore">
+  <img src="https://raw.githubusercontent.com/AviSoori1x/makeMoE/main/images/noisytopkgating.png" width="900" height="700" alt="seemore">
 
 ```python
 
