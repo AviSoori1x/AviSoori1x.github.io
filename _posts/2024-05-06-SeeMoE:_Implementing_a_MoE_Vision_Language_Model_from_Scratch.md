@@ -5,7 +5,7 @@ TL;DR: In  this blog I implement a mixture of experts vision language model cons
 
 The entire implementation can be found in seeMoE_from_Scratch.ipynb in the following repo: https://github.com/AviSoori1x/seemore
 <div align="center">
-  <img src="https://github.com/AviSoori1x/seemore/blob/main/images/seeMoE.png?raw=true" width="500" height="500" alt="seemore">
+  <img src="https://github.com/AviSoori1x/seemore/blob/main/images/seeMoE.png?raw=true" width="300" height="500" alt="seemore">
 </div>
 
 If you've read my other blogs on implementing mixture of experts LLMs from scratch: https://huggingface.co/blog/AviSoori1x/makemoe-from-scratch and implementing a vision language model from scratch: https://huggingface.co/blog/AviSoori1x/seemore-vision-language-model, you'll realize that I'm combining the two to implement seeMoE. Essentially, all I'm doing here is replacing the feed-forward neural network in each transformer block of the decoder with a mixture of experts module with noisy Top-K gating. More information on how this is implemented, is given here: https://huggingface.co/blog/AviSoori1x/makemoe-from-scratch. I strongly encourage you to read these two blogs and carefully go through the repos linked to both the blogs before diving into this.
