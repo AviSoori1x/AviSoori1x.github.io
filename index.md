@@ -6,7 +6,7 @@ Hi, Welcome to my blog. I am Avinash Sooriyarachchi and I write about my work in
 
  [Github](https://github.com/AviSoori1x)
  
-   popular repos:
+   Popular repos:
    
   - [makeMoE- Sparse Mixture of Experts Language Model from Scratch](https://github.com/AviSoori1x/makeMoE)
   - [seemore: From scratch implementation of a vision language model in pure PyTorch](https://github.com/AviSoori1x/seemore)
