@@ -19,7 +19,7 @@ Hi, Welcome to my blog. I am Avinash Sooriyarachchi and I write about my work in
 ## My Talks:
 [Streaming machine learning with Databricks and Github Actions - Universe 2022](https://youtu.be/ogk__G33E-A?si=GO01BOIVzLs78pOK)
 
-[Text to Insights: Building Real-Time Analytics Systems with Generative AI](https://youtu.be/yJ0ywuG_yv4?t=12880)
+[ODSC Generative AI Summit 2023 - Text to Insights: Building Real-Time Analytics Systems with Generative AI](https://youtu.be/yJ0ywuG_yv4?t=12880)
 
 [ODSC Europe 2023 - Getting Up to Speed on Real Time Machine Learning](https://youtu.be/eJqqDZkBrzE?si=QTXPKWQQJ0EqzklY)
 
