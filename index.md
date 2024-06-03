@@ -1,12 +1,13 @@
-Hi, Welcome to my blog. I am Avinash Sooriyarachchi and I write about my work in data and machine learning here. Most of my work has been deep learning focused and as of late I've been doing more stuff with language models and interesting model architectures. Hope you find some interesting things here.
+Hi, Welcome to my blog. I am Avinash Sooriyarachchi and I write about my work in data and machine learning here. Most of my work has been deep learning focused and as of late I've been doing more stuff with language models and interesting model architectures. 
 
 ![Blog logo](images/img.png)
 
-## You can check out my other projects on Github
+#### You can check out my other projects here:
 
- [Github](https://github.com/AviSoori1x)
+ [Personal Github](https://github.com/AviSoori1x)
+ [Databricks GitHub](https://github.com/avisoori-databricks)
  
-   Popular repos:
+   #### Popular repos:
    
   - [makeMoE- Sparse Mixture of Experts Language Model from Scratch](https://github.com/AviSoori1x/makeMoE)
   - [seemore: From scratch implementation of a vision language model in pure PyTorch](https://github.com/AviSoori1x/seemore)
