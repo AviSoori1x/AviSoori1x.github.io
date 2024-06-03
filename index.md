@@ -10,7 +10,7 @@ Hi, Welcome to my blog. I am Avinash Sooriyarachchi and I write about my work in
    
   - [makeMoE- Sparse Mixture of Experts Language Model from Scratch](https://github.com/AviSoori1x/makeMoE)
   - [seemore: From scratch implementation of a vision language model in pure PyTorch](https://github.com/AviSoori1x/seemore)
-  - [Tuning the Fintetuning: Tuning the Finetuning: An exploration of achieving success with QLoRA](https://github.com/AviSoori1x/Tuning-the-Finetuning)
+  - [Tuning the Fintetuning: An exploration of achieving success with QLoRA](https://github.com/AviSoori1x/Tuning-the-Finetuning)
      
     
 
@@ -31,6 +31,13 @@ Hi, Welcome to my blog. I am Avinash Sooriyarachchi and I write about my work in
 [Building a Similarity-based Image Recommendation System for e-Commerce](https://www.databricks.com/blog/2022/03/01/building-a-similarity-based-image-recommendation-system-for-e-commerce.html)
 
 [Common Sense Product Recommendations using Large Language Models](https://www.databricks.com/blog/common-sense-product-recommendations-using-large-language-models)
+
+[Build your own AI Coding Assistant with Databricks using Visual Studio Code and GitHub Copilot](https://avi-soori.medium.com/build-your-own-ai-coding-assistant-with-databricks-using-visual-studio-code-and-github-copilot-50643317082f)
+
+[Getting Up to Speed on Real-Time Machine Learning with Spark and SBERT](https://opendatascience.com/getting-up-to-speed-on-real-time-machine-learning-with-spark-and-sbert/)
+
+
+
 
 ## Posts
 
