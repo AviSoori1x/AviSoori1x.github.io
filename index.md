@@ -1,4 +1,4 @@
-Hi, Welcome to my blog. I am Avinash Sooriyarachchi and I write about my work in the data and machine learning space here. Some of these are work related and some are about projects I do out of interest.
+Hi, Welcome to my blog. I am Avinash Sooriyarachchi and I write about my work in data and machine learning here.
 
 ![Blog logo](images/blogImage.png)
 
