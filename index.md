@@ -1,6 +1,6 @@
-Hi, Welcome to my blog. I am Avinash Sooriyarachchi and I write about my work in data and machine learning here.
+Hi, Welcome to my blog. I am Avinash Sooriyarachchi and I write about my work in data and machine learning here. Most of my work has been deep learning focused and as of late I've been doing more stuff with language models and interesting model architectures. Hope you find some interesting things here.
 
-![Blog logo](images/img.png)
+![Blog logo](images/img.png){: width="200" height="200"}
 
 ## You can check out my other projects on Github
 
