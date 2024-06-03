@@ -5,9 +5,12 @@ Hi, Welcome to my blog. I am Avinash Sooriyarachchi and I write about my work in
 ## You can check out my other projects on Github
 
  [Github](https://github.com/AviSoori1x)
-  - popular repos: [makeMoE- Sparse Mixture of Experts Language Model from Scratch](https://github.com/AviSoori1x/makeMoE)
-                   [seemore: From scratch implementation of a vision language model in pure PyTorch](https://github.com/AviSoori1x/seemore)
-                   [Tuning the Fintetuning: Tuning the Finetuning: An exploration of achieving success with QLoRA](https://github.com/AviSoori1x/Tuning-the-Finetuning)
+ 
+   popular repos:
+   
+  - [makeMoE- Sparse Mixture of Experts Language Model from Scratch](https://github.com/AviSoori1x/makeMoE)
+  - [seemore: From scratch implementation of a vision language model in pure PyTorch](https://github.com/AviSoori1x/seemore)
+  - [Tuning the Fintetuning: Tuning the Finetuning: An exploration of achieving success with QLoRA](https://github.com/AviSoori1x/Tuning-the-Finetuning)
      
     
 
