@@ -1,6 +1,6 @@
 Hi, Welcome to my blog. I am Avinash Sooriyarachchi and I write about my work in data and machine learning here.
 
-![Blog logo](images/blogImage.png)
+![Blog logo](images/img.png)
 
 ## You can check out my other projects on Github
 
