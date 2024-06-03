@@ -16,7 +16,7 @@ Hi, Welcome to my blog. I am Avinash Sooriyarachchi and I write about my work in
 
  [LinkedIn](https://www.linkedin.com/in/avinash-sooriyarachchi-104b45100/)
 
- ## My Talks
+ ## My Talks:
 [Streaming machine learning with Databricks and Github Actions - Universe 2022](https://youtu.be/ogk__G33E-A?si=GO01BOIVzLs78pOK)
 
 [Text to Insights: Building Real-Time Analytics Systems with Generative AI](https://youtu.be/yJ0ywuG_yv4?t=12880)
@@ -35,9 +35,4 @@ Hi, Welcome to my blog. I am Avinash Sooriyarachchi and I write about my work in
 [Build your own AI Coding Assistant with Databricks using Visual Studio Code and GitHub Copilot](https://avi-soori.medium.com/build-your-own-ai-coding-assistant-with-databricks-using-visual-studio-code-and-github-copilot-50643317082f)
 
 [Getting Up to Speed on Real-Time Machine Learning with Spark and SBERT](https://opendatascience.com/getting-up-to-speed-on-real-time-machine-learning-with-spark-and-sbert/)
-
-
-
-
-## Posts
 
