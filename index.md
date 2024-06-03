@@ -16,7 +16,7 @@ Hi, Welcome to my blog. I am Avinash Sooriyarachchi and I write about my work in
 
  [LinkedIn](https://www.linkedin.com/in/avinash-sooriyarachchi-104b45100/)
 
- ## My Talks:
+## My Talks:
 [Streaming machine learning with Databricks and Github Actions - Universe 2022](https://youtu.be/ogk__G33E-A?si=GO01BOIVzLs78pOK)
 
 [Text to Insights: Building Real-Time Analytics Systems with Generative AI](https://youtu.be/yJ0ywuG_yv4?t=12880)
@@ -25,7 +25,7 @@ Hi, Welcome to my blog. I am Avinash Sooriyarachchi and I write about my work in
 
 [Monetizing Data Assets: Sharing Data, Models and Features - Data and AI Summit 2023](https://youtu.be/wj_WtrrEfi8?si=kWgx-jF6nD_f0-h0)
 
-## Some of my Blogs:
+## Selected Blogs:
 [Efficient Fine-Tuning with LoRA: A Guide to Optimal Parameter Selection for Large Language Models](https://www.databricks.com/blog/efficient-fine-tuning-lora-guide-llms)
 
 [Building a Similarity-based Image Recommendation System for e-Commerce](https://www.databricks.com/blog/2022/03/01/building-a-similarity-based-image-recommendation-system-for-e-commerce.html)
