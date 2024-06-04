@@ -10,9 +10,9 @@ Hi, Welcome to my blog. I am Avinash Sooriyarachchi and I write about my work in
  
 ### Popular repos:
    
-  - [makeMoE- Sparse Mixture of Experts Language Model from Scratch](https://github.com/AviSoori1x/makeMoE) (500+ stars, 48 forks)
-  - [seemore: From scratch implementation of a vision language model in pure PyTorch](https://github.com/AviSoori1x/seemore) (100+ stars, 9 forks)
-  - [Tuning the Fintetuning: An exploration of achieving success with QLoRA](https://github.com/AviSoori1x/Tuning-the-Finetuning) (34 stars, 8 forks)
+  - [makeMoE- Sparse Mixture of Experts Language Model from Scratch](https://github.com/AviSoori1x/makeMoE) ([Hackernews](https://news.ycombinator.com/item?id=39742921))
+  - [seemore: From scratch implementation of a vision language model in pure PyTorch](https://github.com/AviSoori1x/seemore)
+  - [Tuning the Fintetuning: An exploration of achieving success with QLoRA](https://github.com/AviSoori1x/Tuning-the-Finetuning) 
      
     
 
