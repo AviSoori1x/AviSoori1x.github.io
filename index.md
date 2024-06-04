@@ -2,7 +2,7 @@ Hi, Welcome to my blog. I am Avinash Sooriyarachchi and I write about my work in
 
 ![Blog logo](images/img.png)
 
-### You can check out my other projects here:
+### You can check out some of my projects here:
 
  [Personal Github](https://github.com/AviSoori1x)
  
