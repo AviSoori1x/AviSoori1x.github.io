@@ -2,13 +2,13 @@ Hi, Welcome to my blog. I am Avinash Sooriyarachchi and I write about my work in
 
 ![Blog logo](images/img.png)
 
-#### You can check out my other projects here:
+### You can check out my other projects here:
 
  [Personal Github](https://github.com/AviSoori1x)
  
  [Databricks GitHub](https://github.com/avisoori-databricks)
  
-#### Popular repos:
+### Popular repos:
    
   - [makeMoE- Sparse Mixture of Experts Language Model from Scratch](https://github.com/AviSoori1x/makeMoE) (500+ stars, 48 forks)
   - [seemore: From scratch implementation of a vision language model in pure PyTorch](https://github.com/AviSoori1x/seemore) (100+ stars, 9 forks)
