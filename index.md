@@ -19,6 +19,8 @@ Hi, Welcome to my blog. I am Avinash Sooriyarachchi and I write about my work in
  [LinkedIn](https://www.linkedin.com/in/avinash-sooriyarachchi-104b45100/)
 
 ## My Talks:
+[Empowering Generative AI with Databricks and AMD-Data and AI Summit 2024](https://youtu.be/FB6H4NwFGzQ?si=MQuWYgrSYb2AuGOp)
+
 [Streaming machine learning with Databricks and Github Actions - Universe 2022](https://youtu.be/ogk__G33E-A?si=GO01BOIVzLs78pOK)
 
 [ODSC Generative AI Summit 2023 - Text to Insights: Building Real-Time Analytics Systems with Generative AI](https://youtu.be/yJ0ywuG_yv4?t=12880)
