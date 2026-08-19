@@ -41,9 +41,10 @@ items:
     role: M.S.E., Mechanical Engineering and Applied Mechanics
     org: University of Pennsylvania
     note: >-
-      Research on mechanical metamaterials in Jordan Raney's Architected Materials Lab, on a
-      Dean's Research Fellowship. Also took Wharton's Modern Data Mining course, which is
-      where the move toward machine learning started.
+      Started as a PhD student in Jordan Raney's Architected Materials Lab, researching
+      mechanical metamaterials on a Dean's Research Fellowship, with coursework in numerical
+      methods and computational mechanics. I left with a master's after getting into machine
+      learning — Wharton's Modern Data Mining course was the turning point.
 
   - when: 2016
     role: B.S., Mechanical Engineering
