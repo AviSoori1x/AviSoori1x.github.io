@@ -9,8 +9,8 @@
   --paper-2:    #f3efe6;
   --ink:        #17150f;
   --ink-2:      #3d382d;
-  --muted:      #6f6857;
-  --faint:      #9a9382;
+  --muted:      #585245;  /* 7.25:1 on paper */
+  --faint:      #6e6759;  /* 5.24:1 — used at 0.6-0.7rem, so it must clear AA too */
   --rule:       #ddd6c6;
   --rule-soft:  #e8e2d5;
   --accent:     #c3341a;
@@ -235,10 +235,10 @@ a { color: inherit; text-decoration: none; }
 .e-meta .venue { color: var(--ink-2); }
 .e-note {
   display: block;
-  font-size: .93rem;
-  color: var(--muted);
+  font-size: .97rem;
+  color: var(--ink-2);
   margin-top: .34rem;
-  line-height: 1.5;
+  line-height: 1.55;
   max-width: 40rem;
   text-wrap: pretty;
 }
@@ -366,7 +366,7 @@ a { color: inherit; text-decoration: none; }
 }
 .tl-role { display: block; font-size: 1.02rem; color: var(--ink); }
 .tl-role .org { font-family: var(--mono); font-size: .82rem; color: var(--accent); }
-.tl-note { display: block; font-size: .93rem; color: var(--muted); margin-top: .3rem; line-height: 1.55; max-width: 40rem; text-wrap: pretty; }
+.tl-note { display: block; font-size: .97rem; color: var(--ink-2); margin-top: .3rem; line-height: 1.55; max-width: 40rem; text-wrap: pretty; }
 .tl .p-links { margin-top: .55rem; }
 @media (max-width: 40rem) { .tl { grid-template-columns: 1fr; } .tl-when { padding: 0 0 .2rem; } }
 
