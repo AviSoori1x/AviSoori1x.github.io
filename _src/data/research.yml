@@ -8,7 +8,7 @@ items:
     date: "2026"
     sort: "2026-07-28"
     url: https://arxiv.org/abs/2607.25857
-    role: Core author block
+    role: Core author
     note: >-
       A 3B policy-adaptive multimodal safety classifier that matches or beats models roughly
       seven times its size on text safety benchmarks, and sets state of the art on multimodal
@@ -19,7 +19,7 @@ items:
     date: "2026"
     sort: "2026-07-22"
     url: https://arxiv.org/abs/2607.20785
-    role: Mistral AI
+    role: Core author
     note: >-
       An 8B vision-language navigation model that takes only monocular RGB and predicts
       waypoints by pointing at the next target in the current camera view — operating in image
