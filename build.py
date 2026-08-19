@@ -138,6 +138,9 @@ def build(serve: bool = False) -> None:
         trim_blocks=True,
         lstrip_blocks=True,
     )
+    # Root-relative internal links break under a subpath deploy (preview builds),
+    # so emit them relative to the current page instead.
+    env.filters["u"] = lambda s, rel="": (rel + s.lstrip("/")) if s.startswith("/") else s
 
     posts = read_posts(data.get("posts", {}).get("titles", {}) or {})
 

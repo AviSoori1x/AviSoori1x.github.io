@@ -11,5 +11,5 @@
 <article class="post-body rise d2">
 {{ post.html|safe }}
 </article>
-<a class="backlink" href="{{ rel }}">Back to index</a>
+<a class="backlink" href="{{ rel or "./" }}">Back to index</a>
 {% endblock %}

@@ -40,7 +40,7 @@
     <li class="entry">
       <span class="e-year">{{ r.date }}</span>
       <span class="e-body">
-        <a class="e-title" href="{{ r.url }}">{{ r.title }}</a>
+        <a class="e-title" href="{{ r.url|u(rel) }}">{{ r.title }}</a>
         <span class="e-meta"><span class="venue">{{ r.venue }}</span>{% if r.role %} · {{ r.role }}{% endif %}</span>
         {% if r.note %}<span class="e-note">{{ r.note }}</span>{% endif %}
       </span>
@@ -58,13 +58,13 @@
   <div class="projects">
     {% for p in projects if p.featured %}
     <article class="project featured">
-      <a class="p-name" href="{{ p.url }}">{{ p.name }}</a>
+      <a class="p-name" href="{{ p.url|u(rel) }}">{{ p.name }}</a>
       {% if p.stars %}<span class="p-stars"><span class="star">★</span> {{ '{:,}'.format(p.stars) }}</span>{% endif %}
       <p class="p-desc">{{ p.desc }}</p>
       {% if p.adoption %}<p class="p-adopt">{{ p.adoption }}</p>{% endif %}
       {% if p.links %}
       <div class="p-links">
-        {% for l in p.links %}<a href="{{ l.url }}">{{ l.label }}</a>{% endfor %}
+        {% for l in p.links %}<a href="{{ l.url|u(rel) }}">{{ l.label }}</a>{% endfor %}
       </div>
       {% endif %}
     </article>
@@ -72,13 +72,13 @@
 
     {% for p in projects if not p.featured %}
     <article class="project">
-      <a class="p-name" href="{{ p.url }}">{{ p.name }}</a>
+      <a class="p-name" href="{{ p.url|u(rel) }}">{{ p.name }}</a>
       {% if p.stars %}<span class="p-stars"><span class="star">★</span> {{ '{:,}'.format(p.stars) }}</span>{% endif %}
       <p class="p-desc">{{ p.desc }}</p>
       {% if p.adoption %}<p class="p-adopt">{{ p.adoption }}</p>{% endif %}
       {% if p.links %}
       <div class="p-links">
-        {% for l in p.links %}<a href="{{ l.url }}">{{ l.label }}</a>{% endfor %}
+        {% for l in p.links %}<a href="{{ l.url|u(rel) }}">{{ l.label }}</a>{% endfor %}
       </div>
       {% endif %}
     </article>
@@ -94,7 +94,7 @@
     <li class="entry">
       <span class="e-year">{{ w.date }}</span>
       <span class="e-body">
-        <a class="e-title" href="{{ w.url }}">{{ w.title }}</a>
+        <a class="e-title" href="{{ w.url|u(rel) }}">{{ w.title }}</a>
         {% if w.with %}<span class="e-meta">with {{ w.with }}</span>{% endif %}
         {% if w.note %}<span class="e-note">{{ w.note }}</span>{% endif %}
       </span>
@@ -124,7 +124,7 @@
     <li class="entry">
       <span class="e-year">{{ t.date }}</span>
       <span class="e-body">
-        <a class="e-title" href="{{ t.url }}">{{ t.title }}</a>
+        <a class="e-title" href="{{ t.url|u(rel) }}">{{ t.title }}</a>
         <span class="e-meta"><span class="venue">{{ t.venue }}</span>{% if t.location %} · {{ t.location }}{% endif %}{% if t.cospeakers %} · with {{ t.cospeakers }}{% endif %}</span>
         {% if t.note %}<span class="e-note">{{ t.note }}</span>{% endif %}
       </span>
@@ -144,7 +144,7 @@
     <li class="entry">
       <span class="e-year">{{ m.date }}</span>
       <span class="e-body">
-        <a class="e-title" href="{{ m.url }}">{{ m.title }}</a>
+        <a class="e-title" href="{{ m.url|u(rel) }}">{{ m.title }}</a>
         <span class="e-meta"><span class="venue">{{ m.venue }}</span>{% if m.host %} · {{ m.host }}{% endif %}</span>
         {% if m.note %}<span class="e-note">{{ m.note }}</span>{% endif %}
       </span>
@@ -183,7 +183,7 @@
     {% for l in site.links %}
     <li class="entry">
       <span class="e-year">{{ l.short }}</span>
-      <span class="e-body"><a class="e-title" href="{{ l.url }}">{{ l.display }}</a></span>
+      <span class="e-body"><a class="e-title" href="{{ l.url|u(rel) }}">{{ l.display }}</a></span>
       <span class="e-tag">{{ l.label }}</span>
     </li>
     {% endfor %}
