@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://avisoori1x.github.io/sitemap.xml

@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+{% block content %}
+
+<header class="masthead rise d1">
+  <h1><span class="giv">Avinash</span> <span class="sur">Sooriyarachchi</span></h1>
+  <p class="standfirst">{{ profile.standfirst }}</p>
+  <div class="byline">
+    <span>{{ profile.role }}</span><span class="sep">/</span>
+    <span>{{ profile.org }}</span><span class="sep">/</span>
+    <span>{{ profile.location }}</span>
+  </div>
+</header>
+
+{% macro section(num, label, id) %}
+<section class="section" id="{{ id }}">
+  <div class="row">
+    <div class="gutter"><span class="num">§{{ '%02d'|format(num) }}</span>{{ label }}</div>
+    <div class="col">
+      {{ caller() }}
+    </div>
+  </div>
+</section>
+{% endmacro %}
+
+{# ---------------- 01 · NOW ---------------- #}
+<div class="rise d2">
+{% call section(1, 'Current work', 'now') %}
+  <h2 class="title">{{ now.headline }}</h2>
+  <div class="prose lede">
+    {% for p in now.paragraphs %}<p>{{ p }}</p>{% endfor %}
+  </div>
+{% endcall %}
+</div>
+
+{# ---------------- 02 · PUBLICATIONS ---------------- #}
+<div class="rise d3">
+{% call section(2, 'Publications', 'research') %}
+  <ul class="index-list">
+    {% for r in research %}
+    <li class="entry">
+      <span class="e-year">{{ r.date }}</span>
+      <span class="e-body">
+        <a class="e-title" href="{{ r.url }}">{{ r.title }}</a>
+        <span class="e-meta"><span class="venue">{{ r.venue }}</span>{% if r.role %} · {{ r.role }}{% endif %}</span>
+        {% if r.note %}<span class="e-note">{{ r.note }}</span>{% endif %}
+      </span>
+      <span class="e-tag">Paper</span>
+    </li>
+    {% endfor %}
+  </ul>
+  {% if research_note %}<p class="footnote">{{ research_note }}</p>{% endif %}
+{% endcall %}
+</div>
+
+{# ---------------- 03 · OPEN SOURCE ---------------- #}
+<div class="rise d3">
+{% call section(3, 'Open source', 'code') %}
+  <div class="projects">
+    {% for p in projects if p.featured %}
+    <article class="project featured">
+      <a class="p-name" href="{{ p.url }}">{{ p.name }}</a>
+      {% if p.stars %}<span class="p-stars"><span class="star">★</span> {{ '{:,}'.format(p.stars) }}</span>{% endif %}
+      <p class="p-desc">{{ p.desc }}</p>
+      {% if p.adoption %}<p class="p-adopt">{{ p.adoption }}</p>{% endif %}
+      {% if p.links %}
+      <div class="p-links">
+        {% for l in p.links %}<a href="{{ l.url }}">{{ l.label }}</a>{% endfor %}
+      </div>
+      {% endif %}
+    </article>
+    {% endfor %}
+
+    {% for p in projects if not p.featured %}
+    <article class="project">
+      <a class="p-name" href="{{ p.url }}">{{ p.name }}</a>
+      {% if p.stars %}<span class="p-stars"><span class="star">★</span> {{ '{:,}'.format(p.stars) }}</span>{% endif %}
+      <p class="p-desc">{{ p.desc }}</p>
+      {% if p.adoption %}<p class="p-adopt">{{ p.adoption }}</p>{% endif %}
+      {% if p.links %}
+      <div class="p-links">
+        {% for l in p.links %}<a href="{{ l.url }}">{{ l.label }}</a>{% endfor %}
+      </div>
+      {% endif %}
+    </article>
+    {% endfor %}
+  </div>
+{% endcall %}
+</div>
+
+{# ---------------- 03 · WRITING ---------------- #}
+{% macro writing_rows(items) %}
+  <ul class="index-list">
+    {% for w in items %}
+    <li class="entry">
+      <span class="e-year">{{ w.date }}</span>
+      <span class="e-body">
+        <a class="e-title" href="{{ w.url }}">{{ w.title }}</a>
+        {% if w.with %}<span class="e-meta">with {{ w.with }}</span>{% endif %}
+        {% if w.note %}<span class="e-note">{{ w.note }}</span>{% endif %}
+      </span>
+      <span class="e-tag">{{ w.publisher }}</span>
+    </li>
+    {% endfor %}
+  </ul>
+{% endmacro %}
+
+<div class="rise d4">
+{% call section(4, 'Writing', 'writing') %}
+  {{ writing_rows(writing_primary) }}
+  {% if writing_more %}
+  <details class="more">
+    <summary>{{ writing_more|length }} more</summary>
+    {{ writing_rows(writing_more) }}
+  </details>
+  {% endif %}
+{% endcall %}
+</div>
+
+{# ---------------- 04 · TALKS ---------------- #}
+<div class="rise d5">
+{% call section(5, 'Talks', 'talks') %}
+  <ul class="index-list">
+    {% for t in talks %}
+    <li class="entry">
+      <span class="e-year">{{ t.date }}</span>
+      <span class="e-body">
+        <a class="e-title" href="{{ t.url }}">{{ t.title }}</a>
+        <span class="e-meta"><span class="venue">{{ t.venue }}</span>{% if t.location %} · {{ t.location }}{% endif %}{% if t.cospeakers %} · with {{ t.cospeakers }}{% endif %}</span>
+        {% if t.note %}<span class="e-note">{{ t.note }}</span>{% endif %}
+      </span>
+      <span class="e-tag">{{ t.kind }}</span>
+    </li>
+    {% endfor %}
+  </ul>
+{% endcall %}
+</div>
+
+{# ---------------- 05 · MEDIA ---------------- #}
+{% if media %}
+<div class="rise d6">
+{% call section(6, 'Podcasts &amp; press', 'media') %}
+  <ul class="index-list">
+    {% for m in media %}
+    <li class="entry">
+      <span class="e-year">{{ m.date }}</span>
+      <span class="e-body">
+        <a class="e-title" href="{{ m.url }}">{{ m.title }}</a>
+        <span class="e-meta"><span class="venue">{{ m.venue }}</span>{% if m.host %} · {{ m.host }}{% endif %}</span>
+        {% if m.note %}<span class="e-note">{{ m.note }}</span>{% endif %}
+      </span>
+      <span class="e-tag">{{ m.kind }}</span>
+    </li>
+    {% endfor %}
+  </ul>
+{% endcall %}
+</div>
+{% endif %}
+
+{# ---------------- 06 · TIMELINE ---------------- #}
+<div class="rise d7">
+{% call section(7, 'Background', 'background') %}
+  <ul class="timeline">
+    {% for t in timeline %}
+    <li class="tl">
+      <span class="tl-when">{{ t.when }}</span>
+      <span>
+        <span class="tl-role">{{ t.role }} &nbsp;<span class="org">{{ t.org }}</span></span>
+        {% if t.note %}<span class="tl-note">{{ t.note }}</span>{% endif %}
+      </span>
+    </li>
+    {% endfor %}
+  </ul>
+{% endcall %}
+</div>
+
+{# ---------------- 07 · CONTACT ---------------- #}
+<div class="rise d8">
+{% call section(8, 'Elsewhere', 'contact') %}
+  <div class="prose">
+    <p>{{ profile.contact }}</p>
+  </div>
+  <ul class="index-list" style="margin-top:1.2rem">
+    {% for l in site.links %}
+    <li class="entry">
+      <span class="e-year">{{ l.short }}</span>
+      <span class="e-body"><a class="e-title" href="{{ l.url }}">{{ l.display }}</a></span>
+      <span class="e-tag">{{ l.label }}</span>
+    </li>
+    {% endfor %}
+  </ul>
+{% endcall %}
+</div>
+
+{% endblock %}

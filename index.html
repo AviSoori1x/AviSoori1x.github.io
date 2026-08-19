@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Avinash Sooriyarachchi — Research Scientist, Mistral AI</title>
+<meta name="description" content="Avinash Sooriyarachchi — Research Scientist at Mistral AI, working on robotics foundation models, vision-language-action policies and real-to-sim evaluation. Author of makeMoE and seemore.">
+<link rel="canonical" href="https://avisoori1x.github.io/">
+<meta name="author" content="Avinash Sooriyarachchi">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="Avinash Sooriyarachchi — Research Scientist, Mistral AI">
+<meta property="og:description" content="Avinash Sooriyarachchi — Research Scientist at Mistral AI, working on robotics foundation models, vision-language-action policies and real-to-sim evaluation. Author of makeMoE and seemore.">
+<meta property="og:url" content="https://avisoori1x.github.io/">
+<meta property="og:site_name" content="Avinash Sooriyarachchi">
+<meta property="og:image" content="https://avisoori1x.github.io/images/blogImage.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:creator" content="@aviTwit3">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="assets/main.css">
+<link rel="alternate" type="application/rss+xml" title="Avinash Sooriyarachchi" href="https://avisoori1x.github.io/feed.xml">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23faf7f1%22/><text y=%22.9em%22 x=%22.06em%22 font-size=%2286%22 font-family=%22Georgia,serif%22 fill=%22%23c3341a%22>A</text></svg>">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Person","name":"Avinash Sooriyarachchi","url":"https://avisoori1x.github.io","jobTitle":"Research Scientist","worksFor":{"@type":"Organization","name":"Mistral AI"},"address":{"@type":"PostalAddress","addressLocality":"San Francisco"},"sameAs":["https://github.com/AviSoori1x","https://scholar.google.com/citations?user=9uC-33kAAAAJ","https://www.linkedin.com/in/avi-data-ml/","https://x.com/aviTwit3","https://huggingface.co/AviSoori1x"],"description":"Avinash Sooriyarachchi \u2014 Research Scientist at Mistral AI, working on robotics foundation models, vision-language-action policies and real-to-sim evaluation. Author of makeMoE and seemore."}</script></head>
+<body>
+<div class="spine" aria-hidden="true"></div>
+<div class="page">
+
+<header class="masthead rise d1">
+  <h1><span class="giv">Avinash</span> <span class="sur">Sooriyarachchi</span></h1>
+  <p class="standfirst">I work on robotics foundation models — vision-language-action policies, the evaluation harnesses that tell us whether they actually work, and the data pipelines that train them. Before that I built and led applied science work on large language models.</p>
+  <div class="byline">
+    <span>Research Scientist</span><span class="sep">/</span>
+    <span>Mistral AI</span><span class="sep">/</span>
+    <span>San Francisco</span>
+  </div>
+</header>
+
+
+<div class="rise d2">
+<section class="section" id="now">
+  <div class="row">
+    <div class="gutter"><span class="num">§01</span>Current work</div>
+    <div class="col">
+        <h2 class="title">Robotics foundation models, and how to know when they work</h2>
+  <div class="prose lede">
+<p>At Mistral AI I work on vision-language-action models: the policies themselves, the System-2 planners that decompose a long-horizon instruction into something a policy can execute, and the training data behind both. I previously led the applied science team in the US.</p><p>A lot of my current attention goes to evaluation. Robot policies are easy to demo and hard to measure, so I build real-to-sim pipelines that turn a single real camera frame into a physically-valid simulated scene — which gives you a reproducible, gradeable environment instead of an anecdote.</p><p>Running through all of it is a habit I have kept since long before this job: when I want to understand an architecture, I rebuild it from scratch in plain PyTorch and write down what I learned. That is where makeMoE and seemore came from.</p>  </div>
+
+    </div>
+  </div>
+</section>
+</div>
+
+<div class="rise d3">
+<section class="section" id="research">
+  <div class="row">
+    <div class="gutter"><span class="num">§02</span>Publications</div>
+    <div class="col">
+        <ul class="index-list">
+    <li class="entry">
+      <span class="e-year">2026</span>
+      <span class="e-body">
+        <a class="e-title" href="https://arxiv.org/abs/2607.25857">Shieldstral</a>
+        <span class="e-meta"><span class="venue">arXiv preprint</span> · Core author block</span>
+<span class="e-note">A 3B policy-adaptive multimodal safety classifier that matches or beats models roughly seven times its size on text safety benchmarks, and sets state of the art on multimodal safety classification, by framing moderation as a binary question against a stated policy.</span>      </span>
+      <span class="e-tag">Paper</span>
+    </li>
+    <li class="entry">
+      <span class="e-year">2026</span>
+      <span class="e-body">
+        <a class="e-title" href="https://arxiv.org/abs/2607.20785">Robostral Navigate</a>
+        <span class="e-meta"><span class="venue">arXiv preprint</span> · Mistral AI</span>
+<span class="e-note">An 8B vision-language navigation model that takes only monocular RGB and predicts waypoints by pointing at the next target in the current camera view — operating in image space rather than a robot-specific action space.</span>      </span>
+      <span class="e-tag">Paper</span>
+    </li>
+    <li class="entry">
+      <span class="e-year">2026</span>
+      <span class="e-body">
+        <a class="e-title" href="https://arxiv.org/abs/2603.25551">Voxtral TTS</a>
+        <span class="e-meta"><span class="venue">arXiv preprint</span> · Mistral AI</span>
+<span class="e-note">Expressive multilingual text to speech that clones a voice from as little as three seconds of reference audio, pairing autoregressive semantic tokens with flow matching for acoustics.</span>      </span>
+      <span class="e-tag">Paper</span>
+    </li>
+    <li class="entry">
+      <span class="e-year">2026</span>
+      <span class="e-body">
+        <a class="e-title" href="https://arxiv.org/abs/2602.11298">Voxtral Realtime</a>
+        <span class="e-meta"><span class="venue">arXiv preprint</span> · Mistral AI</span>
+<span class="e-note">Natively streaming speech recognition that holds offline transcription quality at sub-second latency, trained end to end for streaming with explicit audio/text alignment.</span>      </span>
+      <span class="e-tag">Paper</span>
+    </li>
+    <li class="entry">
+      <span class="e-year">2026</span>
+      <span class="e-body">
+        <a class="e-title" href="https://arxiv.org/abs/2601.08584">Ministral 3</a>
+        <span class="e-meta"><span class="venue">arXiv preprint</span> · Mistral AI</span>
+<span class="e-note">A family of parameter-efficient dense models at 3B, 8B and 14B, each released as base, instruction-tuned and reasoning variants with image understanding, under Apache 2.0.</span>      </span>
+      <span class="e-tag">Paper</span>
+    </li>
+    <li class="entry">
+      <span class="e-year">2016</span>
+      <span class="e-body">
+        <a class="e-title" href="https://doi.org/10.1021/acsbiomaterials.6b00281">Fiber Based Approaches as Medicine Delivery Systems</a>
+        <span class="e-meta"><span class="venue">ACS Biomaterials Science &amp; Engineering 2(9)</span> · Co-first author</span>
+<span class="e-note">A review of micro- and nanofibers as drug carriers, surveying electrospinning, microfluidic, wet-spinning, rotary and self-assembly fabrication routes. From my mechanical engineering research at Iowa State, and still my most-cited paper.</span>      </span>
+      <span class="e-tag">Paper</span>
+    </li>
+  </ul>
+<p class="footnote">Mistral AI ships its models as collectively-authored technical reports. Where my contribution is named in the core author block rather than the full lab list, I say so.</p>
+    </div>
+  </div>
+</section>
+</div>
+
+<div class="rise d3">
+<section class="section" id="code">
+  <div class="row">
+    <div class="gutter"><span class="num">§03</span>Open source</div>
+    <div class="col">
+        <div class="projects">
+    <article class="project featured">
+      <a class="p-name" href="https://github.com/AviSoori1x/makeMoE">makeMoE</a>
+<span class="p-stars"><span class="star">★</span> 812</span>      <p class="p-desc">A sparse mixture-of-experts language model written from scratch in pure PyTorch — expert modules, top-k noisy gating, and the initialisation and routing details that actually decide whether an MoE trains. Built in the spirit of Karpathy&#39;s makemore, as a readable reference for the architecture behind Mixtral, DBRX and Grok.</p>
+<p class="p-adopt">Used as teaching material by the NeurIPS 2024 tutorial “Dynamic Sparsity in Machine Learning”, whose MoE notebook states it is “inspired by the makeMoE blog post” and trains on data pulled straight from the repo; and listed as assigned reading by the M2L Summer School 2024.</p>      <div class="p-links">
+<a href="https://github.com/AviSoori1x/makeMoE">Repository</a><a href="https://huggingface.co/blog/AviSoori1x/makemoe-from-scratch">Write-up</a><a href="https://dynamic-sparsity.github.io/assets/notebooks/moes.ipynb">NeurIPS 2024 tutorial</a><a href="https://github.com/M2Lschool/tutorials2024/blob/main/1_nlp/part_II_text_generation/Transformer_Decoder_MoE_solved.ipynb">M2L Summer School</a><a href="https://news.ycombinator.com/item?id=39742921">Hacker News</a>      </div>
+    </article>
+    <article class="project featured">
+      <a class="p-name" href="https://github.com/AviSoori1x/seemore">seemore</a>
+<span class="p-stars"><span class="star">★</span> 260</span>      <p class="p-desc">A vision language model implemented from scratch in pure PyTorch: a ViT image encoder, a multimodal projection module, and a character-level autoregressive decoder, assembled end to end so every connection is visible. A follow-up, seeMoE, swaps the decoder for a mixture-of-experts version.</p>
+<p class="p-adopt">Its architecture diagram is used as the reference VLM diagram in Lab 1 of École Polytechnique&#39;s graduate course CSC_52002, Multimodal Generative AI.</p>      <div class="p-links">
+<a href="https://github.com/AviSoori1x/seemore">Repository</a><a href="https://huggingface.co/blog/AviSoori1x/seemore-vision-language-model">seemore write-up</a><a href="https://huggingface.co/blog/AviSoori1x/seemoe">seeMoE write-up</a><a href="https://github.com/ArnaudoB/CSC_52002_EP-MultimodalGenAI/blob/main/lab1/lab1.ipynb">École Polytechnique lab</a>      </div>
+    </article>
+
+    <article class="project">
+      <a class="p-name" href="https://github.com/AviSoori1x/Tuning-the-Finetuning">Tuning the Finetuning</a>
+<span class="p-stars"><span class="star">★</span> 46</span>      <p class="p-desc">An empirical exploration of what actually matters when fine-tuning with QLoRA — rank, target modules, and the parameter choices that decide whether a run is worth the GPU hours. The companion write-up is cited in the academic literature.</p>
+      <div class="p-links">
+<a href="https://github.com/AviSoori1x/Tuning-the-Finetuning">Repository</a><a href="https://www.databricks.com/blog/efficient-fine-tuning-lora-guide-llms">LoRA guide</a>      </div>
+    </article>
+    <article class="project">
+      <a class="p-name" href="https://github.com/AviSoori1x/multimodal_LLMs">multimodal_LLMs</a>
+<span class="p-stars"><span class="star">★</span> 12</span>      <p class="p-desc">Fine-tuning BLIP-2 and Flan-T5-XL for caption generation with PEFT/LoRA — an early look at parameter-efficient adaptation of multimodal models.</p>
+    </article>
+    <article class="project">
+      <a class="p-name" href="https://github.com/AviSoori1x/BrickPilot">BrickPilot</a>
+<span class="p-stars"><span class="star">★</span> 10</span>      <p class="p-desc">Build your own AI coding assistant, wiring a self-hosted code model into VS Code alongside GitHub Copilot.</p>
+      <div class="p-links">
+<a href="https://github.com/AviSoori1x/BrickPilot">Repository</a><a href="https://avi-soori.medium.com/build-your-own-ai-coding-assistant-with-databricks-using-visual-studio-code-and-github-copilot-50643317082f">Write-up</a>      </div>
+    </article>
+    <article class="project">
+      <a class="p-name" href="https://github.com/avisoori-databricks/Finetuning-Guide">Finetuning-Guide</a>
+<span class="p-stars"><span class="star">★</span> 10</span>      <p class="p-desc">Fine-tuning OpenLLaMA models on instruction-following datasets with QLoRA, end to end.</p>
+    </article>
+    <article class="project">
+      <a class="p-name" href="https://github.com/avisoori-databricks/text-to-insights">text-to-insights</a>
+<span class="p-stars"><span class="star">★</span> 4</span>      <p class="p-desc">Going from natural language to SQL to an actual answer, combining language models, vector search and resource-efficient fine-tuning.</p>
+    </article>
+    <article class="project">
+      <a class="p-name" href="https://github.com/AviSoori1x/Explainable-ML-Application">Explainable-ML-Application</a>
+<span class="p-stars"><span class="star">★</span> 3</span>      <p class="p-desc">Interactive explainable machine learning — a containerised Streamlit application for interrogating model behaviour.</p>
+      <div class="p-links">
+<a href="https://github.com/AviSoori1x/Explainable-ML-Application">Repository</a><a href="/2021/04/14/Interactive_Explainable_Machine_Learning_with_SAS_Viya,_Streamlit_and_Docker.html">Write-up</a>      </div>
+    </article>
+  </div>
+
+    </div>
+  </div>
+</section>
+</div>
+
+
+<div class="rise d4">
+<section class="section" id="writing">
+  <div class="row">
+    <div class="gutter"><span class="num">§04</span>Writing</div>
+    <div class="col">
+          <ul class="index-list">
+    <li class="entry">
+      <span class="e-year">2024</span>
+      <span class="e-body">
+        <a class="e-title" href="/2024/05/06/SeeMoE-_Implementing_a_MoE_Vision_Language_Model_from_Scratch.html">SeeMoE: Implementing a MoE Vision Language Model from Scratch</a>
+<span class="e-note">In this blog I implement a mixture of experts vision language model consisting of an image encoder, a multimodal projection module and a mixture of…</span>      </span>
+      <span class="e-tag">This site</span>
+    </li>
+    <li class="entry">
+      <span class="e-year">2024</span>
+      <span class="e-body">
+        <a class="e-title" href="/2024/04/22/seemore-_Implement_a_Vision_Language_Model_from_Scratch.html">seemore: Implement a Vision Language Model from Scratch</a>
+<span class="e-note">In this blog I implement a vision language model consisting of an image encoder, a multimodal projection module and a decoder language model in pure…</span>      </span>
+      <span class="e-tag">This site</span>
+    </li>
+    <li class="entry">
+      <span class="e-year">2024</span>
+      <span class="e-body">
+        <a class="e-title" href="https://www.databricks.com/blog/common-sense-product-recommendations-using-large-language-models">Common Sense Product Recommendations using Large Language Models</a>
+<span class="e-meta">with Sam Sawyer, Colton Peltier, Bryan Smith</span><span class="e-note">Uses a language model&#39;s world knowledge to propose complementary products, then grounds those free-text suggestions against a retailer&#39;s real catalogue with embeddings and vector search — knowledge a collaborative-filtering system structurally cannot supply.</span>      </span>
+      <span class="e-tag">Databricks</span>
+    </li>
+    <li class="entry">
+      <span class="e-year">2023</span>
+      <span class="e-body">
+        <a class="e-title" href="https://www.databricks.com/blog/harnessing-machine-learning-anomaly-detection-building-products-industry-databricks">Harnessing Machine Learning for Anomaly Detection in the Building Products Industry</a>
+<span class="e-meta">with Joy Garnett, Sathish Gangichetty</span><span class="e-note">Dimensionality reduction plus anomaly detection over manufacturing sensor data, wrapped in enough MLOps to retrain and redeploy continuously.</span>      </span>
+      <span class="e-tag">Databricks</span>
+    </li>
+    <li class="entry">
+      <span class="e-year">2023</span>
+      <span class="e-body">
+        <a class="e-title" href="https://www.databricks.com/blog/efficient-fine-tuning-lora-guide-llms">Efficient Fine-Tuning with LoRA: A Guide to Optimal Parameter Selection for Large Language Models</a>
+<span class="e-note">An empirical argument that QLoRA should target every linear layer rather than the attention blocks alone, and that a modest rank suffices — better outputs while training under 1% of parameters.</span>      </span>
+      <span class="e-tag">Databricks</span>
+    </li>
+    <li class="entry">
+      <span class="e-year">2023</span>
+      <span class="e-body">
+        <a class="e-title" href="https://opendatascience.com/getting-up-to-speed-on-real-time-machine-learning-with-spark-and-sbert/">Getting Up to Speed on Real-Time Machine Learning with Spark and SBERT</a>
+<span class="e-note">Sentence-transformer inference inside a streaming pipeline, and where the latency actually goes.</span>      </span>
+      <span class="e-tag">ODSC</span>
+    </li>
+    <li class="entry">
+      <span class="e-year">2023</span>
+      <span class="e-body">
+        <a class="e-title" href="https://avi-soori.medium.com/build-your-own-ai-coding-assistant-with-databricks-using-visual-studio-code-and-github-copilot-50643317082f">Build your own AI Coding Assistant with Databricks using Visual Studio Code and GitHub Copilot</a>
+<span class="e-note">Standing up a self-hosted code model and wiring it into the editor alongside Copilot.</span>      </span>
+      <span class="e-tag">Medium</span>
+    </li>
+    <li class="entry">
+      <span class="e-year">2022</span>
+      <span class="e-body">
+        <a class="e-title" href="https://www.databricks.com/blog/near-real-time-anomaly-detection-delta-live-tables-and-databricks-machine-learning">Near Real-Time Anomaly Detection with Delta Live Tables and Databricks Machine Learning</a>
+<span class="e-meta">with Sathish Gangichetty</span><span class="e-note">Embedding a trained isolation forest inside a streaming ETL pipeline to catch fraudulent card transactions in near real time.</span>      </span>
+      <span class="e-tag">Databricks</span>
+    </li>
+    <li class="entry">
+      <span class="e-year">2022</span>
+      <span class="e-body">
+        <a class="e-title" href="https://www.databricks.com/blog/2022/03/01/building-a-similarity-based-image-recommendation-system-for-e-commerce.html">Building a Similarity-based Image Recommendation System for e-Commerce</a>
+<span class="e-note">A contrastive-learning image similarity model for product recommendation, trained distributed across GPU clusters and served end to end.</span>      </span>
+      <span class="e-tag">Databricks</span>
+    </li>
+  </ul>
+
+  <details class="more">
+    <summary>7 more</summary>
+      <ul class="index-list">
+    <li class="entry">
+      <span class="e-year">2023</span>
+      <span class="e-body">
+        <a class="e-title" href="https://www.databricks.com/blog/even-santa-claus-has-ai-fever">Even Santa Claus has AI fever</a>
+<span class="e-meta">with Alex Miller, Kunal Marwah, Mikaila Garfinkel</span><span class="e-note">Synthetic data generation and named-entity recognition applied, seasonally, to extracting gift requests from letters.</span>      </span>
+      <span class="e-tag">Databricks</span>
+    </li>
+    <li class="entry">
+      <span class="e-year">2022</span>
+      <span class="e-body">
+        <a class="e-title" href="https://www.databricks.com/blog/2022/11/08/theres-no-ai-pumpkin-pie-there-should-be-delivering-novel-application-experiences">There&#39;s No AI in Pumpkin Pie, But There Should Be: Delivering Novel Application Experiences Using ML &amp; AI</a>
+<span class="e-meta">with Nicole Jingting Lu, Bryan Smith, Sam Steiny, Mikaila Garfinkel</span><span class="e-note">A recipe-finder application built on image embeddings and similarity search over a recipe dataset.</span>      </span>
+      <span class="e-tag">Databricks</span>
+    </li>
+    <li class="entry">
+      <span class="e-year">2021</span>
+      <span class="e-body">
+        <a class="e-title" href="/2021/07/22/Use-of-Convolutions-for-Time-Series-Prediction-and-Natural-Language-Processing.html">Use of convolutions for time series prediction and natural language processing</a>
+<span class="e-note">Disclaimer: I assume familiarity with machine learning and a general sense of how feed forward (i.e., the most basic type of) neural networks work for the…</span>      </span>
+      <span class="e-tag">This site</span>
+    </li>
+    <li class="entry">
+      <span class="e-year">2021</span>
+      <span class="e-body">
+        <a class="e-title" href="/2021/05/16/Building_a_Natural_Language_Processing_API_with_SAS_Viya_FastAPI_and_Docker.html">Building a Natural Language Processing API with SAS Viya, FastAPI, and Docker</a>
+<span class="e-note">Interactively testing the service we will build in this blog The notebook for training the topic model and obtaining sentiments is at: notebook The code…</span>      </span>
+      <span class="e-tag">This site</span>
+    </li>
+    <li class="entry">
+      <span class="e-year">2021</span>
+      <span class="e-body">
+        <a class="e-title" href="/2021/05/11/Effective_Hyperparameter_Optimization_of_LightGBM_Classifiers_with_Optuna.html">Effective Hyperparameter Optimization of LightGBM Classifiers with Optuna</a>
+<span class="e-note">LightGBM is a really convenient to use, fast to train and usually accurate implementation of boosted trees. Here I use optuna for hyperparameter search…</span>      </span>
+      <span class="e-tag">This site</span>
+    </li>
+    <li class="entry">
+      <span class="e-year">2021</span>
+      <span class="e-body">
+        <a class="e-title" href="/2021/05/10/Bayesian_Optimization_for_Neural_Architecture_Search.html">Bayesian Optimization for Neural Architecture Search</a>
+<span class="e-note">In this blog I will be using bayes_opt, a general purpose bayesian optimization framework to optimize hyperparameters of a fastai tabular learner with…</span>      </span>
+      <span class="e-tag">This site</span>
+    </li>
+    <li class="entry">
+      <span class="e-year">2021</span>
+      <span class="e-body">
+        <a class="e-title" href="/2021/04/14/Interactive_Explainable_Machine_Learning_with_SAS_Viya,_Streamlit_and_Docker.html">Interactive Explainable Machine Learning with SAS Viya, Streamlit, and Docker</a>
+<span class="e-note">The app we will build in this blog If you want to get to the part about building the app and the code walk-through, skip the first 3 paragraphs ;). But in…</span>      </span>
+      <span class="e-tag">This site</span>
+    </li>
+  </ul>
+
+  </details>
+
+    </div>
+  </div>
+</section>
+</div>
+
+<div class="rise d5">
+<section class="section" id="talks">
+  <div class="row">
+    <div class="gutter"><span class="num">§05</span>Talks</div>
+    <div class="col">
+        <ul class="index-list">
+    <li class="entry">
+      <span class="e-year">2024</span>
+      <span class="e-body">
+        <a class="e-title" href="https://odsc.com/speakers/innovating-with-multimodality-and-reasoning-with-mistral-ai/">Innovating with Multimodality and Reasoning with Mistral AI</a>
+        <span class="e-meta"><span class="venue">ODSC West</span></span>
+<span class="e-note">Where multimodal input and explicit reasoning change what you can actually build on a foundation model, presented in the &#34;What&#39;s Next in AI&#34; track.</span>      </span>
+      <span class="e-tag">Talk</span>
+    </li>
+    <li class="entry">
+      <span class="e-year">2024</span>
+      <span class="e-body">
+        <a class="e-title" href="https://www.aicamp.ai/event/eventdetails/W2024101509">Innovating with Multimodality and Reasoning with Mistral AI</a>
+        <span class="e-meta"><span class="venue">AWS GenAI Developer Day</span> · San Francisco</span>
+<span class="e-note">The same material for a developer audience at the AWS SF Loft, hosted with AICamp.</span>      </span>
+      <span class="e-tag">Talk</span>
+    </li>
+    <li class="entry">
+      <span class="e-year">2024</span>
+      <span class="e-body">
+        <a class="e-title" href="https://youtu.be/FB6H4NwFGzQ">Empowering Generative AI with Databricks and AMD</a>
+        <span class="e-meta"><span class="venue">Data + AI Summit</span></span>
+<span class="e-note">Running generative AI workloads on AMD accelerators from within the Databricks platform — what it takes to make an alternative accelerator stack practical.</span>      </span>
+      <span class="e-tag">Talk</span>
+    </li>
+    <li class="entry">
+      <span class="e-year">2023</span>
+      <span class="e-body">
+        <a class="e-title" href="https://youtu.be/yJ0ywuG_yv4?t=12880">Text to Insights: Building Real-Time Analytics Systems with Generative AI</a>
+        <span class="e-meta"><span class="venue">ODSC Generative AI Summit</span></span>
+<span class="e-note">Composing language models, vector databases and efficient fine-tuning into a system that turns a plain-English question into a live analytical answer.</span>      </span>
+      <span class="e-tag">Talk</span>
+    </li>
+    <li class="entry">
+      <span class="e-year">2023</span>
+      <span class="e-body">
+        <a class="e-title" href="https://youtu.be/eJqqDZkBrzE">Getting Up to Speed on Real-Time Machine Learning</a>
+        <span class="e-meta"><span class="venue">ODSC Europe</span></span>
+<span class="e-note">What &#34;real time&#34; actually means across streaming inference, feature freshness and online learning — and which parts are worth the operational cost.</span>      </span>
+      <span class="e-tag">Talk</span>
+    </li>
+    <li class="entry">
+      <span class="e-year">2023</span>
+      <span class="e-body">
+        <a class="e-title" href="https://youtu.be/wj_WtrrEfi8">Monetizing Data Assets: Sharing Data, Models and Features</a>
+        <span class="e-meta"><span class="venue">Data + AI Summit</span></span>
+<span class="e-note">Treating models and feature tables as shareable, governed products rather than artefacts locked inside one team&#39;s workspace.</span>      </span>
+      <span class="e-tag">Talk</span>
+    </li>
+    <li class="entry">
+      <span class="e-year">2022</span>
+      <span class="e-body">
+        <a class="e-title" href="https://youtu.be/ogk__G33E-A">Streaming Machine Learning with Databricks and GitHub Actions</a>
+        <span class="e-meta"><span class="venue">GitHub Universe</span></span>
+<span class="e-note">Continuous delivery for streaming ML — driving model training and deployment on a structured streaming pipeline from CI.</span>      </span>
+      <span class="e-tag">Talk</span>
+    </li>
+  </ul>
+
+    </div>
+  </div>
+</section>
+</div>
+
+<div class="rise d6">
+<section class="section" id="media">
+  <div class="row">
+    <div class="gutter"><span class="num">§06</span>Podcasts &amp;amp; press</div>
+    <div class="col">
+        <ul class="index-list">
+    <li class="entry">
+      <span class="e-year">2025</span>
+      <span class="e-body">
+        <a class="e-title" href="https://www.youtube.com/watch?v=pVDPb9JoFGo">Inside Applied AI at Mistral: Benchmarks, Guardrails &amp; Career Advice</a>
+        <span class="e-meta"><span class="venue">Chris&#39;s Corner</span> · with Chris Richardson</span>
+<span class="e-note">A long-form conversation on building products on top of foundation models — fine-tuning, DPO and quantisation; why evaluation and guardrails are the hard part of enterprise deployment; and how to move into applied AI research.</span>      </span>
+      <span class="e-tag">Podcast</span>
+    </li>
+    <li class="entry">
+      <span class="e-year">2025</span>
+      <span class="e-body">
+        <a class="e-title" href="https://www.youtube.com/watch?v=yz2a2BiYtJo">Mistral AI on AWS: 3 Features Developers Need to Know</a>
+        <span class="e-meta"><span class="venue">AWS Developers</span></span>
+<span class="e-note">A walkthrough of the Mistral capabilities that matter most when building on AWS.</span>      </span>
+      <span class="e-tag">Video</span>
+    </li>
+    <li class="entry">
+      <span class="e-year">2024</span>
+      <span class="e-body">
+        <a class="e-title" href="https://www.youtube.com/watch?v=s0_Yd83td9M">Building a Mixture of Experts Model from Scratch with makeMoE</a>
+        <span class="e-meta"><span class="venue">Fahd Mirza</span></span>
+<span class="e-note">An independent video walkthrough of makeMoE, one of several third-party explainers the project has attracted.</span>      </span>
+      <span class="e-tag">Coverage</span>
+    </li>
+  </ul>
+
+    </div>
+  </div>
+</section>
+</div>
+
+<div class="rise d7">
+<section class="section" id="background">
+  <div class="row">
+    <div class="gutter"><span class="num">§07</span>Background</div>
+    <div class="col">
+        <ul class="timeline">
+    <li class="tl">
+      <span class="tl-when">2024 — now</span>
+      <span>
+        <span class="tl-role">Research Scientist &nbsp;<span class="org">Mistral AI</span></span>
+<span class="tl-note">Robotics foundation models — vision-language-action policies, System-2 manipulation planning, and real-to-sim evaluation. Contributor on the Ministral 3, Voxtral, Robostral Navigate and Shieldstral releases. Joined in 2024 on the applied side and went on to lead the US applied science team.</span>      </span>
+    </li>
+    <li class="tl">
+      <span class="tl-when">2021 — 2024</span>
+      <span>
+        <span class="tl-role">Senior Solutions Architect, AI/ML &nbsp;<span class="org">Databricks</span></span>
+<span class="tl-note">Field engineering, latterly for retail and consumer packaged goods in the Bay Area. Large language model fine-tuning, recommender systems, vector search and streaming ML, with a parallel stream of writing and conference talks.</span>      </span>
+    </li>
+    <li class="tl">
+      <span class="tl-when">2019 — 2021</span>
+      <span>
+        <span class="tl-role">Senior Solutions Architect, AI/ML &nbsp;<span class="org">SAS</span></span>
+<span class="tl-note">Applied machine learning on SAS Viya in Cary, North Carolina — explainability, NLP services and model deployment. Led the AutoML prototype solution development team.</span>      </span>
+    </li>
+    <li class="tl">
+      <span class="tl-when">2017 — 2019</span>
+      <span>
+        <span class="tl-role">Founder &amp; Lead Data Scientist &nbsp;<span class="org">RandomWalk Technologies</span></span>
+<span class="tl-note">Built Fora, a conversational analytics engine that answered natural-language questions over social media data. Ames, Iowa, out of the ISU Startup Factory.</span>      </span>
+    </li>
+    <li class="tl">
+      <span class="tl-when">2016 — 2017</span>
+      <span>
+        <span class="tl-role">Graduate researcher, Architected Materials Lab &nbsp;<span class="org">University of Pennsylvania</span></span>
+<span class="tl-note">M.S.E. in Mechanical Engineering and Applied Mechanics. Research on mechanical metamaterials with Jordan Raney; Dean&#39;s Research Fellowship. Also took Wharton&#39;s Modern Data Mining course, which is where the machine learning detour began.</span>      </span>
+    </li>
+    <li class="tl">
+      <span class="tl-when">2016</span>
+      <span>
+        <span class="tl-role">B.S., Mechanical Engineering &nbsp;<span class="org">Iowa State University</span></span>
+<span class="tl-note">Undergraduate research in bio-microfluidics with Nastaran Hashemi, producing a co-first author review in ACS Biomaterials Science &amp; Engineering.</span>      </span>
+    </li>
+  </ul>
+
+    </div>
+  </div>
+</section>
+</div>
+
+<div class="rise d8">
+<section class="section" id="contact">
+  <div class="row">
+    <div class="gutter"><span class="num">§08</span>Elsewhere</div>
+    <div class="col">
+        <div class="prose">
+    <p>LinkedIn is the most reliable way to reach me. Most of what I build ends up on GitHub sooner or later, and the papers are on Scholar.</p>
+  </div>
+  <ul class="index-list" style="margin-top:1.2rem">
+    <li class="entry">
+      <span class="e-year">gh</span>
+      <span class="e-body"><a class="e-title" href="https://github.com/AviSoori1x">github.com/AviSoori1x</a></span>
+      <span class="e-tag">GitHub</span>
+    </li>
+    <li class="entry">
+      <span class="e-year">sch</span>
+      <span class="e-body"><a class="e-title" href="https://scholar.google.com/citations?user=9uC-33kAAAAJ">Google Scholar</a></span>
+      <span class="e-tag">Google Scholar</span>
+    </li>
+    <li class="entry">
+      <span class="e-year">in</span>
+      <span class="e-body"><a class="e-title" href="https://www.linkedin.com/in/avi-data-ml/">linkedin.com/in/avi-data-ml</a></span>
+      <span class="e-tag">LinkedIn</span>
+    </li>
+    <li class="entry">
+      <span class="e-year">x</span>
+      <span class="e-body"><a class="e-title" href="https://x.com/aviTwit3">@aviTwit3</a></span>
+      <span class="e-tag">X</span>
+    </li>
+    <li class="entry">
+      <span class="e-year">hf</span>
+      <span class="e-body"><a class="e-title" href="https://huggingface.co/AviSoori1x">huggingface.co/AviSoori1x</a></span>
+      <span class="e-tag">Hugging Face</span>
+    </li>
+  </ul>
+
+    </div>
+  </div>
+</section>
+</div>
+
+<footer class="colophon">
+  <span>© 2026 Avinash Sooriyarachchi</span>
+  <span><a href="https://github.com/AviSoori1x">GitHub</a> &nbsp;·&nbsp; <a href="https://scholar.google.com/citations?user=9uC-33kAAAAJ">Google Scholar</a> &nbsp;·&nbsp; <a href="https://www.linkedin.com/in/avi-data-ml/">LinkedIn</a> &nbsp;·&nbsp; <a href="https://x.com/aviTwit3">X</a> &nbsp;·&nbsp; <a href="https://huggingface.co/AviSoori1x">Hugging Face</a></span>
+  <span>Set in Instrument Serif &amp; IBM Plex Mono</span>
+</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SeeMoE: Implementing a MoE Vision Language Model from Scratch — Avinash Sooriyarachchi</title>
+<meta name="description" content="In this blog I implement a mixture of experts vision language model consisting of an image encoder, a multimodal projection module and a mixture of experts decoder language model i">
+<link rel="canonical" href="https://avisoori1x.github.io/2024/05/06/SeeMoE-_Implementing_a_MoE_Vision_Language_Model_from_Scratch.html">
+<meta name="author" content="Avinash Sooriyarachchi">
+
+<meta property="og:type" content="article">
+<meta property="og:title" content="SeeMoE: Implementing a MoE Vision Language Model from Scratch — Avinash Sooriyarachchi">
+<meta property="og:description" content="In this blog I implement a mixture of experts vision language model consisting of an image encoder, a multimodal projection module and a mixture of experts decoder language model i">
+<meta property="og:url" content="https://avisoori1x.github.io/2024/05/06/SeeMoE-_Implementing_a_MoE_Vision_Language_Model_from_Scratch.html">
+<meta property="og:site_name" content="Avinash Sooriyarachchi">
+<meta property="og:image" content="https://avisoori1x.github.io/images/blogImage.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:creator" content="@aviTwit3">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="../../../assets/main.css">
+<link rel="alternate" type="application/rss+xml" title="Avinash Sooriyarachchi" href="https://avisoori1x.github.io/feed.xml">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23faf7f1%22/><text y=%22.9em%22 x=%22.06em%22 font-size=%2286%22 font-family=%22Georgia,serif%22 fill=%22%23c3341a%22>A</text></svg>">
+</head>
+<body>
+<div class="spine" aria-hidden="true"></div>
+<div class="page">
+<header class="post-head rise d1">
+  <h1>SeeMoE: Implementing a MoE Vision Language Model from Scratch</h1>
+  <div class="post-meta">
+    <span>6 May 2024</span>
+    <span>Avinash Sooriyarachchi</span>
+<span>12 min read</span>  </div>
+</header>
+<article class="post-body rise d2">
+<p>TL;DR: In  this blog I implement a mixture of experts vision language model consisting of an image encoder, a multimodal projection module and a mixture of experts decoder language model in pure pytorch. Thus, the resulting implementation could be thought of as a scaled down version of Grok 1.5 Vision and GPT-4 Vision (both have vision encoders connected to a MoE Decoder model via a projection module). The name ‘seeMoE’ is my way of paying homage to Andrej Karpathy’s project ‘makemore’ because for the decoder used here I implement a character level autoregressive language model much like in his nanoGPT/ makemore implementation but with a twist. The twist being that it's a mixture of experts Decoder (much like DBRX, Mixtral and Grok). My goal is for you to have an intuitive understanding of how this seemingly state of the art implementation works so that you can improve upon it or use the key takeaways to build more useful systems.</p>
+<p>The entire implementation can be found in seeMoE_from_Scratch.ipynb in this <a href="https://github.com/AviSoori1x/seemore">GitHub repo</a></p>
+<div align="center">
+  <img src="https://github.com/AviSoori1x/seemore/blob/main/images/seeMoE.png?raw=true" width="500" height="300" alt="seemore">
+</div>
+
+<p>If you've read my other blogs on implementing mixture of experts LLMs from scratch: https://huggingface.co/blog/AviSoori1x/makemoe-from-scratch and implementing a vision language model from scratch: https://huggingface.co/blog/AviSoori1x/seemore-vision-language-model, you'll realize that I'm combining the two to implement seeMoE. Essentially, all I'm doing here is replacing the feed-forward neural network in each transformer block of the decoder with a mixture of experts module with noisy Top-K gating. More information on how this is implemented, is given here: https://huggingface.co/blog/AviSoori1x/makemoe-from-scratch. I strongly encourage you to read these two blogs and carefully go through the repos linked to both the blogs before diving into this.</p>
+<p>In ‘seeMoE’, my simple implementation of a Mixture of Experts vision language model (VLM), there are 3 main components.</p>
+<div align="center">
+  <img src="https://github.com/AviSoori1x/seemore/blob/main/images/moevlm.png?raw=true" width="500" height="500" alt="seemore">
+</div>
+
+<ul>
+<li>
+<p>Image Encoder to extract visual features from images. In this case I use a from scratch implementation of the original vision transformer used in CLIP. This is actually a popular choice in many modern VLMs. The one notable exception is Fuyu series of models from Adept, that passes the patchified images directly to the projection layer.</p>
+</li>
+<li>
+<p>Vision-Language Projector - Image embeddings are not of the same shape as text embeddings used by the decoder. So we need to ‘project’ i.e. change dimensionality of image features extracted by the image encoder to match what’s observed in the text embedding space. So image features become ‘visual tokens’ for the decoder. This could be a single layer or an MLP. I’ve used an MLP because it’s worth showing.</p>
+</li>
+<li>
+<p>A decoder only language model with the mixture of experts architecture. This is the component that ultimately generates text. In my implementation I’ve deviated from what you see in LLaVA a bit by incorporating the projection module to my decoder. Typically this is not observed, and you leave the architecture of the decoder (which is usually an already pretrained model) untouched. The biggest change here is that, as mentioned before, the feed forward neural net / MLP in each transformer block is replaced by a mixture of experts block with a noisy top-k gating mechanism. Basically each token (text tokens + visual tokens that have been mapped to the same embedding space as text tokens) are only processed by top-k of the n experts in each transformer block. So if it's a MoE architecture with 8 experts and top 2 gating, only 2 of the experts will be activated. </p>
+</li>
+</ul>
+<p>Since the Image Encoder and Vision Language Projector are unchanged from seemore (Linked above. Repo here: https://github.com/AviSoori1x/seemore), I encourage you to read the blog/ go through the notebooks for details on those. </p>
+<p>Now let's revisit the components of a sparse mixture of experts module: </p>
+<ol>
+<li>Experts - just n vanilla MLPs</li>
+<li>A gating/ routing mechanism</li>
+<li>weighted summation of activated experts based on the routing mechanism</li>
+</ol>
+<p><img src="https://raw.githubusercontent.com/AviSoori1x/makeMoE/main/images/experts.png" width="800" height="400" alt="seemore"></p>
+<p>First, the 'Expert' which is just an MLP like we saw earlier when implementing the Encoder. </p>
+<div class="highlight"><pre><span></span><code><span class="c1">#Expert module</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Expert</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">""" An MLP is a simple linear layer followed by a non-linearity i.e. each Expert """</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_embed</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">net</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">n_embed</span><span class="p">,</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">n_embed</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">n_embed</span><span class="p">,</span> <span class="n">n_embed</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">dropout</span><span class="p">),</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</code></pre></div>
+
+<p>The routing module decides which experts will be activated. Noisy top k gating/ routing adds a bit of gaussian noise to ensure that there's a fine balance between exploration and exploitation in picking the top-k experts for each token. This reduces the odds of the same n experts getting picked everytime, which defeats the purpose of having a larger parameter count with sparse activation for better generalizability.</p>
+<p><img src="https://raw.githubusercontent.com/AviSoori1x/makeMoE/main/images/noisytopkgating.png" width="800" height="400" alt="seemore"></p>
+<div class="highlight"><pre><span></span><code><span class="c1">#noisy top-k gating</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">NoisyTopkRouter</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_embed</span><span class="p">,</span> <span class="n">num_experts</span><span class="p">,</span> <span class="n">top_k</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">NoisyTopkRouter</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">top_k</span> <span class="o">=</span> <span class="n">top_k</span>
+        <span class="c1">#layer for router logits</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">topkroute_linear</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">n_embed</span><span class="p">,</span> <span class="n">num_experts</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">noise_linear</span> <span class="o">=</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">n_embed</span><span class="p">,</span> <span class="n">num_experts</span><span class="p">)</span>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mh_output</span><span class="p">):</span>
+        <span class="c1"># mh_ouput is the output tensor from multihead self attention block</span>
+        <span class="n">logits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">topkroute_linear</span><span class="p">(</span><span class="n">mh_output</span><span class="p">)</span>
+
+        <span class="c1">#Noise logits</span>
+        <span class="n">noise_logits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">noise_linear</span><span class="p">(</span><span class="n">mh_output</span><span class="p">)</span>
+
+        <span class="c1">#Adding scaled unit gaussian noise to the logits</span>
+        <span class="n">noise</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn_like</span><span class="p">(</span><span class="n">logits</span><span class="p">)</span><span class="o">*</span><span class="n">F</span><span class="o">.</span><span class="n">softplus</span><span class="p">(</span><span class="n">noise_logits</span><span class="p">)</span>
+        <span class="n">noisy_logits</span> <span class="o">=</span> <span class="n">logits</span> <span class="o">+</span> <span class="n">noise</span>
+
+        <span class="n">top_k_logits</span><span class="p">,</span> <span class="n">indices</span> <span class="o">=</span> <span class="n">noisy_logits</span><span class="o">.</span><span class="n">topk</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">top_k</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">zeros</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">noisy_logits</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="s1">'-inf'</span><span class="p">))</span>
+        <span class="n">sparse_logits</span> <span class="o">=</span> <span class="n">zeros</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="n">top_k_logits</span><span class="p">)</span>
+        <span class="n">router_output</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">sparse_logits</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">router_output</span><span class="p">,</span> <span class="n">indices</span>
+</code></pre></div>
+
+<p>Now both noisy-top-k gating and experts can be combined to create a sparse Mixture of Experts module. Note that weighted summation calculation has been incorporated to yield the output for each token in the forward pass.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">#Now create the sparse mixture of experts module</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SparseMoE</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_embed</span><span class="p">,</span> <span class="n">num_experts</span><span class="p">,</span> <span class="n">top_k</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SparseMoE</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">router</span> <span class="o">=</span> <span class="n">NoisyTopkRouter</span><span class="p">(</span><span class="n">n_embed</span><span class="p">,</span> <span class="n">num_experts</span><span class="p">,</span> <span class="n">top_k</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">experts</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">([</span><span class="n">Expert</span><span class="p">(</span><span class="n">n_embed</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_experts</span><span class="p">)])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">top_k</span> <span class="o">=</span> <span class="n">top_k</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">gating_output</span><span class="p">,</span> <span class="n">indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">router</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">final_output</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="c1"># Reshape inputs for batch processing</span>
+        <span class="n">flat_x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">flat_gating_output</span> <span class="o">=</span> <span class="n">gating_output</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">gating_output</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+
+        <span class="c1"># Process each expert in parallel</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">expert</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">experts</span><span class="p">):</span>
+            <span class="c1"># Create a mask for the inputs where the current expert is in top-k</span>
+            <span class="n">expert_mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">indices</span> <span class="o">==</span> <span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">flat_mask</span> <span class="o">=</span> <span class="n">expert_mask</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">flat_mask</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+                <span class="n">expert_input</span> <span class="o">=</span> <span class="n">flat_x</span><span class="p">[</span><span class="n">flat_mask</span><span class="p">]</span>
+                <span class="n">expert_output</span> <span class="o">=</span> <span class="n">expert</span><span class="p">(</span><span class="n">expert_input</span><span class="p">)</span>
+
+                <span class="c1"># Extract and apply gating scores</span>
+                <span class="n">gating_scores</span> <span class="o">=</span> <span class="n">flat_gating_output</span><span class="p">[</span><span class="n">flat_mask</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">weighted_output</span> <span class="o">=</span> <span class="n">expert_output</span> <span class="o">*</span> <span class="n">gating_scores</span>
+
+                <span class="c1"># Update final output additively by indexing and adding</span>
+                <span class="n">final_output</span><span class="p">[</span><span class="n">expert_mask</span><span class="p">]</span> <span class="o">+=</span> <span class="n">weighted_output</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">final_output</span>
+</code></pre></div>
+
+<p>This can now be combined with multihead self attention to create a sparse MoE transformer block.</p>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">SparseMoEBlock</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_embd</span><span class="p">,</span> <span class="n">num_heads</span><span class="p">,</span> <span class="n">num_experts</span><span class="p">,</span> <span class="n">top_k</span><span class="p">,</span> <span class="n">dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">is_decoder</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="c1"># Layer normalization for the input to the attention layer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ln1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LayerNorm</span><span class="p">(</span><span class="n">n_embd</span><span class="p">)</span>
+
+        <span class="c1"># Multi-head attention module</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attn</span> <span class="o">=</span> <span class="n">MultiHeadAttention</span><span class="p">(</span><span class="n">n_embd</span><span class="p">,</span> <span class="n">num_heads</span><span class="p">,</span> <span class="n">dropout</span><span class="p">,</span> <span class="n">is_decoder</span><span class="p">)</span>
+
+        <span class="c1"># Layer normalization for the input to the FFN</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ln2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LayerNorm</span><span class="p">(</span><span class="n">n_embd</span><span class="p">)</span>
+
+        <span class="c1"># Feed-forward neural network (FFN)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sparseMoE</span> <span class="o">=</span> <span class="n">SparseMoE</span><span class="p">(</span><span class="n">n_embd</span><span class="p">,</span> <span class="n">num_experts</span><span class="p">,</span> <span class="n">top_k</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">original_x</span> <span class="o">=</span> <span class="n">x</span>  <span class="c1"># Save the input for the residual connection</span>
+
+        <span class="c1"># Apply layer normalization to the input</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ln1</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="c1"># Apply multi-head attention</span>
+        <span class="n">attn_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">attn</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="c1"># Add the residual connection (original input) to the attention output</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">original_x</span> <span class="o">+</span> <span class="n">attn_output</span>
+
+        <span class="c1"># Apply layer normalization to the input to the FFN</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ln2</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="c1"># Apply the FFN</span>
+        <span class="n">sparseMoE_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sparseMoE</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="c1"># Add the residual connection (input to FFN) to the FFN output</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">sparseMoE_output</span>
+
+        <span class="k">return</span> <span class="n">x</span>
+</code></pre></div>
+
+<p>Now we combine the sparse MoE transformer architecture language decoder model that has been modified to accomodate 'visual tokens' created by the vision-language projector module. Typically, the decoder language model (sparse MoE or dense) will be kept unmodified and will receive embeddings, I've incorportated the vision-langauge projector to the model architecture to keep things simple. A detailed write-up is found in this blog: https://huggingface.co/blog/AviSoori1x/seemore-vision-language-model</p>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">MoEDecoderLanguageModel</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_embd</span><span class="p">,</span> <span class="n">image_embed_dim</span><span class="p">,</span> <span class="n">vocab_size</span><span class="p">,</span> <span class="n">num_heads</span><span class="p">,</span> <span class="n">n_layer</span><span class="p">,</span> <span class="n">num_experts</span><span class="p">,</span> <span class="n">top_k</span><span class="p">,</span> <span class="n">use_images</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_images</span> <span class="o">=</span> <span class="n">use_images</span>
+
+        <span class="c1"># Token embedding table</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">token_embedding_table</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Embedding</span><span class="p">(</span><span class="n">vocab_size</span><span class="p">,</span> <span class="n">n_embd</span><span class="p">)</span>
+
+        <span class="c1"># Position embedding table</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">position_embedding_table</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Embedding</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="n">n_embd</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">use_images</span><span class="p">:</span>
+            <span class="c1"># Image projection layer to align image embeddings with text embeddings</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">image_projection</span> <span class="o">=</span> <span class="n">MultiModalProjector</span><span class="p">(</span><span class="n">n_embd</span><span class="p">,</span> <span class="n">image_embed_dim</span><span class="p">)</span>
+
+        <span class="c1"># Stack of transformer decoder blocks</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sparseMoEBlocks</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">SparseMoEBlock</span><span class="p">(</span><span class="n">n_embd</span><span class="p">,</span> <span class="n">num_heads</span><span class="p">,</span> <span class="n">num_experts</span><span class="p">,</span> <span class="n">top_k</span><span class="p">,</span> <span class="n">is_decoder</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_layer</span><span class="p">)])</span>
+
+        <span class="c1"># Final layer normalization</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ln_f</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LayerNorm</span><span class="p">(</span><span class="n">n_embd</span><span class="p">)</span>
+
+        <span class="c1"># Language modeling head</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lm_head</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">n_embd</span><span class="p">,</span> <span class="n">vocab_size</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">image_embeds</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">targets</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># Get token embeddings from the input indices</span>
+        <span class="n">tok_emb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">token_embedding_table</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_images</span> <span class="ow">and</span> <span class="n">image_embeds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Project and concatenate image embeddings with token embeddings</span>
+            <span class="n">img_emb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_projection</span><span class="p">(</span><span class="n">image_embeds</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">tok_emb</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">img_emb</span><span class="p">,</span> <span class="n">tok_emb</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Get position embeddings</span>
+        <span class="n">pos_emb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">position_embedding_table</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">tok_emb</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">))</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># Add position embeddings to token embeddings</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">tok_emb</span> <span class="o">+</span> <span class="n">pos_emb</span>
+
+        <span class="c1"># Pass through the transformer decoder blocks</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sparseMoEBlocks</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="c1"># Apply final layer normalization</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ln_f</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="c1"># Get the logits from the language modeling head</span>
+        <span class="n">logits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lm_head</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">targets</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_images</span> <span class="ow">and</span> <span class="n">image_embeds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># Prepare targets by concatenating a dummy target for the image embedding</span>
+                <span class="n">batch_size</span> <span class="o">=</span> <span class="n">idx</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">targets</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">torch</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">batch_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">),</span> <span class="n">targets</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+            <span class="c1"># Compute the cross-entropy loss</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">cross_entropy</span><span class="p">(</span><span class="n">logits</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">logits</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)),</span> <span class="n">targets</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">ignore_index</span><span class="o">=-</span><span class="mi">100</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">logits</span><span class="p">,</span> <span class="n">loss</span>
+
+        <span class="k">return</span> <span class="n">logits</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">image_embeds</span><span class="p">,</span> <span class="n">max_new_tokens</span><span class="p">):</span>
+        <span class="c1"># The autoregressive character level generation function is just like in any other decoder model implementation</span>
+
+        <span class="k">return</span> <span class="n">generated</span>
+</code></pre></div>
+
+<p>Now that we have our three key components, we can put it all together into a sparse Mixture of Experts Vision Language Model. The full implementation is given below. If you were to remove the assert statements for error handling, this is very simple. Coming back full circle to the outline I’ve given at the beginning of the blog, all that’s happening here is:</p>
+<ol>
+<li>
+<p>Get image features from the vision encoder (Here it’s a vision transformer, but it could be any model that could generate features from an image input such as a ResNet or a traditional convolutional neural network (needless to say performance may suffer))</p>
+</li>
+<li>
+<p>A projection module for projecting image tokens to the same embedding space as text embeddings for the decoder (this projector is integrated with the decoder in this implementation)</p>
+</li>
+<li>
+<p>A decoder language model with a sparseMoE architecture for generating text conditioned on a preceding image.</p>
+</li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">VisionMoELanguageModel</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_embd</span><span class="p">,</span> <span class="n">image_embed_dim</span><span class="p">,</span> <span class="n">vocab_size</span><span class="p">,</span> <span class="n">n_layer</span><span class="p">,</span> <span class="n">img_size</span><span class="p">,</span> <span class="n">patch_size</span><span class="p">,</span> <span class="n">num_heads</span><span class="p">,</span> <span class="n">num_blks</span><span class="p">,</span> <span class="n">emb_dropout</span><span class="p">,</span> <span class="n">blk_dropout</span><span class="p">,</span> <span class="n">num_experts</span><span class="p">,</span> <span class="n">top_k</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="c1"># Set num_hiddens equal to image_embed_dim</span>
+        <span class="n">num_hiddens</span> <span class="o">=</span> <span class="n">image_embed_dim</span>
+
+        <span class="c1"># Assert that num_hiddens is divisible by num_heads</span>
+        <span class="k">assert</span> <span class="n">num_hiddens</span> <span class="o">%</span> <span class="n">num_heads</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">"num_hiddens must be divisible by num_heads"</span>
+
+        <span class="c1"># Initialize the vision encoder (ViT)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vision_encoder</span> <span class="o">=</span> <span class="n">ViT</span><span class="p">(</span><span class="n">img_size</span><span class="p">,</span> <span class="n">patch_size</span><span class="p">,</span> <span class="n">num_hiddens</span><span class="p">,</span> <span class="n">num_heads</span><span class="p">,</span> <span class="n">num_blks</span><span class="p">,</span> <span class="n">emb_dropout</span><span class="p">,</span> <span class="n">blk_dropout</span><span class="p">)</span>
+
+        <span class="c1"># Initialize the language model decoder (DecoderLanguageModel)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span> <span class="o">=</span> <span class="n">MoEDecoderLanguageModel</span><span class="p">(</span><span class="n">n_embd</span><span class="p">,</span> <span class="n">image_embed_dim</span><span class="p">,</span> <span class="n">vocab_size</span><span class="p">,</span> <span class="n">num_heads</span><span class="p">,</span> <span class="n">n_layer</span><span class="p">,</span><span class="n">num_experts</span><span class="p">,</span> <span class="n">top_k</span><span class="p">,</span> <span class="n">use_images</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img_array</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">targets</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># Get the image embeddings from the vision encoder</span>
+        <span class="n">image_embeds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vision_encoder</span><span class="p">(</span><span class="n">img_array</span><span class="p">)</span>
+
+        <span class="c1"># Check if the image embeddings are valid</span>
+        <span class="k">if</span> <span class="n">image_embeds</span><span class="o">.</span><span class="n">nelement</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">image_embeds</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Something is wrong with the ViT model. It's returning an empty tensor or the embedding dimension is empty."</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">targets</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># If targets are provided, compute the logits and loss</span>
+            <span class="n">logits</span><span class="p">,</span> <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">image_embeds</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">logits</span><span class="p">,</span> <span class="n">loss</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># If targets are not provided, compute only the logits</span>
+            <span class="n">logits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">image_embeds</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">logits</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img_array</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">max_new_tokens</span><span class="p">):</span>
+        <span class="c1"># Get the image embeddings from the vision encoder</span>
+        <span class="n">image_embeds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vision_encoder</span><span class="p">(</span><span class="n">img_array</span><span class="p">)</span>
+
+        <span class="c1"># Check if the image embeddings are valid</span>
+        <span class="k">if</span> <span class="n">image_embeds</span><span class="o">.</span><span class="n">nelement</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">image_embeds</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Something is wrong with the ViT model. It's returning an empty tensor or the embedding dimension is empty."</span><span class="p">)</span>
+
+        <span class="c1"># Generate new tokens using the language model decoder</span>
+        <span class="n">generated_tokens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">image_embeds</span><span class="p">,</span> <span class="n">max_new_tokens</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">generated_tokens</span>
+</code></pre></div>
+
+<p>Now back to where we started. The above VisionMoELanguageModel class neatly wraps up all the components we set out to put together.</p>
+<p><img src="https://github.com/AviSoori1x/seemore/blob/main/images/moevlm.png?raw=true" width="500" height="500" alt="seemore"></p>
+<p>The training loop is exactly as you see in the original vision language blog linked at the top. Please check out seeMoE_from_Scratch.ipynb in the following repo: https://github.com/AviSoori1x/seemore</p>
+</article>
+<a class="backlink" href="../../../">Back to index</a>
+<footer class="colophon">
+  <span>© 2026 Avinash Sooriyarachchi</span>
+  <span><a href="https://github.com/AviSoori1x">GitHub</a> &nbsp;·&nbsp; <a href="https://scholar.google.com/citations?user=9uC-33kAAAAJ">Google Scholar</a> &nbsp;·&nbsp; <a href="https://www.linkedin.com/in/avi-data-ml/">LinkedIn</a> &nbsp;·&nbsp; <a href="https://x.com/aviTwit3">X</a> &nbsp;·&nbsp; <a href="https://huggingface.co/AviSoori1x">Hugging Face</a></span>
+  <span>Set in Instrument Serif &amp; IBM Plex Mono</span>
+</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,70 @@
+items:
+  - title: Empowering Generative AI with Databricks and AMD
+    venue: Data + AI Summit
+    date: "2024"
+    sort: "2024-06"
+    kind: Talk
+    url: https://youtu.be/FB6H4NwFGzQ
+    note: >-
+      Running generative AI workloads on AMD accelerators from within the Databricks
+      platform — what it takes to make an alternative accelerator stack practical.
+
+  - title: "Text to Insights: Building Real-Time Analytics Systems with Generative AI"
+    venue: ODSC Generative AI Summit
+    date: "2023"
+    sort: "2023-10"
+    kind: Talk
+    url: https://youtu.be/yJ0ywuG_yv4?t=12880
+    note: >-
+      Composing language models, vector databases and efficient fine-tuning into a system
+      that turns a plain-English question into a live analytical answer.
+
+  - title: "Getting Up to Speed on Real-Time Machine Learning"
+    venue: ODSC Europe
+    date: "2023"
+    sort: "2023-06"
+    kind: Talk
+    url: https://youtu.be/eJqqDZkBrzE
+    note: >-
+      What "real time" actually means across streaming inference, feature freshness and
+      online learning — and which parts are worth the operational cost.
+
+  - title: "Monetizing Data Assets: Sharing Data, Models and Features"
+    venue: Data + AI Summit
+    date: "2023"
+    sort: "2023-06"
+    kind: Talk
+    url: https://youtu.be/wj_WtrrEfi8
+    note: >-
+      Treating models and feature tables as shareable, governed products rather than
+      artefacts locked inside one team's workspace.
+
+  - title: Streaming Machine Learning with Databricks and GitHub Actions
+    venue: GitHub Universe
+    date: "2022"
+    sort: "2022-11"
+    kind: Talk
+    url: https://youtu.be/ogk__G33E-A
+    note: >-
+      Continuous delivery for streaming ML — driving model training and deployment on a
+      structured streaming pipeline from CI.
+
+  - title: Innovating with Multimodality and Reasoning with Mistral AI
+    venue: ODSC West
+    date: "2024"
+    sort: "2024-10-31"
+    kind: Talk
+    url: https://odsc.com/speakers/innovating-with-multimodality-and-reasoning-with-mistral-ai/
+    note: >-
+      Where multimodal input and explicit reasoning change what you can actually build on a
+      foundation model, presented in the "What's Next in AI" track.
+
+  - title: Innovating with Multimodality and Reasoning with Mistral AI
+    venue: AWS GenAI Developer Day
+    location: San Francisco
+    date: "2024"
+    sort: "2024-10-15"
+    kind: Talk
+    url: https://www.aicamp.ai/event/eventdetails/W2024101509
+    note: >-
+      The same material for a developer audience at the AWS SF Loft, hosted with AICamp.

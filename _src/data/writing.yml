@@ -1,0 +1,91 @@
+# `secondary: true` keeps a piece in the collapsed fold rather than the
+# selected list — used for lighter, seasonal or heavily co-authored marketing posts.
+items:
+  - title: Common Sense Product Recommendations using Large Language Models
+    publisher: Databricks
+    date: "2024"
+    sort: "2024-03-05"
+    with: Sam Sawyer, Colton Peltier, Bryan Smith
+    url: https://www.databricks.com/blog/common-sense-product-recommendations-using-large-language-models
+    note: >-
+      Uses a language model's world knowledge to propose complementary products, then grounds
+      those free-text suggestions against a retailer's real catalogue with embeddings and
+      vector search — knowledge a collaborative-filtering system structurally cannot supply.
+
+  - title: "Efficient Fine-Tuning with LoRA: A Guide to Optimal Parameter Selection for Large Language Models"
+    publisher: Databricks
+    date: "2023"
+    sort: "2023-08-30"
+    url: https://www.databricks.com/blog/efficient-fine-tuning-lora-guide-llms
+    note: >-
+      An empirical argument that QLoRA should target every linear layer rather than the
+      attention blocks alone, and that a modest rank suffices — better outputs while training
+      under 1% of parameters.
+
+  - title: Harnessing Machine Learning for Anomaly Detection in the Building Products Industry
+    publisher: Databricks
+    date: "2023"
+    sort: "2023-12-22"
+    with: Joy Garnett, Sathish Gangichetty
+    url: https://www.databricks.com/blog/harnessing-machine-learning-anomaly-detection-building-products-industry-databricks
+    note: >-
+      Dimensionality reduction plus anomaly detection over manufacturing sensor data, wrapped
+      in enough MLOps to retrain and redeploy continuously.
+
+  - title: Near Real-Time Anomaly Detection with Delta Live Tables and Databricks Machine Learning
+    publisher: Databricks
+    date: "2022"
+    sort: "2022-08-08"
+    with: Sathish Gangichetty
+    url: https://www.databricks.com/blog/near-real-time-anomaly-detection-delta-live-tables-and-databricks-machine-learning
+    note: >-
+      Embedding a trained isolation forest inside a streaming ETL pipeline to catch fraudulent
+      card transactions in near real time.
+
+  - title: Building a Similarity-based Image Recommendation System for e-Commerce
+    publisher: Databricks
+    date: "2022"
+    sort: "2022-03-01"
+    url: https://www.databricks.com/blog/2022/03/01/building-a-similarity-based-image-recommendation-system-for-e-commerce.html
+    note: >-
+      A contrastive-learning image similarity model for product recommendation, trained
+      distributed across GPU clusters and served end to end.
+
+  - title: Getting Up to Speed on Real-Time Machine Learning with Spark and SBERT
+    publisher: ODSC
+    date: "2023"
+    sort: "2023-05"
+    url: https://opendatascience.com/getting-up-to-speed-on-real-time-machine-learning-with-spark-and-sbert/
+    note: >-
+      Sentence-transformer inference inside a streaming pipeline, and where the latency
+      actually goes.
+
+  - title: Build your own AI Coding Assistant with Databricks using Visual Studio Code and GitHub Copilot
+    publisher: Medium
+    date: "2023"
+    sort: "2023-03"
+    url: https://avi-soori.medium.com/build-your-own-ai-coding-assistant-with-databricks-using-visual-studio-code-and-github-copilot-50643317082f
+    note: >-
+      Standing up a self-hosted code model and wiring it into the editor alongside Copilot.
+
+  - title: "There's No AI in Pumpkin Pie, But There Should Be: Delivering Novel Application Experiences Using ML & AI"
+    publisher: Databricks
+    date: "2022"
+    sort: "2022-11-08"
+    secondary: true
+    with: Nicole Jingting Lu, Bryan Smith, Sam Steiny, Mikaila Garfinkel
+    url: https://www.databricks.com/blog/2022/11/08/theres-no-ai-pumpkin-pie-there-should-be-delivering-novel-application-experiences
+    note: >-
+      A recipe-finder application built on image embeddings and similarity search over a
+      recipe dataset.
+
+  - title: Even Santa Claus has AI fever
+    publisher: Databricks
+    date: "2023"
+    sort: "2023-12-15"
+    secondary: true
+    with: Alex Miller, Kunal Marwah, Mikaila Garfinkel
+    url: https://www.databricks.com/blog/even-santa-claus-has-ai-fever
+    note: >-
+      Synthetic data generation and named-entity recognition applied, seasonally, to
+      extracting gift requests from letters.

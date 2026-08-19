@@ -1,0 +1,105 @@
+items:
+  - name: makeMoE
+    featured: true
+    stars: 812
+    url: https://github.com/AviSoori1x/makeMoE
+    desc: >-
+      A sparse mixture-of-experts language model written from scratch in pure PyTorch —
+      expert modules, top-k noisy gating, and the initialisation and routing details that
+      actually decide whether an MoE trains. Built in the spirit of Karpathy's makemore, as a
+      readable reference for the architecture behind Mixtral, DBRX and Grok.
+    adoption: >-
+      Used as teaching material by the NeurIPS 2024 tutorial “Dynamic Sparsity in Machine
+      Learning”, whose MoE notebook states it is “inspired by the makeMoE blog post” and trains
+      on data pulled straight from the repo; and listed as assigned reading by the M2L Summer
+      School 2024.
+    links:
+      - label: Repository
+        url: https://github.com/AviSoori1x/makeMoE
+      - label: Write-up
+        url: https://huggingface.co/blog/AviSoori1x/makemoe-from-scratch
+      - label: NeurIPS 2024 tutorial
+        url: https://dynamic-sparsity.github.io/assets/notebooks/moes.ipynb
+      - label: M2L Summer School
+        url: https://github.com/M2Lschool/tutorials2024/blob/main/1_nlp/part_II_text_generation/Transformer_Decoder_MoE_solved.ipynb
+      - label: Hacker News
+        url: https://news.ycombinator.com/item?id=39742921
+
+  - name: seemore
+    featured: true
+    stars: 260
+    url: https://github.com/AviSoori1x/seemore
+    desc: >-
+      A vision language model implemented from scratch in pure PyTorch: a ViT image encoder, a
+      multimodal projection module, and a character-level autoregressive decoder, assembled end
+      to end so every connection is visible. A follow-up, seeMoE, swaps the decoder for a
+      mixture-of-experts version.
+    adoption: >-
+      Its architecture diagram is used as the reference VLM diagram in Lab 1 of École
+      Polytechnique's graduate course CSC_52002, Multimodal Generative AI.
+    links:
+      - label: Repository
+        url: https://github.com/AviSoori1x/seemore
+      - label: seemore write-up
+        url: https://huggingface.co/blog/AviSoori1x/seemore-vision-language-model
+      - label: seeMoE write-up
+        url: https://huggingface.co/blog/AviSoori1x/seemoe
+      - label: École Polytechnique lab
+        url: https://github.com/ArnaudoB/CSC_52002_EP-MultimodalGenAI/blob/main/lab1/lab1.ipynb
+
+  - name: Tuning the Finetuning
+    stars: 46
+    url: https://github.com/AviSoori1x/Tuning-the-Finetuning
+    desc: >-
+      An empirical exploration of what actually matters when fine-tuning with QLoRA — rank,
+      target modules, and the parameter choices that decide whether a run is worth the GPU
+      hours. The companion write-up is cited in the academic literature.
+    links:
+      - label: Repository
+        url: https://github.com/AviSoori1x/Tuning-the-Finetuning
+      - label: LoRA guide
+        url: https://www.databricks.com/blog/efficient-fine-tuning-lora-guide-llms
+
+  - name: multimodal_LLMs
+    stars: 12
+    url: https://github.com/AviSoori1x/multimodal_LLMs
+    desc: >-
+      Fine-tuning BLIP-2 and Flan-T5-XL for caption generation with PEFT/LoRA — an early look
+      at parameter-efficient adaptation of multimodal models.
+
+  - name: BrickPilot
+    stars: 10
+    url: https://github.com/AviSoori1x/BrickPilot
+    desc: >-
+      Build your own AI coding assistant, wiring a self-hosted code model into VS Code
+      alongside GitHub Copilot.
+    links:
+      - label: Repository
+        url: https://github.com/AviSoori1x/BrickPilot
+      - label: Write-up
+        url: https://avi-soori.medium.com/build-your-own-ai-coding-assistant-with-databricks-using-visual-studio-code-and-github-copilot-50643317082f
+
+  - name: Finetuning-Guide
+    stars: 10
+    url: https://github.com/avisoori-databricks/Finetuning-Guide
+    desc: >-
+      Fine-tuning OpenLLaMA models on instruction-following datasets with QLoRA, end to end.
+
+  - name: text-to-insights
+    stars: 4
+    url: https://github.com/avisoori-databricks/text-to-insights
+    desc: >-
+      Going from natural language to SQL to an actual answer, combining language models,
+      vector search and resource-efficient fine-tuning.
+
+  - name: Explainable-ML-Application
+    stars: 3
+    url: https://github.com/AviSoori1x/Explainable-ML-Application
+    desc: >-
+      Interactive explainable machine learning — a containerised Streamlit application for
+      interrogating model behaviour.
+    links:
+      - label: Repository
+        url: https://github.com/AviSoori1x/Explainable-ML-Application
+      - label: Write-up
+        url: /2021/04/14/Interactive_Explainable_Machine_Learning_with_SAS_Viya,_Streamlit_and_Docker.html

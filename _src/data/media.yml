@@ -1,0 +1,31 @@
+items:
+  - title: "Inside Applied AI at Mistral: Benchmarks, Guardrails & Career Advice"
+    venue: Chris's Corner
+    host: with Chris Richardson
+    date: "2025"
+    sort: "2025-05-28"
+    kind: Podcast
+    url: https://www.youtube.com/watch?v=pVDPb9JoFGo
+    note: >-
+      A long-form conversation on building products on top of foundation models — fine-tuning,
+      DPO and quantisation; why evaluation and guardrails are the hard part of enterprise
+      deployment; and how to move into applied AI research.
+
+  - title: "Mistral AI on AWS: 3 Features Developers Need to Know"
+    venue: AWS Developers
+    date: "2025"
+    sort: "2025-02"
+    kind: Video
+    url: https://www.youtube.com/watch?v=yz2a2BiYtJo
+    note: >-
+      A walkthrough of the Mistral capabilities that matter most when building on AWS.
+
+  - title: Building a Mixture of Experts Model from Scratch with makeMoE
+    venue: Fahd Mirza
+    date: "2024"
+    sort: "2024-01-28"
+    kind: Coverage
+    url: https://www.youtube.com/watch?v=s0_Yd83td9M
+    note: >-
+      An independent video walkthrough of makeMoE, one of several third-party explainers the
+      project has attracted.

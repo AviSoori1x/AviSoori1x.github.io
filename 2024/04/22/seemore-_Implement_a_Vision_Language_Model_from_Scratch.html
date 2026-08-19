@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>seemore: Implement a Vision Language Model from Scratch — Avinash Sooriyarachchi</title>
+<meta name="description" content="In this blog I implement a vision language model consisting of an image encoder, a multimodal projection module and a decoder language model in pure pytorch. Think of this as a sim">
+<link rel="canonical" href="https://avisoori1x.github.io/2024/04/22/seemore-_Implement_a_Vision_Language_Model_from_Scratch.html">
+<meta name="author" content="Avinash Sooriyarachchi">
+
+<meta property="og:type" content="article">
+<meta property="og:title" content="seemore: Implement a Vision Language Model from Scratch — Avinash Sooriyarachchi">
+<meta property="og:description" content="In this blog I implement a vision language model consisting of an image encoder, a multimodal projection module and a decoder language model in pure pytorch. Think of this as a sim">
+<meta property="og:url" content="https://avisoori1x.github.io/2024/04/22/seemore-_Implement_a_Vision_Language_Model_from_Scratch.html">
+<meta property="og:site_name" content="Avinash Sooriyarachchi">
+<meta property="og:image" content="https://avisoori1x.github.io/images/blogImage.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:creator" content="@aviTwit3">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="../../../assets/main.css">
+<link rel="alternate" type="application/rss+xml" title="Avinash Sooriyarachchi" href="https://avisoori1x.github.io/feed.xml">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23faf7f1%22/><text y=%22.9em%22 x=%22.06em%22 font-size=%2286%22 font-family=%22Georgia,serif%22 fill=%22%23c3341a%22>A</text></svg>">
+</head>
+<body>
+<div class="spine" aria-hidden="true"></div>
+<div class="page">
+<header class="post-head rise d1">
+  <h1>seemore: Implement a Vision Language Model from Scratch</h1>
+  <div class="post-meta">
+    <span>22 April 2024</span>
+    <span>Avinash Sooriyarachchi</span>
+<span>22 min read</span>  </div>
+</header>
+<article class="post-body rise d2">
+<p>TL;DR: In  this blog I implement a vision language model consisting of an image encoder, a multimodal projection module and a decoder language model in pure pytorch. Think of this as a simplified version of what you see in GPT-4 or Claude 3 in terms of vision capabilities demonstrated by a language model. The name ‘seemore’ is my way of paying homage to Andrej Karpathy’s project ‘makemore’ because here I use a character level autoregressive language model much like in his nanoGPT/ makemore implementation.  My goal is for you to gain an intuitive understanding of how it all works by reading this blog and stepping through the code in the repository.</p>
+<div align="center">
+ <img src="https://github.com/AviSoori1x/seemore/blob/main/images/seemorelogo.png?raw=true" width="300" height="300" alt="seemore">
+</div>
+
+<p>The Github repo here provides the end-to-end implementation: <a href="https://github.com/AviSoori1x/seemore">Repo</a></p>
+<h4>Motivation</h4>
+<p>Vision language models have become a topic of great interest in the machine learning community due to the capabilities displayed by GPT-4, Grok 1.5, Claude 3 and Google Gemini. In addition to these proprietary multimodal (primarily vision-language) models, there have been a number of highly performant open models such as LLaVa, Kosmos from Microsoft and most recently, Idefics2 from Hugging Face.</p>
+<p>Although the term vision language model could mean a number of things, the current wave of this class of models tend to demonstrate instruction following capabilities over both image and text inputs. In essence, you can expect a vision language model to write you a poem about how great sushi is and at the same time be able to count the number of sushi rolls on a given plate, given an image. I want to make this clear as there’s a rich collection of other types of vision language models such as CLIP and more recent variations such as SigLIP that are very important but quite different in how they are used. As a matter of fact, we will look at how components from these architectures are used in the current crop of vision language models.</p>
+<p>For the purpose of this blog, I will focus on this type of vision language models that can be instruction tuned to perform useful tasks. More specifically, here I will specify a common architectural pattern that seems to be taking shape and proving to be highly versatile.</p>
+<h4>The General Architecture</h4>
+<div align="center">
+ <img src="https://github.com/AviSoori1x/seemore/blob/main/images/vlm.png?raw=true" width="600" height="600" alt="seemore">
+</div>
+
+<p>In ‘seemore’, my simple implementation of a vision language model (VLM), there are 3 main components. </p>
+<ol>
+<li>
+<p>Image Encoder to extract visual features from images. In this case I use a from scratch implementation of the original vision transformer used in CLIP. This is actually a popular choice in many modern VLMs. The one notable exception is the Fuyu series of models from Adept, that passes the patchified images directly to the projection layer.</p>
+</li>
+<li>
+<p>Vision-Language Projector - Image embeddings are not of the same shape as text embeddings used by the decoder. So we need to ‘project’ i.e. change dimensionality of image features extracted by the image encoder to match what’s observed in the text embedding space. So image features become ‘visual tokens’ for the decoder. This could be a single layer or an MLP. I’ve used an MLP because it’s worth showing.</p>
+</li>
+<li>
+<p>A decoder only language model. This is the component that ultimately generates text. In my implementation I’ve deviated from what you see in LLaVA a bit by incorporating the projection module to my decoder. Typically this is not observed, and you leave the architecture of the decoder (which is usually an already pretrained model) untouched.</p>
+</li>
+</ol>
+<p>So in summary, an image encoder extracts features from a given image, passes these image embeddings to a vision-language projector which projects these image embeddings to the text embedding space, that is then concatenated with the text embeddings from the text inputs and used to autoregressively generate text by a decoder only language model.</p>
+<p>When you zoom out, it’s not all that complicated and honestly, quite clever. It’s also kind of amazing that this works. Just like everything else in deep learning. </p>
+<h5>Let’s start with the image encoder</h5>
+<p>As mentioned earlier, here I choose to implement a vision transformer similar to the one used in CLIP. </p>
+<div align="center">
+ <img src="https://github.com/AviSoori1x/seemore/blob/main/images/clip.png?raw=true" width="600" height="400" alt="seemore">
+</div>
+<p>source: https://openai.com/research/clip</p>
+<p>There has been a trend of vision language models getting much better performance using a vision transformer from an improved version of CLIP known as SigLIP that uses a sigmoid loss instead of the cross entropy loss used in the contrastive learning task of CLIP. A great example of a tiny vision language model using the vision transformer from SigLIP punching way above its weight (literally. it’s only 1.6B parameters in total) is moondream 2 by vikhyat: https://github.com/vikhyat/moondream.</p>
+<p>However, for the sake of simplicity, we assume that the CLIP version is used here but the implementation would be identical. In seemore, I use the embedding corresponding to the  ‘[CLS]’ token as the feature vector that represents the entire image. This is done for the sake of simplicity. However, it is possible, and likely better, to choose all the feature vectors from the last layer of the vision transformer. My assumption is that this will help with tasks such as counting and OCR, where spatial information is available in a less compressed manner for the decoder. </p>
+<div align="center">
+<img src="https://github.com/AviSoori1x/seemore/blob/main/images/vit.png?raw=true" width="600" height="300" alt="seemore">
+</div>
+<p>source: https://arxiv.org/pdf/2010.11929.pdf</p>
+<p>To implement this vision transformer from scratch we have to create a PatchEmbeddings class that can take an image and create a sequence of patches. This process is crucial for enabling the transformer architecture to process visual data effectively, specifically using the attention blocks in the subsequent steps of the architecture. 
+This can be implemented quite simply as follows:</p>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">PatchEmbeddings</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img_size</span><span class="o">=</span><span class="mi">96</span><span class="p">,</span> <span class="n">patch_size</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="o">=</span><span class="mi">512</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="c1"># Store the input image size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">img_size</span> <span class="o">=</span> <span class="n">img_size</span>
+
+        <span class="c1"># Store the size of each patch</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">patch_size</span> <span class="o">=</span> <span class="n">patch_size</span>
+
+        <span class="c1"># Calculate the total number of patches</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_patches</span> <span class="o">=</span> <span class="p">(</span><span class="n">img_size</span> <span class="o">//</span> <span class="n">patch_size</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+
+        <span class="c1"># Create a convolutional layer to extract patch embeddings</span>
+        <span class="c1"># in_channels=3 assumes the input image has 3 color channels (RGB)</span>
+        <span class="c1"># out_channels=hidden_dim sets the number of output channels to match the hidden dimension</span>
+        <span class="c1"># kernel_size=patch_size and stride=patch_size ensure each patch is separately embedded</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="n">in_channels</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">out_channels</span><span class="o">=</span><span class="n">hidden_dim</span><span class="p">,</span>
+                              <span class="n">kernel_size</span><span class="o">=</span><span class="n">patch_size</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="n">patch_size</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="c1"># Extract patch embeddings from the input image</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+        <span class="c1"># Flatten the spatial dimensions (height and width) of the patch embeddings</span>
+        <span class="c1"># This step flattens the patch dimensions into a single dimension</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="c1"># Transpose the dimensions to obtain the shape [batch_size, num_patches, hidden_dim]</span>
+        <span class="c1"># This step brings the num_patches dimension to the second position</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">X</span>
+</code></pre></div>
+
+<p>In the above code, the input image is broken down to (img_size // patch_size) ** 2 patches using the convolution layer and projected into vectors with a channel dimension (the C, in [B, T, C] shape commonly encountered in pytorch implementations for 3D tensors) of 512.</p>
+<h3>Attention Mechanism across both the vision encoder and language decoder</h3>
+<p>Things get interesting when building the components seen in the transformer blocks. i.e. The attention head implementation, multi head attention, the multilayer perceptron seen in each transformer block and the transformer block itself. These components are mostly identical across the vision transformer we are implementing for the ‘visual token’ generation and the decoder language model for the actual text output generation. </p>
+<p>The only key difference is the masking applied in each attention head in the decoder language model. This is done to ensure the integrity of the autoregressive language generation process, particularly in a decoder-only model, the code implements masking. This masking technique is crucial as it obscures any information following the current token's position, thereby directing the model's attention to only the preceding parts of the sequence. Such an attention mechanism is known as causal self-attention.</p>
+<div align="center">
+<img src="https://github.com/AviSoori1x/seemore/blob/main/images/mhsa.png?raw=true" width="800" height="400" alt="seemore">
+</div>
+
+<p>In the above image, the lower triangular mask is only applied in the case of a decoder model. Consider the bright blue triangle in matrix W absent in the case of visualizing the process in each attention head in the vision encoder. </p>
+<p>So here I implement these components in such a manner that they can be shared for both the vision encoder and language decoder by passing in an is_decoder boolean argument to the class constructor. </p>
+<p>The code for causal self attention and multi-head causal self attention can be organized as follows. Multi-head self attention applies multiple attention heads in parallel, each focusing on a separate section of the channel (the embedding dimension). Multi-head self attention essentially improves the learning process and improves efficiency of model training due to the inherently parallel implementation. Notice I have used dropout throughout this implementation for regularization i.e. preventing overfitting.</p>
+<p>The implementation of the attention head looks like this: </p>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Head</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_embd</span><span class="p">,</span> <span class="n">head_size</span><span class="p">,</span> <span class="n">dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">is_decoder</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="c1"># Linear layer for key projection</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">n_embd</span><span class="p">,</span> <span class="n">head_size</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># Linear layer for query projection</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">query</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">n_embd</span><span class="p">,</span> <span class="n">head_size</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># Linear layer for value projection</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">n_embd</span><span class="p">,</span> <span class="n">head_size</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># Dropout layer for regularization</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">dropout</span><span class="p">)</span>
+
+        <span class="c1"># Flag indicating whether this head is used in the decoder</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_decoder</span> <span class="o">=</span> <span class="n">is_decoder</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="c1"># Get the batch size (B), sequence length (T), and embedding dimension (C) from the input tensor</span>
+        <span class="n">B</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span>
+
+        <span class="c1"># Compute key, query, and value projections</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>   <span class="c1"># Shape: [B, T, head_size]</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="c1"># Shape: [B, T, head_size]</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="c1"># Shape: [B, T, head_size]</span>
+
+        <span class="c1"># Compute attention scores by taking the dot product of query and key</span>
+        <span class="c1"># and scaling by the square root of the embedding dimension</span>
+        <span class="n">wei</span> <span class="o">=</span> <span class="n">q</span> <span class="o">@</span> <span class="n">k</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">C</span> <span class="o">**</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">)</span> <span class="c1"># Shape: [B, T, T]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_decoder</span><span class="p">:</span>
+            <span class="c1"># If this head is used in the decoder, apply a causal mask to the attention scores</span>
+            <span class="c1"># to prevent attending to future positions</span>
+            <span class="n">tril</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tril</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">bool</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">x</span><span class="o">.</span><span class="n">device</span><span class="p">))</span>
+            <span class="n">wei</span> <span class="o">=</span> <span class="n">wei</span><span class="o">.</span><span class="n">masked_fill</span><span class="p">(</span><span class="n">tril</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="s1">'-inf'</span><span class="p">))</span>
+
+        <span class="c1"># Apply softmax to the attention scores to obtain attention probabilities</span>
+        <span class="n">wei</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">wei</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># Shape: [B, T, T]</span>
+
+        <span class="c1"># Apply dropout to the attention probabilities for regularization</span>
+        <span class="n">wei</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">wei</span><span class="p">)</span>
+
+        <span class="c1"># Perform weighted aggregation of values using the attention probabilities</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">wei</span> <span class="o">@</span> <span class="n">v</span> <span class="c1"># Shape: [B, T, head_size]</span>
+
+        <span class="k">return</span> <span class="n">out</span>
+</code></pre></div>
+
+<p>The implementation of multihead attention is as follows: </p>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">MultiHeadAttention</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_embd</span><span class="p">,</span> <span class="n">num_heads</span><span class="p">,</span> <span class="n">dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">is_decoder</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="c1"># Ensure that the embedding dimension is divisible by the number of heads</span>
+        <span class="k">assert</span> <span class="n">n_embd</span> <span class="o">%</span> <span class="n">num_heads</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">"n_embd must be divisible by num_heads"</span>
+
+        <span class="c1"># Create a ModuleList of attention heads</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">heads</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">([</span>
+            <span class="n">Head</span><span class="p">(</span><span class="n">n_embd</span><span class="p">,</span> <span class="n">n_embd</span> <span class="o">//</span> <span class="n">num_heads</span><span class="p">,</span> <span class="n">dropout</span><span class="p">,</span> <span class="n">is_decoder</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_heads</span><span class="p">)</span>
+        <span class="p">])</span>
+
+        <span class="c1"># Linear layer for projecting the concatenated head outputs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">proj</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">n_embd</span><span class="p">,</span> <span class="n">n_embd</span><span class="p">)</span>
+
+        <span class="c1"># Dropout layer for regularization</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">dropout</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="c1"># Apply each attention head to the input tensor</span>
+        <span class="n">head_outputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">h</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">heads</span><span class="p">]</span>
+
+        <span class="c1"># Concatenate the outputs from all heads along the last dimension</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">head_outputs</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Apply the projection layer to the concatenated outputs</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">proj</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+
+        <span class="c1"># Apply dropout to the projected outputs for regularization</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">out</span>
+</code></pre></div>
+
+<p>The multilayer perceptron that follows each multihead attention module is quite straightforward. Please note that I’ve noticed GELU being used quite often in Vision Transformers and ReLU used in text transformers, so I have this conditional logic to switch between the two based on where this MLP will be inserted. However, it seems that GELU is being used for both due to its resultant model performance, regardless of the fact that it’s more computationally expensive that RELU.</p>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">MLP</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_embd</span><span class="p">,</span> <span class="n">dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">is_decoder</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="c1"># Define the layers of the MLP</span>
+        <span class="n">layers</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="c1"># First linear layer that expands the input dimension from n_embd to 4 * n_embd</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">n_embd</span><span class="p">,</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">n_embd</span><span class="p">),</span>
+
+            <span class="c1"># Activation function: ReLU if is_decoder is True, else GELU</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">()</span> <span class="k">if</span> <span class="n">is_decoder</span> <span class="k">else</span> <span class="n">nn</span><span class="o">.</span><span class="n">GELU</span><span class="p">(),</span>
+
+            <span class="c1"># Second linear layer that projects the intermediate dimension back to n_embd</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">n_embd</span><span class="p">,</span> <span class="n">n_embd</span><span class="p">),</span>
+
+            <span class="c1"># Dropout layer for regularization</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">dropout</span><span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="c1"># Create a sequential container to hold the layers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">net</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span><span class="o">*</span><span class="n">layers</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="c1"># Pass the input through the MLP layers</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</code></pre></div>
+
+<p>Multihead attention and MLP can be combined into transformer blocks. As discussed before the is_decoder boolean flag will allow us to turn the mask on and off, allowing us to create encoder and decoder blocks quite easily.</p>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Block</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_embd</span><span class="p">,</span> <span class="n">num_heads</span><span class="p">,</span> <span class="n">dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">is_decoder</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="c1"># Layer normalization for the input to the attention layer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ln1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LayerNorm</span><span class="p">(</span><span class="n">n_embd</span><span class="p">)</span>
+
+        <span class="c1"># Multi-head attention module</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attn</span> <span class="o">=</span> <span class="n">MultiHeadAttention</span><span class="p">(</span><span class="n">n_embd</span><span class="p">,</span> <span class="n">num_heads</span><span class="p">,</span> <span class="n">dropout</span><span class="p">,</span> <span class="n">is_decoder</span><span class="p">)</span>
+
+        <span class="c1"># Layer normalization for the input to the FFN</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ln2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LayerNorm</span><span class="p">(</span><span class="n">n_embd</span><span class="p">)</span>
+
+        <span class="c1"># Feed-forward neural network (FFN)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ffn</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">n_embd</span><span class="p">,</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">n_embd</span><span class="p">),</span>  <span class="c1"># Expand the dimension</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">GELU</span><span class="p">(),</span>  <span class="c1"># Activation function</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">n_embd</span><span class="p">,</span> <span class="n">n_embd</span><span class="p">),</span>  <span class="c1"># Project back to the original dimension</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">original_x</span> <span class="o">=</span> <span class="n">x</span>  <span class="c1"># Save the input for the residual connection</span>
+
+        <span class="c1"># Apply layer normalization to the input</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ln1</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="c1"># Apply multi-head attention</span>
+        <span class="n">attn_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">attn</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="c1"># Add the residual connection (original input) to the attention output</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">original_x</span> <span class="o">+</span> <span class="n">attn_output</span>
+
+        <span class="c1"># Apply layer normalization to the input to the FFN</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ln2</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="c1"># Apply the FFN</span>
+        <span class="n">ffn_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ffn</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="c1"># Add the residual connection (input to FFN) to the FFN output</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">ffn_output</span>
+
+        <span class="k">return</span> <span class="n">x</span>
+</code></pre></div>
+
+<h3>Putting the vision encoder together</h3>
+<p>Now the patchification logic and attention blocks can be combined to create the vision transformer (ViT)</p>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">ViT</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img_size</span><span class="p">,</span> <span class="n">patch_size</span><span class="p">,</span> <span class="n">num_hiddens</span><span class="p">,</span> <span class="n">num_heads</span><span class="p">,</span> <span class="n">num_blks</span><span class="p">,</span> <span class="n">emb_dropout</span><span class="p">,</span> <span class="n">blk_dropout</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="c1"># Patch embedding layer to convert the input image into patches</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">patch_embedding</span> <span class="o">=</span> <span class="n">PatchEmbeddings</span><span class="p">(</span><span class="n">img_size</span><span class="p">,</span> <span class="n">patch_size</span><span class="p">,</span> <span class="n">num_hiddens</span><span class="p">)</span>
+
+        <span class="c1"># Learnable classification token</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cls_token</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">num_hiddens</span><span class="p">))</span>
+
+        <span class="c1"># Calculate the number of patches</span>
+        <span class="n">num_patches</span> <span class="o">=</span> <span class="p">(</span><span class="n">img_size</span> <span class="o">//</span> <span class="n">patch_size</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+
+        <span class="c1"># Learnable position embedding</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pos_embedding</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_patches</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">num_hiddens</span><span class="p">))</span>
+
+        <span class="c1"># Dropout layer for the embeddings</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">emb_dropout</span><span class="p">)</span>
+
+        <span class="c1"># Stack of transformer blocks</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">blocks</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">([</span><span class="n">Block</span><span class="p">(</span><span class="n">num_hiddens</span><span class="p">,</span> <span class="n">num_heads</span><span class="p">,</span> <span class="n">blk_dropout</span><span class="p">,</span> <span class="n">is_decoder</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_blks</span><span class="p">)])</span>
+
+        <span class="c1"># Layer normalization for the final representation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layer_norm</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LayerNorm</span><span class="p">(</span><span class="n">num_hiddens</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="c1"># Convert the input image into patch embeddings</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">patch_embedding</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+        <span class="c1"># Expand the classification token to match the batch size</span>
+        <span class="n">cls_tokens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cls_token</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Concatenate the classification token with the patch embeddings</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">cls_tokens</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Add the position embedding to the patch embeddings</span>
+        <span class="n">x</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos_embedding</span>
+
+        <span class="c1"># Apply dropout to the embeddings</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="c1"># Pass the embeddings through the transformer blocks</span>
+        <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">block</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="c1"># Apply layer normalization to the final representation</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer_norm</span><span class="p">(</span><span class="n">x</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">x</span>
+</code></pre></div>
+
+<p>Overall, the ViT class encapsulates the architecture and forward pass of a Vision Transformer model. It takes an input image, converts it into patch embeddings, adds positional information, and processes the embeddings through a series of transformer blocks to generate a meaningful representation of the image. The final representation returned is the embedding corresponding to the CLS token, which is then used to condition the text generation in the language decoder. </p>
+<h3>Vision-Language Projection Module</h3>
+<p>However, we can’t directly concatenate this to the text embeddings. We need to project this from the dimensionality of image embeddings from the vision transformer to the dimensionality of text embeddings. This is done by the vision-language projector. As mentioned before, this can be a single learnable layer followed by a non-linearity or an MLP. Here I implement an MLP for a couple of reasons. </p>
+<ol>
+<li>
+<p>This is an implementation to understand how things work in a VLM. So this is more interesting than a single projection layer.</p>
+</li>
+<li>
+<p>There is an interesting current trend of keeping both the pretrained vision encoder and language decoder frozen during the VLM training phase. Therefore, allocating more parameters to the connection module could enhance the overall VLM's ability to generalize and aid in the downstream instruction-tuning process.</p>
+</li>
+</ol>
+<p>Here’s the implementation of this projection module. It’s not too different from the MLP used in the transformer blocks. </p>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">MultiModalProjector</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_embd</span><span class="p">,</span> <span class="n">image_embed_dim</span><span class="p">,</span> <span class="n">dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="c1"># Define the projection network</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">net</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="c1"># Linear layer to expand the image embedding dimension</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">image_embed_dim</span><span class="p">,</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">image_embed_dim</span><span class="p">),</span>
+
+            <span class="c1"># GELU activation function</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">GELU</span><span class="p">(),</span>
+
+            <span class="c1"># Linear layer to project the expanded image embeddings to the text embedding dimension</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">image_embed_dim</span><span class="p">,</span> <span class="n">n_embd</span><span class="p">),</span>
+
+            <span class="c1"># Dropout layer for regularization</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">dropout</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="c1"># Pass the input through the projection network</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">x</span>
+</code></pre></div>
+
+<h3>Building the Decoder Language Model</h3>
+<p>The final component we need to look at is the decoder language model. Here I’ve remained within the confines of the modern VLM architecture but deviated a bit in the implementation. I have integrated the projection module into the decoder model class implementation. This is because I built everything from scratch and wanted to retain the causal language model architecture from Andrej Karpathy’s makemore. There’s no easy way to directly feed in reshaped embeddings in this implementation, so I’ve had to improvise a little. Please keep in mind that in using pretrained models with the Hugging Face API or any other modern library that allows you to use pretrained large language models, you can directly feed embeddings as input to the model (e.g. using inputs_embeds parameter: https://huggingface.co/docs/transformers/en/model_doc/gpt2#transformers.GPT2Model.forward.inputs_embeds).</p>
+<p>That being said, what I’ve done here is an interesting exercise in that it allows you to see in pretty simple code:</p>
+<ul>
+<li>
+<p>How the image embeddings are reshaped using the vision language projector to match that of text embeddings.</p>
+</li>
+<li>
+<p>Then concatenated with token embedding.</p>
+</li>
+<li>
+<p>Subsequently combined with position embeddings and used to eventually calculate a loss function (and finally generate text). </p>
+</li>
+</ul>
+<p>Essentially the text generation is conditioned on the initial image input. This can be modified in a number of ways to work with interleaved text and images, which will be useful for multi-turn conversation i.e. chat scenarios using the finetuned VLM.</p>
+<p>The crucial parts of this decoder implementation is given below. Note how the is_decoder flag is passed as ‘True’ to use the masked version of the self attention blocks, resulting in causal scaled dot product self attention in the language decoder. Please refer to the GitHub <a href="https://github.com/AviSoori1x/seemore">Repo</a> linked above for the full implementation.</p>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">DecoderLanguageModel</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_embd</span><span class="p">,</span> <span class="n">image_embed_dim</span><span class="p">,</span> <span class="n">vocab_size</span><span class="p">,</span> <span class="n">num_heads</span><span class="p">,</span> <span class="n">n_layer</span><span class="p">,</span> <span class="n">use_images</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_images</span> <span class="o">=</span> <span class="n">use_images</span>
+
+        <span class="c1"># Token embedding table</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">token_embedding_table</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Embedding</span><span class="p">(</span><span class="n">vocab_size</span><span class="p">,</span> <span class="n">n_embd</span><span class="p">)</span>
+
+        <span class="c1"># Position embedding table</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">position_embedding_table</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Embedding</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="n">n_embd</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">use_images</span><span class="p">:</span>
+            <span class="c1"># Image projection layer to align image embeddings with text embeddings</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">image_projection</span> <span class="o">=</span> <span class="n">MultiModalProjector</span><span class="p">(</span><span class="n">n_embd</span><span class="p">,</span> <span class="n">image_embed_dim</span><span class="p">)</span>
+
+        <span class="c1"># Stack of transformer decoder blocks</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">blocks</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">Block</span><span class="p">(</span><span class="n">n_embd</span><span class="p">,</span> <span class="n">num_heads</span><span class="p">,</span> <span class="n">is_decoder</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_layer</span><span class="p">)])</span>
+
+        <span class="c1"># Final layer normalization</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ln_f</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LayerNorm</span><span class="p">(</span><span class="n">n_embd</span><span class="p">)</span>
+
+        <span class="c1"># Language modeling head</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lm_head</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">n_embd</span><span class="p">,</span> <span class="n">vocab_size</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">image_embeds</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">targets</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># Get token embeddings from the input indices</span>
+        <span class="n">tok_emb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">token_embedding_table</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_images</span> <span class="ow">and</span> <span class="n">image_embeds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Project and concatenate image embeddings with token embeddings</span>
+            <span class="n">img_emb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_projection</span><span class="p">(</span><span class="n">image_embeds</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">tok_emb</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">img_emb</span><span class="p">,</span> <span class="n">tok_emb</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Get position embeddings</span>
+        <span class="n">pos_emb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">position_embedding_table</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">tok_emb</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">))</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># Add position embeddings to token embeddings</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">tok_emb</span> <span class="o">+</span> <span class="n">pos_emb</span>
+
+        <span class="c1"># Pass through the transformer decoder blocks</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="c1"># Apply final layer normalization</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ln_f</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="c1"># Get the logits from the language modeling head</span>
+        <span class="n">logits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lm_head</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">targets</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_images</span> <span class="ow">and</span> <span class="n">image_embeds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># Prepare targets by concatenating a dummy target for the image embedding</span>
+                <span class="n">batch_size</span> <span class="o">=</span> <span class="n">idx</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">targets</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">torch</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">batch_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">),</span> <span class="n">targets</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+            <span class="c1"># Compute the cross-entropy loss</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">cross_entropy</span><span class="p">(</span><span class="n">logits</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">logits</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)),</span> <span class="n">targets</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">ignore_index</span><span class="o">=-</span><span class="mi">100</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">logits</span><span class="p">,</span> <span class="n">loss</span>
+
+        <span class="k">return</span> <span class="n">logits</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">image_embeds</span><span class="p">,</span> <span class="n">max_new_tokens</span><span class="p">):</span>
+          <span class="c1"># Autoregressive character geneneration conditioned on visual token and preceding tokens. Refer to repo</span>
+</code></pre></div>
+
+<h3>Bringing everything together to implement Seemore: the simple Vision Language Model</h3>
+<p>Now that we have our three key components, we can put it all together into a Vision Language Model. The full implementation is given below. If you were to remove the assert statements for error handling, this looks very simple. Coming back full circle to the outline I’ve given at the beginning of the blog, all that’s happening here is:</p>
+<ol>
+<li>
+<p>Get image features from the vision encoder (Here it’s a vision transformer, but it could be any model that could generate features from an image input such as a ResNet or a traditional convolutional neural network (needless to say performance may suffer))</p>
+</li>
+<li>
+<p>A projection module for projecting image tokens to the same embedding space as text embeddings for the decoder (this projector is integrated with the decoder in this implementation).</p>
+</li>
+<li>
+<p>A decoder language model for generating text conditioned on a preceding image. </p>
+</li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">VisionLanguageModel</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_embd</span><span class="p">,</span> <span class="n">image_embed_dim</span><span class="p">,</span> <span class="n">vocab_size</span><span class="p">,</span> <span class="n">n_layer</span><span class="p">,</span> <span class="n">img_size</span><span class="p">,</span> <span class="n">patch_size</span><span class="p">,</span> <span class="n">num_heads</span><span class="p">,</span> <span class="n">num_blks</span><span class="p">,</span> <span class="n">emb_dropout</span><span class="p">,</span> <span class="n">blk_dropout</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="c1"># Set num_hiddens equal to image_embed_dim</span>
+        <span class="n">num_hiddens</span> <span class="o">=</span> <span class="n">image_embed_dim</span>
+
+        <span class="c1"># Assert that num_hiddens is divisible by num_heads</span>
+        <span class="k">assert</span> <span class="n">num_hiddens</span> <span class="o">%</span> <span class="n">num_heads</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">"num_hiddens must be divisible by num_heads"</span>
+
+        <span class="c1"># Initialize the vision encoder (ViT)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vision_encoder</span> <span class="o">=</span> <span class="n">ViT</span><span class="p">(</span><span class="n">img_size</span><span class="p">,</span> <span class="n">patch_size</span><span class="p">,</span> <span class="n">num_hiddens</span><span class="p">,</span> <span class="n">num_heads</span><span class="p">,</span> <span class="n">num_blks</span><span class="p">,</span> <span class="n">emb_dropout</span><span class="p">,</span> <span class="n">blk_dropout</span><span class="p">)</span>
+
+        <span class="c1"># Initialize the language model decoder (DecoderLanguageModel)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span> <span class="o">=</span> <span class="n">DecoderLanguageModel</span><span class="p">(</span><span class="n">n_embd</span><span class="p">,</span> <span class="n">image_embed_dim</span><span class="p">,</span> <span class="n">vocab_size</span><span class="p">,</span> <span class="n">num_heads</span><span class="p">,</span> <span class="n">n_layer</span><span class="p">,</span> <span class="n">use_images</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img_array</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">targets</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># Get the image embeddings from the vision encoder</span>
+        <span class="n">image_embeds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vision_encoder</span><span class="p">(</span><span class="n">img_array</span><span class="p">)</span>
+
+        <span class="c1"># Check if the image embeddings are valid</span>
+        <span class="k">if</span> <span class="n">image_embeds</span><span class="o">.</span><span class="n">nelement</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">image_embeds</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Something is wrong with the ViT model. It's returning an empty tensor or the embedding dimension is empty."</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">targets</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># If targets are provided, compute the logits and loss</span>
+            <span class="n">logits</span><span class="p">,</span> <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">image_embeds</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">logits</span><span class="p">,</span> <span class="n">loss</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># If targets are not provided, compute only the logits</span>
+            <span class="n">logits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">image_embeds</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">logits</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img_array</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">max_new_tokens</span><span class="p">):</span>
+        <span class="c1"># Get the image embeddings from the vision encoder</span>
+        <span class="n">image_embeds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vision_encoder</span><span class="p">(</span><span class="n">img_array</span><span class="p">)</span>
+
+        <span class="c1"># Check if the image embeddings are valid</span>
+        <span class="k">if</span> <span class="n">image_embeds</span><span class="o">.</span><span class="n">nelement</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">image_embeds</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Something is wrong with the ViT model. It's returning an empty tensor or the embedding dimension is empty."</span><span class="p">)</span>
+
+        <span class="c1"># Generate new tokens using the language model decoder</span>
+        <span class="n">generated_tokens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">image_embeds</span><span class="p">,</span> <span class="n">max_new_tokens</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">generated_tokens</span>
+</code></pre></div>
+
+<p>And now we've implemented everything we set out to implement:</p>
+<div align="center">
+ <img src="https://github.com/AviSoori1x/seemore/blob/main/images/vlm.png?raw=true" width="600" height="600" alt="seemore">
+</div>
+
+<p>The <a href="https://github.com/AviSoori1x/seemore">repo</a> has some mock data, data loaders implemented mostly from scratch and a simple training loop with cross-entropy loss calculation. Please note that in this simple example, we are training the entire system end to end, much like Kosmos-1 from Microsoft Research. I left it at this for convenience. In practice, the commonly observed sequence is:</p>
+<ol>
+<li>
+<p>Get pretrained vision encoder from SigLIP or CLIP (both come in difference sizes). Freeze weights (i.e. don’t update during backward pass in training)</p>
+</li>
+<li>
+<p>Get pretrained decoder only language model e.g. all the way from TinyLLaMA, Phi-2 etc. to Llama 3 (or even much bigger in the case of GPT-4 and Grok 1.5 etc.). Freeze weights.</p>
+</li>
+<li>
+<p>Implement a projection module and train a VLM module much like what we have here, but only updating the weights of this projection module. This would effectively be the pretraining phase.</p>
+</li>
+<li>
+<p>Then during the instruction finetuning keep both the projection module and the decoder language model unfrozen and update weights of both in the backward pass.</p>
+</li>
+</ol>
+<p>I developed this on Databricks using a single T4 GPU and MLFlow for tracking loss (during the training process). I wanted to set this up this way so that I can scale up to a GPU cluster of any size I want quite easily on Databricks, should I decide to adapt this to a more performance oriented implementation. However, you can run this anywhere, with or without a GPU. Please note that even the toy training loop with 90 samples will be painfully slow on a CPU. </p>
+<p>Please check out the <a href="https://github.com/AviSoori1x/seemore">repo</a>, run the code yourself, and have fun! </p>
+</article>
+<a class="backlink" href="../../../">Back to index</a>
+<footer class="colophon">
+  <span>© 2026 Avinash Sooriyarachchi</span>
+  <span><a href="https://github.com/AviSoori1x">GitHub</a> &nbsp;·&nbsp; <a href="https://scholar.google.com/citations?user=9uC-33kAAAAJ">Google Scholar</a> &nbsp;·&nbsp; <a href="https://www.linkedin.com/in/avi-data-ml/">LinkedIn</a> &nbsp;·&nbsp; <a href="https://x.com/aviTwit3">X</a> &nbsp;·&nbsp; <a href="https://huggingface.co/AviSoori1x">Hugging Face</a></span>
+  <span>Set in Instrument Serif &amp; IBM Plex Mono</span>
+</footer>
+</div>
+</body>
+</html>

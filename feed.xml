@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Avinash Sooriyarachchi</title>
+  <link href="https://avisoori1x.github.io/feed.xml" rel="self"/>
+  <link href="https://avisoori1x.github.io/"/>
+  <id>https://avisoori1x.github.io/</id>
+  <updated>2024-05-06T00:00:00+00:00</updated>
+  <author><name>Avinash Sooriyarachchi</name></author>
+  <entry>
+    <title>SeeMoE: Implementing a MoE Vision Language Model from Scratch</title>
+    <link href="https://avisoori1x.github.io/2024/05/06/SeeMoE-_Implementing_a_MoE_Vision_Language_Model_from_Scratch.html"/>
+    <id>https://avisoori1x.github.io/2024/05/06/SeeMoE-_Implementing_a_MoE_Vision_Language_Model_from_Scratch.html</id>
+    <published>2024-05-06T00:00:00+00:00</published>
+    <updated>2024-05-06T00:00:00+00:00</updated>
+    <author><name>Avinash Sooriyarachchi</name></author>
+    <summary>In this blog I implement a mixture of experts vision language model consisting of an image encoder, a multimodal projection module and a mixture of experts decoder language model in pure pytorch. Thus, the resulting implementation could be…</summary>
+  </entry>
+  <entry>
+    <title>seemore: Implement a Vision Language Model from Scratch</title>
+    <link href="https://avisoori1x.github.io/2024/04/22/seemore-_Implement_a_Vision_Language_Model_from_Scratch.html"/>
+    <id>https://avisoori1x.github.io/2024/04/22/seemore-_Implement_a_Vision_Language_Model_from_Scratch.html</id>
+    <published>2024-04-22T00:00:00+00:00</published>
+    <updated>2024-04-22T00:00:00+00:00</updated>
+    <author><name>Avinash Sooriyarachchi</name></author>
+    <summary>In this blog I implement a vision language model consisting of an image encoder, a multimodal projection module and a decoder language model in pure pytorch. Think of this as a simplified version of what you see in GPT-4 or Claude 3 in…</summary>
+  </entry>
+  <entry>
+    <title>Use of convolutions for time series prediction and natural language processing</title>
+    <link href="https://avisoori1x.github.io/2021/07/22/Use-of-Convolutions-for-Time-Series-Prediction-and-Natural-Language-Processing.html"/>
+    <id>https://avisoori1x.github.io/2021/07/22/Use-of-Convolutions-for-Time-Series-Prediction-and-Natural-Language-Processing.html</id>
+    <published>2021-07-22T00:00:00+00:00</published>
+    <updated>2021-07-22T00:00:00+00:00</updated>
+    <author><name>Avinash Sooriyarachchi</name></author>
+    <summary>Disclaimer: I assume familiarity with machine learning and a general sense of how feed forward (i.e., the most basic type of) neural networks work for the contents of this article to be particularly valuable to the reader. Predicting the…</summary>
+  </entry>
+  <entry>
+    <title>Building a Natural Language Processing API with SAS Viya, FastAPI, and Docker</title>
+    <link href="https://avisoori1x.github.io/2021/05/16/Building_a_Natural_Language_Processing_API_with_SAS_Viya_FastAPI_and_Docker.html"/>
+    <id>https://avisoori1x.github.io/2021/05/16/Building_a_Natural_Language_Processing_API_with_SAS_Viya_FastAPI_and_Docker.html</id>
+    <published>2021-05-16T00:00:00+00:00</published>
+    <updated>2021-05-16T00:00:00+00:00</updated>
+    <author><name>Avinash Sooriyarachchi</name></author>
+    <summary>Interactively testing the service we will build in this blog The notebook for training the topic model and obtaining sentiments is at: notebook The code for the FastAPI service and Docker file are at: service code Making sense of text data…</summary>
+  </entry>
+  <entry>
+    <title>Effective Hyperparameter Optimization of LightGBM Classifiers with Optuna</title>
+    <link href="https://avisoori1x.github.io/2021/05/11/Effective_Hyperparameter_Optimization_of_LightGBM_Classifiers_with_Optuna.html"/>
+    <id>https://avisoori1x.github.io/2021/05/11/Effective_Hyperparameter_Optimization_of_LightGBM_Classifiers_with_Optuna.html</id>
+    <published>2021-05-11T00:00:00+00:00</published>
+    <updated>2021-05-11T00:00:00+00:00</updated>
+    <author><name>Avinash Sooriyarachchi</name></author>
+    <summary>LightGBM is a really convenient to use, fast to train and usually accurate implementation of boosted trees. Here I use optuna for hyperparameter search using Bayesian optimization methods, with 5-fold cross validation, to gain a fairly…</summary>
+  </entry>
+  <entry>
+    <title>Bayesian Optimization for Neural Architecture Search</title>
+    <link href="https://avisoori1x.github.io/2021/05/10/Bayesian_Optimization_for_Neural_Architecture_Search.html"/>
+    <id>https://avisoori1x.github.io/2021/05/10/Bayesian_Optimization_for_Neural_Architecture_Search.html</id>
+    <published>2021-05-10T00:00:00+00:00</published>
+    <updated>2021-05-10T00:00:00+00:00</updated>
+    <author><name>Avinash Sooriyarachchi</name></author>
+    <summary>In this blog I will be using bayes_opt, a general purpose bayesian optimization framework to optimize hyperparameters of a fastai tabular learner with categorical embedding layers. I will do my best to account for the evaluation metric…</summary>
+  </entry>
+  <entry>
+    <title>Interactive Explainable Machine Learning with SAS Viya, Streamlit, and Docker</title>
+    <link href="https://avisoori1x.github.io/2021/04/14/Interactive_Explainable_Machine_Learning_with_SAS_Viya,_Streamlit_and_Docker.html"/>
+    <id>https://avisoori1x.github.io/2021/04/14/Interactive_Explainable_Machine_Learning_with_SAS_Viya,_Streamlit_and_Docker.html</id>
+    <published>2021-04-14T00:00:00+00:00</published>
+    <updated>2021-04-14T00:00:00+00:00</updated>
+    <author><name>Avinash Sooriyarachchi</name></author>
+    <summary>The app we will build in this blog If you want to get to the part about building the app and the code walk-through, skip the first 3 paragraphs ;). But in all seriousness, I welcome you to read the introduction, just so you understand why…</summary>
+  </entry>
+</feed>

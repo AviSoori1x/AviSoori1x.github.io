@@ -1,0 +1,27 @@
+# Post stems listed here still build at their original URL, but sit in the
+# collapsed "more" fold on the front page rather than the selected list.
+secondary:
+  - 2021-04-14-Interactive_Explainable_Machine_Learning_with_SAS_Viya,_Streamlit_and_Docker
+  - 2021-05-10-Bayesian_Optimization_for_Neural_Architecture_Search
+  - 2021-05-11-Effective_Hyperparameter_Optimization_of_LightGBM_Classifiers_with_Optuna
+  - 2021-05-16-Building_a_Natural_Language_Processing_API_with_SAS_Viya_FastAPI_and_Docker
+  - 2021-07-22-Use of Convolutions for Time Series Prediction and Natural Language Processing
+
+# Titles as they appeared on the live Jekyll site (jekyll-titles-from-headings
+# derived these from the leading H1, except the convolutions post which had none).
+# Keyed by the _posts/ filename stem so URLs and titles stay byte-identical.
+titles:
+  2021-04-14-Interactive_Explainable_Machine_Learning_with_SAS_Viya,_Streamlit_and_Docker: >-
+    Interactive Explainable Machine Learning with SAS Viya, Streamlit, and Docker
+  2021-05-10-Bayesian_Optimization_for_Neural_Architecture_Search: >-
+    Bayesian Optimization for Neural Architecture Search
+  2021-05-11-Effective_Hyperparameter_Optimization_of_LightGBM_Classifiers_with_Optuna: >-
+    Effective Hyperparameter Optimization of LightGBM Classifiers with Optuna
+  2021-05-16-Building_a_Natural_Language_Processing_API_with_SAS_Viya_FastAPI_and_Docker: >-
+    Building a Natural Language Processing API with SAS Viya, FastAPI, and Docker
+  2021-07-22-Use of Convolutions for Time Series Prediction and Natural Language Processing: >-
+    Use of convolutions for time series prediction and natural language processing
+  ? 2024-04-22-seemore:_Implement_a_Vision_Language_Model_from_Scratch
+  : "seemore: Implement a Vision Language Model from Scratch"
+  ? 2024-05-06-SeeMoE:_Implementing_a_MoE_Vision_Language_Model_from_Scratch
+  : "SeeMoE: Implementing a MoE Vision Language Model from Scratch"

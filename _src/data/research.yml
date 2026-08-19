@@ -1,0 +1,68 @@
+note: >-
+  Mistral AI ships its models as collectively-authored technical reports. Where my
+  contribution is named in the core author block rather than the full lab list, I say so.
+
+items:
+  - title: Shieldstral
+    venue: arXiv preprint
+    date: "2026"
+    sort: "2026-07-28"
+    url: https://arxiv.org/abs/2607.25857
+    role: Core author block
+    note: >-
+      A 3B policy-adaptive multimodal safety classifier that matches or beats models roughly
+      seven times its size on text safety benchmarks, and sets state of the art on multimodal
+      safety classification, by framing moderation as a binary question against a stated policy.
+
+  - title: Robostral Navigate
+    venue: arXiv preprint
+    date: "2026"
+    sort: "2026-07-22"
+    url: https://arxiv.org/abs/2607.20785
+    role: Mistral AI
+    note: >-
+      An 8B vision-language navigation model that takes only monocular RGB and predicts
+      waypoints by pointing at the next target in the current camera view — operating in image
+      space rather than a robot-specific action space.
+
+  - title: Voxtral TTS
+    venue: arXiv preprint
+    date: "2026"
+    sort: "2026-03-26"
+    url: https://arxiv.org/abs/2603.25551
+    role: Mistral AI
+    note: >-
+      Expressive multilingual text to speech that clones a voice from as little as three
+      seconds of reference audio, pairing autoregressive semantic tokens with flow matching
+      for acoustics.
+
+  - title: Voxtral Realtime
+    venue: arXiv preprint
+    date: "2026"
+    sort: "2026-02-11"
+    url: https://arxiv.org/abs/2602.11298
+    role: Mistral AI
+    note: >-
+      Natively streaming speech recognition that holds offline transcription quality at
+      sub-second latency, trained end to end for streaming with explicit audio/text alignment.
+
+  - title: Ministral 3
+    venue: arXiv preprint
+    date: "2026"
+    sort: "2026-01-13"
+    url: https://arxiv.org/abs/2601.08584
+    role: Mistral AI
+    note: >-
+      A family of parameter-efficient dense models at 3B, 8B and 14B, each released as base,
+      instruction-tuned and reasoning variants with image understanding, under Apache 2.0.
+
+  - title: Fiber Based Approaches as Medicine Delivery Systems
+    venue: ACS Biomaterials Science & Engineering 2(9)
+    date: "2016"
+    sort: "2016-08-02"
+    url: https://doi.org/10.1021/acsbiomaterials.6b00281
+    role: Co-first author
+    note: >-
+      A review of micro- and nanofibers as drug carriers, surveying electrospinning,
+      microfluidic, wet-spinning, rotary and self-assembly fabrication routes. From my
+      mechanical engineering research at Iowa State, and still my most-cited paper.

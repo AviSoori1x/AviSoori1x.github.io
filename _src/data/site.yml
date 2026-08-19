@@ -1,0 +1,26 @@
+name: Avinash Sooriyarachchi
+url: https://avisoori1x.github.io
+twitter: aviTwit3
+og_image: images/blogImage.png
+
+links:
+  - label: GitHub
+    short: gh
+    display: github.com/AviSoori1x
+    url: https://github.com/AviSoori1x
+  - label: Google Scholar
+    short: sch
+    display: Google Scholar
+    url: https://scholar.google.com/citations?user=9uC-33kAAAAJ
+  - label: LinkedIn
+    short: in
+    display: linkedin.com/in/avi-data-ml
+    url: https://www.linkedin.com/in/avi-data-ml/
+  - label: X
+    short: x
+    display: "@aviTwit3"
+    url: https://x.com/aviTwit3
+  - label: Hugging Face
+    short: hf
+    display: huggingface.co/AviSoori1x
+    url: https://huggingface.co/AviSoori1x

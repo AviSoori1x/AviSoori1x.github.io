@@ -1,3 +1,0 @@
-# About
-
-I am a Solutions Architect focused on solving challenging Data and AI related business problems using the Databricks Lakehouse platform. This involves leveraging unique capabilities in the Databricks platform, open-source frameworks such as Spark, MLflow, and Delta Lake which were created by Databricks, other open-source tools, and cloud services to solve business problems. Prior to joining Databricks, I was a machine learning solutions architect at SAS. Prior to that, I worked in the NLP space, developing a Natural Language querying product for social media data analysis at a startup I founded.

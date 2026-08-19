@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<header class="post-head rise d1">
+  <h1>{{ post.title }}</h1>
+  <div class="post-meta">
+    <span>{{ post.date_display }}</span>
+    <span>{{ site.name }}</span>
+    {% if post.reading %}<span>{{ post.reading }} min read</span>{% endif %}
+  </div>
+</header>
+<article class="post-body rise d2">
+{{ post.html|safe }}
+</article>
+<a class="backlink" href="{{ rel }}">Back to index</a>
+{% endblock %}

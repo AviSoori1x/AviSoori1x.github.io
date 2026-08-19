@@ -1,0 +1,46 @@
+items:
+  - when: 2024 — now
+    role: Research Scientist
+    org: Mistral AI
+    note: >-
+      Robotics foundation models — vision-language-action policies, System-2 manipulation
+      planning, and real-to-sim evaluation. Contributor on the Ministral 3, Voxtral, Robostral
+      Navigate and Shieldstral releases. Joined in 2024 on the applied side and went on to lead
+      the US applied science team.
+
+  - when: 2021 — 2024
+    role: Senior Solutions Architect, AI/ML
+    org: Databricks
+    note: >-
+      Field engineering, latterly for retail and consumer packaged goods in the Bay Area.
+      Large language model fine-tuning, recommender systems, vector search and streaming ML,
+      with a parallel stream of writing and conference talks.
+
+  - when: 2019 — 2021
+    role: Senior Solutions Architect, AI/ML
+    org: SAS
+    note: >-
+      Applied machine learning on SAS Viya in Cary, North Carolina — explainability, NLP
+      services and model deployment. Led the AutoML prototype solution development team.
+
+  - when: 2017 — 2019
+    role: Founder & Lead Data Scientist
+    org: RandomWalk Technologies
+    note: >-
+      Built Fora, a conversational analytics engine that answered natural-language questions
+      over social media data. Ames, Iowa, out of the ISU Startup Factory.
+
+  - when: 2016 — 2017
+    role: Graduate researcher, Architected Materials Lab
+    org: University of Pennsylvania
+    note: >-
+      M.S.E. in Mechanical Engineering and Applied Mechanics. Research on mechanical
+      metamaterials with Jordan Raney; Dean's Research Fellowship. Also took Wharton's
+      Modern Data Mining course, which is where the machine learning detour began.
+
+  - when: 2016
+    role: B.S., Mechanical Engineering
+    org: Iowa State University
+    note: >-
+      Undergraduate research in bio-microfluidics with Nastaran Hashemi, producing a co-first
+      author review in ACS Biomaterials Science & Engineering.

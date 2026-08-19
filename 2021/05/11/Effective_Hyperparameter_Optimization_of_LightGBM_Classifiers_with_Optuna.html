@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Effective Hyperparameter Optimization of LightGBM Classifiers with Optuna — Avinash Sooriyarachchi</title>
+<meta name="description" content="LightGBM is a really convenient to use, fast to train and usually accurate implementation of boosted trees. Here I use optuna for hyperparameter search using Bayesian optimization ">
+<link rel="canonical" href="https://avisoori1x.github.io/2021/05/11/Effective_Hyperparameter_Optimization_of_LightGBM_Classifiers_with_Optuna.html">
+<meta name="author" content="Avinash Sooriyarachchi">
+
+<meta property="og:type" content="article">
+<meta property="og:title" content="Effective Hyperparameter Optimization of LightGBM Classifiers with Optuna — Avinash Sooriyarachchi">
+<meta property="og:description" content="LightGBM is a really convenient to use, fast to train and usually accurate implementation of boosted trees. Here I use optuna for hyperparameter search using Bayesian optimization ">
+<meta property="og:url" content="https://avisoori1x.github.io/2021/05/11/Effective_Hyperparameter_Optimization_of_LightGBM_Classifiers_with_Optuna.html">
+<meta property="og:site_name" content="Avinash Sooriyarachchi">
+<meta property="og:image" content="https://avisoori1x.github.io/images/blogImage.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:creator" content="@aviTwit3">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="../../../assets/main.css">
+<link rel="alternate" type="application/rss+xml" title="Avinash Sooriyarachchi" href="https://avisoori1x.github.io/feed.xml">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23faf7f1%22/><text y=%22.9em%22 x=%22.06em%22 font-size=%2286%22 font-family=%22Georgia,serif%22 fill=%22%23c3341a%22>A</text></svg>">
+</head>
+<body>
+<div class="spine" aria-hidden="true"></div>
+<div class="page">
+<header class="post-head rise d1">
+  <h1>Effective Hyperparameter Optimization of LightGBM Classifiers with Optuna</h1>
+  <div class="post-meta">
+    <span>11 May 2021</span>
+    <span>Avinash Sooriyarachchi</span>
+<span>5 min read</span>  </div>
+</header>
+<article class="post-body rise d2">
+<p>LightGBM is a really convenient to use, fast to train and usually accurate implementation of boosted trees. Here I use optuna for hyperparameter search using Bayesian optimization methods, with 5-fold cross validation, to gain a fairly accurate model. Also I leverage some seemingly minor but very useful built in features of the LightGBM library to handle categorical variables.</p>
+<p>Note that the dataset I am using for this blog is the kaggle tabular playground march-2021 dataset which could be downloaded at https://www.kaggle.com/c/tabular-playground-series-mar-2021. Also note that I am not going to go over the EDA aspects of the problem because the purpose is to show the ease with which optuna could be used to tune the hyperparameters of LightGBM to yield highly accurate models.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">##Import the required packages. These include pandas, numpy,scikit-learn and optuna</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span> <span class="c1"># linear algebra</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span> <span class="c1"># data processing, CSV file I/O (e.g. pd.read_csv)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">KFold</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">optuna</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">optuna.integration.lightgbm</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">lgb</span>
+
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="k">for</span> <span class="n">dirname</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">filenames</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="s1">'/kaggle/input'</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">filenames</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dirname</span><span class="p">,</span> <span class="n">filename</span><span class="p">))</span>
+</code></pre></div>
+
+<style type='text/css'>
+.datatable table.frame { margin-bottom: 0; }
+.datatable table.frame thead { border-bottom: none; }
+.datatable table.frame tr.coltypes td {  color: #FFFFFF;  line-height: 6px;  padding: 0 0.5em;}
+.datatable .bool    { background: #DDDD99; }
+.datatable .object  { background: #565656; }
+.datatable .int     { background: #5D9E5D; }
+.datatable .float   { background: #4040CC; }
+.datatable .str     { background: #CC4040; }
+.datatable .row_index {  background: var(--jp-border-color3);  border-right: 1px solid var(--jp-border-color0);  color: var(--jp-ui-font-color3);  font-size: 9px;}
+.datatable .frame tr.coltypes .row_index {  background: var(--jp-border-color0);}
+.datatable th:nth-child(2) { padding-left: 12px; }
+.datatable .hellipsis {  color: var(--jp-cell-editor-border-color);}
+.datatable .vellipsis {  background: var(--jp-layout-color0);  color: var(--jp-cell-editor-border-color);}
+.datatable .na {  color: var(--jp-cell-editor-border-color);  font-size: 80%;}
+.datatable .footer { font-size: 9px; }
+.datatable .frame_dimensions {  background: var(--jp-border-color3);  border-top: 1px solid var(--jp-border-color0);  color: var(--jp-ui-font-color3);  display: inline-block;  opacity: 0.6;  padding: 1px 10px 1px 5px;}
+</style>
+
+<div class="highlight"><pre><span></span><code>/kaggle/input/tabular-playground-series-mar-2021/sample_submission.csv
+/kaggle/input/tabular-playground-series-mar-2021/train.csv
+/kaggle/input/tabular-playground-series-mar-2021/test.csv
+</code></pre></div>
+
+<p>Read the train and test csv's into variables and list out the column names</p>
+<div class="highlight"><pre><span></span><code><span class="n">train</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">'train.csv'</span><span class="p">)</span>
+<span class="n">test</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">'test.csv'</span><span class="p">)</span>
+
+<span class="n">train</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code>['id',
+ 'cat0',
+ 'cat1',
+ 'cat2',
+ 'cat3',
+ 'cat4',
+ 'cat5',
+ 'cat6',
+ 'cat7',
+ 'cat8',
+ 'cat9',
+ 'cat10',
+ 'cat11',
+ 'cat12',
+ 'cat13',
+ 'cat14',
+ 'cat15',
+ 'cat16',
+ 'cat17',
+ 'cat18',
+ 'cont0',
+ 'cont1',
+ 'cont2',
+ 'cont3',
+ 'cont4',
+ 'cont5',
+ 'cont6',
+ 'cont7',
+ 'cont8',
+ 'cont9',
+ 'cont10',
+ 'target']
+</code></pre></div>
+
+<p>Convert the categorical data into the category type such that lightgbm can handle the categorical variables. Unless you leverage learned embeddings for categorical variables, this fares better that one hot encoding or label encoding</p>
+<div class="highlight"><pre><span></span><code><span class="n">conts</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'cont0'</span><span class="p">,</span><span class="s1">'cont1'</span><span class="p">,</span><span class="s1">'cont2'</span><span class="p">,</span><span class="s1">'cont3'</span><span class="p">,</span><span class="s1">'cont4'</span><span class="p">,</span><span class="s1">'cont5'</span><span class="p">,</span><span class="s1">'cont6'</span><span class="p">,</span><span class="s1">'cont7'</span><span class="p">,</span><span class="s1">'cont8'</span><span class="p">,</span><span class="s1">'cont9'</span><span class="p">,</span><span class="s1">'cont10'</span><span class="p">]</span>
+<span class="n">cats</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'cat0'</span><span class="p">,</span><span class="s1">'cat1'</span><span class="p">,</span><span class="s1">'cat2'</span><span class="p">,</span><span class="s1">'cat3'</span><span class="p">,</span><span class="s1">'cat4'</span><span class="p">,</span><span class="s1">'cat5'</span><span class="p">,</span><span class="s1">'cat6'</span><span class="p">,</span><span class="s1">'cat7'</span><span class="p">,</span><span class="s1">'cat8'</span><span class="p">,</span><span class="s1">'cat9'</span><span class="p">,</span><span class="s1">'cat10'</span><span class="p">,</span><span class="s1">'cat11'</span><span class="p">,</span><span class="s1">'cat12'</span><span class="p">,</span><span class="s1">'cat13'</span><span class="p">,</span><span class="s1">'cat14'</span><span class="p">,</span><span class="s1">'cat15'</span><span class="p">,</span><span class="s1">'cat16'</span><span class="p">,</span><span class="s1">'cat17'</span><span class="p">,</span><span class="s1">'cat18'</span><span class="p">,</span><span class="s1">'target'</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">train</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+    <span class="n">col_type</span> <span class="o">=</span> <span class="n">train</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span>
+    <span class="k">if</span> <span class="n">col_type</span> <span class="o">==</span> <span class="s1">'object'</span> <span class="ow">or</span> <span class="n">col_type</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">'category'</span><span class="p">:</span>
+        <span class="n">train</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">train</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">'category'</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">test</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+    <span class="n">col_type</span> <span class="o">=</span> <span class="n">test</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span>
+    <span class="k">if</span> <span class="n">col_type</span> <span class="o">==</span> <span class="s1">'object'</span> <span class="ow">or</span> <span class="n">col_type</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">'category'</span><span class="p">:</span>
+        <span class="n">test</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">test</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">'category'</span><span class="p">)</span>
+</code></pre></div>
+
+<p>Specify dependent and independent variables and create a lgb Dataset object</p>
+<div class="highlight"><pre><span></span><code><span class="n">X</span><span class="o">=</span> <span class="n">train</span><span class="p">[[</span><span class="s1">'cont0'</span><span class="p">,</span><span class="s1">'cont1'</span><span class="p">,</span><span class="s1">'cont2'</span><span class="p">,</span><span class="s1">'cont3'</span><span class="p">,</span><span class="s1">'cont4'</span><span class="p">,</span><span class="s1">'cont5'</span><span class="p">,</span><span class="s1">'cont6'</span><span class="p">,</span><span class="s1">'cont7'</span><span class="p">,</span><span class="s1">'cont8'</span><span class="p">,</span><span class="s1">'cont9'</span><span class="p">,</span><span class="s1">'cont10'</span><span class="p">,</span><span class="s1">'cat0'</span><span class="p">,</span><span class="s1">'cat1'</span><span class="p">,</span><span class="s1">'cat2'</span><span class="p">,</span><span class="s1">'cat3'</span><span class="p">,</span><span class="s1">'cat4'</span><span class="p">,</span><span class="s1">'cat5'</span><span class="p">,</span><span class="s1">'cat6'</span><span class="p">,</span><span class="s1">'cat7'</span><span class="p">,</span><span class="s1">'cat8'</span><span class="p">,</span><span class="s1">'cat9'</span><span class="p">,</span><span class="s1">'cat10'</span><span class="p">,</span><span class="s1">'cat11'</span><span class="p">,</span><span class="s1">'cat12'</span><span class="p">,</span><span class="s1">'cat13'</span><span class="p">,</span><span class="s1">'cat14'</span><span class="p">,</span><span class="s1">'cat15'</span><span class="p">,</span><span class="s1">'cat16'</span><span class="p">,</span><span class="s1">'cat17'</span><span class="p">,</span><span class="s1">'cat18'</span><span class="p">]]</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">train</span><span class="p">[[</span><span class="s1">'target'</span><span class="p">]]</span>
+</code></pre></div>
+
+<p>Use the optuna lightGBM integration to do hyperparamater optimization with 5 fold cross validation. Make sure to pass in the argument 'auto' for categorical_feature for automated feature engineering for categorical input features.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">StratifiedKFold</span>
+<span class="n">kfolds</span> <span class="o">=</span> <span class="n">StratifiedKFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+</code></pre></div>
+
+<p>Notice how I've specified auc as the metric.</p>
+<div class="highlight"><pre><span></span><code><span class="n">dtrain</span> <span class="o">=</span> <span class="n">lgb</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">,</span><span class="n">categorical_feature</span> <span class="o">=</span> <span class="s1">'auto'</span><span class="p">)</span>
+
+<span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"objective"</span><span class="p">:</span> <span class="s2">"binary"</span><span class="p">,</span>
+    <span class="s2">"metric"</span><span class="p">:</span> <span class="s2">"auc"</span><span class="p">,</span>
+    <span class="s2">"verbosity"</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="s2">"boosting_type"</span><span class="p">:</span> <span class="s2">"gbdt"</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">tuner</span> <span class="o">=</span> <span class="n">lgb</span><span class="o">.</span><span class="n">LightGBMTunerCV</span><span class="p">(</span>
+    <span class="n">params</span><span class="p">,</span> <span class="n">dtrain</span><span class="p">,</span> <span class="n">verbose_eval</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">early_stopping_rounds</span><span class="o">=</span><span class="mi">1000000</span><span class="p">,</span> <span class="n">folds</span><span class="o">=</span><span class="n">kfolds</span>
+<span class="p">)</span>
+
+<span class="n">tuner</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Best score:"</span><span class="p">,</span> <span class="n">tuner</span><span class="o">.</span><span class="n">best_score</span><span class="p">)</span>
+<span class="n">best_params</span> <span class="o">=</span> <span class="n">tuner</span><span class="o">.</span><span class="n">best_params</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Best params:"</span><span class="p">,</span> <span class="n">best_params</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"  Params: "</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">best_params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"    </span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="c1">#Results</span>
+<span class="n">Best</span> <span class="n">score</span><span class="p">:</span> <span class="mf">0.8950986360077963</span>
+<span class="n">Best</span> <span class="n">params</span><span class="p">:</span> <span class="p">{</span><span class="s1">'objective'</span><span class="p">:</span> <span class="s1">'binary'</span><span class="p">,</span> <span class="s1">'metric'</span><span class="p">:</span> <span class="s1">'auc'</span><span class="p">,</span> <span class="s1">'verbosity'</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s1">'boosting_type'</span><span class="p">:</span> <span class="s1">'gbdt'</span><span class="p">,</span> <span class="s1">'feature_pre_filter'</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">'lambda_l1'</span><span class="p">:</span> <span class="mf">7.959176411127531</span><span class="p">,</span> <span class="s1">'lambda_l2'</span><span class="p">:</span> <span class="mf">5.381687699546818e-05</span><span class="p">,</span> <span class="s1">'num_leaves'</span><span class="p">:</span> <span class="mi">135</span><span class="p">,</span> <span class="s1">'feature_fraction'</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">,</span> <span class="s1">'bagging_fraction'</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">'bagging_freq'</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">'min_child_samples'</span><span class="p">:</span> <span class="mi">20</span><span class="p">}</span>
+  <span class="n">Params</span><span class="p">:</span> 
+    <span class="n">objective</span><span class="p">:</span> <span class="n">binary</span>
+    <span class="n">metric</span><span class="p">:</span> <span class="n">auc</span>
+    <span class="n">verbosity</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">boosting_type</span><span class="p">:</span> <span class="n">gbdt</span>
+    <span class="n">feature_pre_filter</span><span class="p">:</span> <span class="kc">False</span>
+    <span class="n">lambda_l1</span><span class="p">:</span> <span class="mf">7.959176411127531</span>
+    <span class="n">lambda_l2</span><span class="p">:</span> <span class="mf">5.381687699546818e-05</span>
+    <span class="n">num_leaves</span><span class="p">:</span> <span class="mi">135</span>
+    <span class="n">feature_fraction</span><span class="p">:</span> <span class="mf">0.4</span>
+    <span class="n">bagging_fraction</span><span class="p">:</span> <span class="mf">1.0</span>
+    <span class="n">bagging_freq</span><span class="p">:</span> <span class="mi">0</span>
+    <span class="n">min_child_samples</span><span class="p">:</span> <span class="mi">20</span>
+</code></pre></div>
+
+<p>Inspect the best score for AUC value</p>
+<div class="highlight"><pre><span></span><code><span class="n">tuner</span><span class="o">.</span><span class="n">best_score</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code>0.8950986360077963
+</code></pre></div>
+
+<p>Assign the best params to a variable</p>
+<div class="highlight"><pre><span></span><code><span class="n">params</span> <span class="o">=</span> <span class="n">tuner</span><span class="o">.</span><span class="n">best_params</span>
+</code></pre></div>
+
+<p>Use these parameters to train a LightGBM model on the entire training dataset </p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">lightgbm</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">lgb</span>
+<span class="n">id_test</span> <span class="o">=</span> <span class="n">test</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">lgb</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">dtrain</span><span class="p">,</span> <span class="n">num_boost_round</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+</code></pre></div>
+
+<p>Predict on the test set and save file. Make sure you set index=False </p>
+<div class="highlight"><pre><span></span><code><span class="n">X_test</span> <span class="o">=</span> <span class="n">test</span><span class="p">[[</span><span class="s1">'cont0'</span><span class="p">,</span><span class="s1">'cont1'</span><span class="p">,</span><span class="s1">'cont2'</span><span class="p">,</span><span class="s1">'cont3'</span><span class="p">,</span><span class="s1">'cont4'</span><span class="p">,</span><span class="s1">'cont5'</span><span class="p">,</span><span class="s1">'cont6'</span><span class="p">,</span><span class="s1">'cont7'</span><span class="p">,</span><span class="s1">'cont8'</span><span class="p">,</span><span class="s1">'cont9'</span><span class="p">,</span><span class="s1">'cont10'</span><span class="p">,</span><span class="s1">'cat0'</span><span class="p">,</span><span class="s1">'cat1'</span><span class="p">,</span><span class="s1">'cat2'</span><span class="p">,</span><span class="s1">'cat3'</span><span class="p">,</span><span class="s1">'cat4'</span><span class="p">,</span><span class="s1">'cat5'</span><span class="p">,</span><span class="s1">'cat6'</span><span class="p">,</span><span class="s1">'cat7'</span><span class="p">,</span><span class="s1">'cat8'</span><span class="p">,</span><span class="s1">'cat9'</span><span class="p">,</span><span class="s1">'cat10'</span><span class="p">,</span><span class="s1">'cat11'</span><span class="p">,</span><span class="s1">'cat12'</span><span class="p">,</span><span class="s1">'cat13'</span><span class="p">,</span><span class="s1">'cat14'</span><span class="p">,</span><span class="s1">'cat15'</span><span class="p">,</span><span class="s1">'cat16'</span><span class="p">,</span><span class="s1">'cat17'</span><span class="p">,</span><span class="s1">'cat18'</span><span class="p">]]</span>
+<span class="n">preds</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+<span class="n">resultf</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+<span class="n">resultf</span><span class="p">[</span><span class="s1">'id'</span><span class="p">]</span> <span class="o">=</span> <span class="n">id_test</span>
+<span class="n">resultf</span><span class="p">[</span><span class="s1">'target'</span><span class="p">]</span> <span class="o">=</span> <span class="n">preds</span>
+<span class="n">resultf</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">'submission.csv'</span><span class="p">,</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+</article>
+<a class="backlink" href="../../../">Back to index</a>
+<footer class="colophon">
+  <span>© 2026 Avinash Sooriyarachchi</span>
+  <span><a href="https://github.com/AviSoori1x">GitHub</a> &nbsp;·&nbsp; <a href="https://scholar.google.com/citations?user=9uC-33kAAAAJ">Google Scholar</a> &nbsp;·&nbsp; <a href="https://www.linkedin.com/in/avi-data-ml/">LinkedIn</a> &nbsp;·&nbsp; <a href="https://x.com/aviTwit3">X</a> &nbsp;·&nbsp; <a href="https://huggingface.co/AviSoori1x">Hugging Face</a></span>
+  <span>Set in Instrument Serif &amp; IBM Plex Mono</span>
+</footer>
+</div>
+</body>
+</html>

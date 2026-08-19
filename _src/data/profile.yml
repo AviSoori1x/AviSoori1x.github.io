@@ -1,0 +1,35 @@
+profile:
+  role: Research Scientist
+  org: Mistral AI
+  location: San Francisco
+  standfirst: >-
+    I work on robotics foundation models — vision-language-action policies, the
+    evaluation harnesses that tell us whether they actually work, and the data
+    pipelines that train them. Before that I built and led applied science work
+    on large language models.
+  meta_desc: >-
+    Avinash Sooriyarachchi — Research Scientist at Mistral AI, working on robotics
+    foundation models, vision-language-action policies and real-to-sim evaluation.
+    Author of makeMoE and seemore.
+  contact: >-
+    LinkedIn is the most reliable way to reach me. Most of what I build ends up on
+    GitHub sooner or later, and the papers are on Scholar.
+
+now:
+  headline: Robotics foundation models, and how to know when they work
+  paragraphs:
+    - >-
+      At Mistral AI I work on vision-language-action models: the policies themselves,
+      the System-2 planners that decompose a long-horizon instruction into something
+      a policy can execute, and the training data behind both. I previously led the
+      applied science team in the US.
+    - >-
+      A lot of my current attention goes to evaluation. Robot policies are easy to
+      demo and hard to measure, so I build real-to-sim pipelines that turn a single
+      real camera frame into a physically-valid simulated scene — which gives you a
+      reproducible, gradeable environment instead of an anecdote.
+    - >-
+      Running through all of it is a habit I have kept since long before this job:
+      when I want to understand an architecture, I rebuild it from scratch in plain
+      PyTorch and write down what I learned. That is where makeMoE and seemore came
+      from.

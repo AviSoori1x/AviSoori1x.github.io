@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Use of convolutions for time series prediction and natural language processing — Avinash Sooriyarachchi</title>
+<meta name="description" content="Disclaimer: I assume familiarity with machine learning and a general sense of how feed forward (i.e., the most basic type of) neural networks work for the contents of this article ">
+<link rel="canonical" href="https://avisoori1x.github.io/2021/07/22/Use-of-Convolutions-for-Time-Series-Prediction-and-Natural-Language-Processing.html">
+<meta name="author" content="Avinash Sooriyarachchi">
+
+<meta property="og:type" content="article">
+<meta property="og:title" content="Use of convolutions for time series prediction and natural language processing — Avinash Sooriyarachchi">
+<meta property="og:description" content="Disclaimer: I assume familiarity with machine learning and a general sense of how feed forward (i.e., the most basic type of) neural networks work for the contents of this article ">
+<meta property="og:url" content="https://avisoori1x.github.io/2021/07/22/Use-of-Convolutions-for-Time-Series-Prediction-and-Natural-Language-Processing.html">
+<meta property="og:site_name" content="Avinash Sooriyarachchi">
+<meta property="og:image" content="https://avisoori1x.github.io/images/blogImage.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:creator" content="@aviTwit3">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="../../../assets/main.css">
+<link rel="alternate" type="application/rss+xml" title="Avinash Sooriyarachchi" href="https://avisoori1x.github.io/feed.xml">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23faf7f1%22/><text y=%22.9em%22 x=%22.06em%22 font-size=%2286%22 font-family=%22Georgia,serif%22 fill=%22%23c3341a%22>A</text></svg>">
+</head>
+<body>
+<div class="spine" aria-hidden="true"></div>
+<div class="page">
+<header class="post-head rise d1">
+  <h1>Use of convolutions for time series prediction and natural language processing</h1>
+  <div class="post-meta">
+    <span>22 July 2021</span>
+    <span>Avinash Sooriyarachchi</span>
+<span>3 min read</span>  </div>
+</header>
+<article class="post-body rise d2">
+<p>Disclaimer: I assume familiarity with machine learning and a general sense of how feed forward (i.e., the most basic type of) neural networks work for the contents of this article to be particularly valuable to the reader.</p>
+<p>Predicting the next item in a sequence is the central theme of several natural language processing and time series prediction tasks. All the data concerned could be considered as sequences of numbers or characters (which are usually encoded as numbers in several ways). Whether forecasting weather, commodity prices or predicting the aggregate sentiment with respect to a consumer brand, this type of machine learning problem is widely seen in industry. Let’s look at how convolutions, normally associated with convolutional neural nets for computer vision, work with respect to sequence data.</p>
+<p>The idea of convolutions is most often encountered in the context of Convolutional neural networks for computer vision related tasks e.g., convolutional neural nets for image classification, localization, and regression (yes regression, that’s not a typo. e.g., predicting weight of a dog/ fruit based on an image)</p>
+<p>In a textbook use case, a 2D grid of parameters i.e., a filter, is slid across the pixels of the image, where at each stride, the pixels and the parameters are multiplied element-wise and summed. Once this is done to the entire image, the convolved output is pooled. This process is repeated for however many times the neural net architecture prescribes and then fed to a typical feedforward neural network. (TLDR: a stack of convolution/ pooling operations then a fully connected network). Usually, multiple filters are used and the best weights for each filter are learned using back propagation and gradient descent.</p>
+<p>Long story short, the convolutions reduce the information in the image to result in features that provide an increase in predictive performance to the fully connected layer (hence the whole neural network). The alternative of directly feeding in pixel values to a fully connected network is sub-optimal and riddled with issues.</p>
+<p>TLDR: 2D convolutions distill features from 2D pixel arrays which we call images</p>
+<p>Now I want to illustrate how this process can be applied for series (or sequence) data.</p>
+<p>Series data is 1D. So, the filter would be 1D as well. The element-wise multiplication would look like this</p>
+<p><img src="https://miro.medium.com/max/1400/1*V7xDn6HGniGW2-VGJLrESg.png" /></p>
+<p>As in the case of 2D convolutions, the filter is moved by a certain step i.e., a stride. When the stride is 1 and the entire convolution operation looks like this</p>
+<p><img src="https://miro.medium.com/max/2400/1*o610XFHevKm5eKFoUyn34Q.png" /></p>
+<p>Usually, multiple filters are applied and the output, i.e., the distilled series features, are fed into a fully connected layer for the actual prediction. The actual weights of the filters, which are randomly initialized, are learned during the training of the neural net.</p>
+<p>You could think of 1D and 2D convolutions as feature engineering sub-units of a neural network architecture.</p>
+<p>A code snippet for a neural network leveraging 1D Convolutions implemented using TensorFlow looks like follows.</p>
+<p><img src="https://miro.medium.com/max/2000/1*DtFgAsk-TIvOs9UlqKu7Vw.png" width="150%" height="150%"/></p>
+<p>There are 64 filters, each of 3 elements in length (kernel_size). The padding we use in this case is ‘valid’ (i.e., no padding) and the stride is 1 (just like in the example). The specific example is from a time series use case where a windowed dataset is created for time series prediction, but the same general architecture could be mapped to a natural language processing use case.</p>
+<p>In practice, I would recommend trying this approach and using a hyperparameter optimization framework like Keras Tuner, Hyperopt or Optuna to experiment with the number of convolution layers, kernel sizes and stride lengths.</p>
+</article>
+<a class="backlink" href="../../../">Back to index</a>
+<footer class="colophon">
+  <span>© 2026 Avinash Sooriyarachchi</span>
+  <span><a href="https://github.com/AviSoori1x">GitHub</a> &nbsp;·&nbsp; <a href="https://scholar.google.com/citations?user=9uC-33kAAAAJ">Google Scholar</a> &nbsp;·&nbsp; <a href="https://www.linkedin.com/in/avi-data-ml/">LinkedIn</a> &nbsp;·&nbsp; <a href="https://x.com/aviTwit3">X</a> &nbsp;·&nbsp; <a href="https://huggingface.co/AviSoori1x">Hugging Face</a></span>
+  <span>Set in Instrument Serif &amp; IBM Plex Mono</span>
+</footer>
+</div>
+</body>
+</html>
