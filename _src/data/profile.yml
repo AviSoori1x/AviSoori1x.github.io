@@ -5,9 +5,8 @@ profile:
   standfirst: >-
     I work on robotics foundation models — vision-language-action policies, the
     evaluation harnesses that tell us whether they actually work, and the data
-    pipelines that train them. I have been building deep learning systems since
-    2017, across NLP, recommenders and multimodal models, and led applied science
-    in the US at Mistral before moving to research.
+    pipelines that train them. I have worked in deep learning since 2017, and led
+    applied science in the US at Mistral before moving to research.
   meta_desc: >-
     Avinash Sooriyarachchi — Research Scientist at Mistral AI, working on robotics
     foundation models, vision-language-action policies and real-to-sim evaluation.
@@ -29,6 +28,7 @@ now:
       into a physically-valid simulated scene — a reproducible, gradeable environment
       instead of an anecdote.
     - >-
-      Robotics is the current problem rather than the whole arc. I started working in deep
-      learning in 2017 and have spent time on NLP, recommender systems, multimodal models
-      and language model post-training since.
+      Robotics is the current problem rather than the whole arc. At Mistral I have also been
+      a lead contributor on Shieldstral, a multimodal safety classifier, and on Mistral Small
+      Creative. My deep learning work started in 2017 — NLP first, then recommender systems
+      and multimodal models — and predates the language model era.
