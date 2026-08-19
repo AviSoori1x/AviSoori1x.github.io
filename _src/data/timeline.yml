@@ -4,9 +4,16 @@ items:
     org: Mistral AI
     note: >-
       Robotics foundation models — vision-language-action policies, System-2 manipulation
-      planning, and real-to-sim evaluation. Contributor on the Ministral 3, Voxtral, Robostral
-      Navigate and Shieldstral releases. Joined in 2024 on the applied side and went on to lead
-      the US applied science team.
+      planning, and real-to-sim evaluation. Contributor on the Robostral Navigate release, and
+      a lead contributor on Shieldstral and Mistral Small Creative. Joined in 2024 on the
+      applied side and went on to lead the US applied science team.
+    links:
+      - label: Robostral Navigate
+        url: https://arxiv.org/abs/2607.20785
+      - label: Shieldstral
+        url: https://arxiv.org/abs/2607.25857
+      - label: Mistral Small Creative
+        url: https://docs.mistral.ai/models/mistral-small-creative-25-12
 
   - when: 2021 — 2024
     role: Senior Solutions Architect, AI/ML
@@ -31,12 +38,12 @@ items:
       over social media data. Ames, Iowa, out of the ISU Startup Factory.
 
   - when: 2016 — 2017
-    role: Graduate researcher, Architected Materials Lab
+    role: M.S.E., Mechanical Engineering and Applied Mechanics
     org: University of Pennsylvania
     note: >-
-      M.S.E. in Mechanical Engineering and Applied Mechanics. Research on mechanical
-      metamaterials with Jordan Raney; Dean's Research Fellowship. Also took Wharton's
-      Modern Data Mining course, which is where the machine learning detour began.
+      Research on mechanical metamaterials in Jordan Raney's Architected Materials Lab, on a
+      Dean's Research Fellowship. Also took Wharton's Modern Data Mining course, which is
+      where the move toward machine learning started.
 
   - when: 2016
     role: B.S., Mechanical Engineering

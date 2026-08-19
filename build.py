@@ -238,10 +238,7 @@ def build(serve: bool = False) -> None:
 
 
 def pygments_css() -> str:
-    light = HtmlFormatter(style="tango").get_style_defs(".highlight")
-    dark = HtmlFormatter(style="native").get_style_defs(".highlight")
-    dark = "\n".join("  " + line for line in dark.splitlines())
-    return f"{light}\n@media (prefers-color-scheme: dark) {{\n{dark}\n}}\n"
+    return HtmlFormatter(style="tango").get_style_defs(".highlight")
 
 
 def person_json_ld(site: dict, profile: dict) -> str:

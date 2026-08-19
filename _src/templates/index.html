@@ -166,6 +166,11 @@
       <span>
         <span class="tl-role">{{ t.role }} &nbsp;<span class="org">{{ t.org }}</span></span>
         {% if t.note %}<span class="tl-note">{{ t.note }}</span>{% endif %}
+        {% if t.links %}
+        <span class="p-links">
+          {% for l in t.links %}<a href="{{ l.url|u(rel) }}">{{ l.label }}</a>{% endfor %}
+        </span>
+        {% endif %}
       </span>
     </li>
     {% endfor %}

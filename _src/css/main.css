@@ -28,21 +28,9 @@
   --step: 0.32s cubic-bezier(.22,.61,.36,1);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --paper:      #12110e;
-    --paper-2:    #1a1815;
-    --ink:        #f0eade;
-    --ink-2:      #cdc5b4;
-    --muted:      #918a78;
-    --faint:      #6a6455;
-    --rule:       #2e2b24;
-    --rule-soft:  #24221c;
-    --accent:     #ff6a45;
-    --accent-dim: #e8542f;
-    --accent-wash:#2a1a14;
-  }
-}
+/* Deliberately light-only: the warm paper ground is the design. Honouring
+   prefers-color-scheme here produced a near-black page that read as a different
+   site entirely. */
 
 /* ---------- reset ---------- */
 *, *::before, *::after { box-sizing: border-box; }
@@ -70,9 +58,6 @@ body::before {
   mix-blend-mode: multiply;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
 }
-@media (prefers-color-scheme: dark) {
-  body::before { mix-blend-mode: screen; opacity: .045; }
-}
 
 /* ---------- layout ---------- */
 .page {
@@ -81,17 +66,7 @@ body::before {
   padding: 0 2rem 8rem;
 }
 
-/* the "binding spine": hairline down the left gutter */
-.spine {
-  position: fixed;
-  top: 0; bottom: 0;
-  left: calc(50vw - (var(--page) / 2) + 2rem + var(--gutter) - 2.25rem);
-  width: 1px;
-  background: var(--rule-soft);
-  z-index: 0;
-  pointer-events: none;
-}
-@media (max-width: 62rem) { .spine { display: none; } }
+.spine { display: none; }
 
 .row {
   display: grid;
@@ -390,9 +365,10 @@ a { color: inherit; text-decoration: none; }
   padding-top: .28rem;
   white-space: nowrap;
 }
-.tl-role { font-size: 1.02rem; color: var(--ink); }
+.tl-role { display: block; font-size: 1.02rem; color: var(--ink); }
 .tl-role .org { font-family: var(--mono); font-size: .82rem; color: var(--accent); }
-.tl-note { font-size: .93rem; color: var(--muted); margin-top: .22rem; line-height: 1.5; max-width: 40rem; text-wrap: pretty; }
+.tl-note { display: block; font-size: .93rem; color: var(--muted); margin-top: .3rem; line-height: 1.55; max-width: 40rem; text-wrap: pretty; }
+.tl .p-links { margin-top: .55rem; }
 @media (max-width: 40rem) { .tl { grid-template-columns: 1fr; } .tl-when { padding: 0 0 .2rem; } }
 
 /* ---------- footer ---------- */
