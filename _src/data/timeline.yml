@@ -16,12 +16,12 @@ items:
         url: https://docs.mistral.ai/models/mistral-small-creative-25-12
 
   - when: 2021 to 2024
-    role: Senior Solutions Architect, AI/ML
+    role: Mosaic AI - Solutions Architect Lead, Digital Native and Emerging
     org: Databricks
     note: >-
-      Field engineering, and for the last stretch retail and consumer packaged goods in the
-      Bay Area. LLM fine-tuning, recommender systems, vector search and streaming ML. Most
-      of my writing and conference talks come from this period.
+      Field engineering for digital native and emerging accounts in the Bay Area. LLM
+      fine-tuning, recommender systems, vector search and streaming ML. Most of my writing
+      and conference talks come from this period.
 
   - when: 2019 to 2021
     role: Senior Solutions Architect, AI/ML
