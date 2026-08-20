@@ -22,7 +22,7 @@ items:
     role: Core author
     note: >-
       An 8B vision-language navigation model that takes only monocular RGB and predicts
-      waypoints by pointing at the next target in the current camera view — operating in image
+      waypoints by pointing at the next target in the current camera view, operating in image
       space rather than a robot-specific action space.
 
   - title: Voxtral TTS

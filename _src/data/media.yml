@@ -7,9 +7,9 @@ items:
     kind: Podcast
     url: https://www.youtube.com/watch?v=pVDPb9JoFGo
     note: >-
-      A long-form conversation on building products on top of foundation models — fine-tuning,
-      DPO and quantisation; why evaluation and guardrails are the hard part of enterprise
-      deployment; and how to move into applied AI research.
+      A long-form conversation on building products on top of foundation models: fine-tuning,
+      DPO and quantisation, why evaluation and guardrails are the hard part of enterprise
+      deployment, and how to move into applied AI research.
 
   - title: "Mistral AI on AWS: 3 Features Developers Need to Know"
     venue: AWS Developers

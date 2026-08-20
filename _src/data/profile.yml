@@ -3,12 +3,12 @@ profile:
   org: Mistral AI
   location: San Francisco
   standfirst: >-
-    I work on robotics foundation models — vision-language-action policies, the
+    I work on robotics foundation models: vision-language-action policies, the
     evaluation harnesses that tell us whether they actually work, and the data
     pipelines that train them. I have worked in deep learning since 2017, and led
     applied science in the US at Mistral before moving to research.
   meta_desc: >-
-    Avinash Sooriyarachchi — Research Scientist at Mistral AI, working on robotics
+    Avinash Sooriyarachchi is a Research Scientist at Mistral AI, working on robotics
     foundation models, vision-language-action policies and real-to-sim evaluation.
     Author of makeMoE and seemore.
   contact: >-
@@ -25,10 +25,10 @@ now:
     - >-
       A lot of my current attention goes to evaluation. Robot policies are easy to demo and
       hard to measure, so I build real-to-sim pipelines that turn a single real camera frame
-      into a physically-valid simulated scene — a reproducible, gradeable environment
-      instead of an anecdote.
+      into a physically-valid simulated scene. That gives you a reproducible, gradeable
+      environment instead of an anecdote.
     - >-
       Robotics is the current problem rather than the whole arc. At Mistral I have also been
       a lead contributor on Shieldstral, a multimodal safety classifier, and on Mistral Small
-      Creative. My deep learning work started in 2017 — NLP first, then recommender systems
-      and multimodal models — and predates the language model era.
+      Creative. My deep learning work started in 2017, first in NLP and later in recommender
+      systems and multimodal models, so it predates the language model era.

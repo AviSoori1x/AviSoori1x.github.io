@@ -4,7 +4,7 @@ items:
     stars: 812
     url: https://github.com/AviSoori1x/makeMoE
     desc: >-
-      A sparse mixture-of-experts language model written from scratch in pure PyTorch —
+      A sparse mixture-of-experts language model written from scratch in pure PyTorch:
       expert modules, top-k noisy gating, and the initialisation and routing details that
       actually decide whether an MoE trains. Built in the spirit of Karpathy's makemore, as a
       readable reference for the architecture behind Mixtral, DBRX and Grok.
@@ -51,7 +51,7 @@ items:
     stars: 46
     url: https://github.com/AviSoori1x/Tuning-the-Finetuning
     desc: >-
-      An empirical exploration of what actually matters when fine-tuning with QLoRA — rank,
+      An empirical exploration of what actually matters when fine-tuning with QLoRA: rank,
       target modules, and the parameter choices that decide whether a run is worth the GPU
       hours. The companion write-up is cited in the academic literature.
     links:
@@ -64,7 +64,7 @@ items:
     stars: 12
     url: https://github.com/AviSoori1x/multimodal_LLMs
     desc: >-
-      Fine-tuning BLIP-2 and Flan-T5-XL for caption generation with PEFT/LoRA — an early look
+      Fine-tuning BLIP-2 and Flan-T5-XL for caption generation with PEFT/LoRA, an early look
       at parameter-efficient adaptation of multimodal models.
 
   - name: BrickPilot
@@ -96,7 +96,7 @@ items:
     stars: 3
     url: https://github.com/AviSoori1x/Explainable-ML-Application
     desc: >-
-      Interactive explainable machine learning — a containerised Streamlit application for
+      Interactive explainable machine learning: a containerised Streamlit application for
       interrogating model behaviour.
     links:
       - label: Repository

@@ -7,7 +7,7 @@ items:
     url: https://youtu.be/FB6H4NwFGzQ
     note: >-
       Running generative AI workloads on AMD accelerators from within the Databricks
-      platform — what it takes to make an alternative accelerator stack practical.
+      platform, and what it takes to make an alternative accelerator stack practical.
 
   - title: "Text to Insights: Building Real-Time Analytics Systems with Generative AI"
     venue: ODSC Generative AI Summit
@@ -27,7 +27,7 @@ items:
     url: https://youtu.be/eJqqDZkBrzE
     note: >-
       What "real time" actually means across streaming inference, feature freshness and
-      online learning — and which parts are worth the operational cost.
+      online learning, and which parts are worth the operational cost.
 
   - title: "Monetizing Data Assets: Sharing Data, Models and Features"
     venue: Data + AI Summit
@@ -46,7 +46,7 @@ items:
     kind: Talk
     url: https://youtu.be/ogk__G33E-A
     note: >-
-      Continuous delivery for streaming ML — driving model training and deployment on a
+      Continuous delivery for streaming ML, driving model training and deployment on a
       structured streaming pipeline from CI.
 
   - title: Innovating with Multimodality and Reasoning with Mistral AI

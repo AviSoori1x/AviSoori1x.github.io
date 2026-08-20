@@ -1,9 +1,9 @@
 items:
-  - when: 2024 — now
+  - when: 2024 to now
     role: Research Scientist
     org: Mistral AI
     note: >-
-      Robotics foundation models — vision-language-action policies, System-2 manipulation
+      Robotics foundation models: vision-language-action policies, System-2 manipulation
       planning, and real-to-sim evaluation. Contributor on the Robostral Navigate release, and
       a lead contributor on Shieldstral and Mistral Small Creative. Joined in 2024 on the
       applied side and went on to lead the US applied science team.
@@ -15,7 +15,7 @@ items:
       - label: Mistral Small Creative
         url: https://docs.mistral.ai/models/mistral-small-creative-25-12
 
-  - when: 2021 — 2024
+  - when: 2021 to 2024
     role: Senior Solutions Architect, AI/ML
     org: Databricks
     note: >-
@@ -23,28 +23,28 @@ items:
       Large language model fine-tuning, recommender systems, vector search and streaming ML,
       with a parallel stream of writing and conference talks.
 
-  - when: 2019 — 2021
+  - when: 2019 to 2021
     role: Senior Solutions Architect, AI/ML
     org: SAS
     note: >-
-      Applied machine learning on SAS Viya in Cary, North Carolina — explainability, NLP
-      services and model deployment. Led the AutoML prototype solution development team.
+      Applied machine learning on SAS Viya in Cary, North Carolina, covering explainability,
+      NLP services and model deployment. Led the AutoML prototype solution development team.
 
-  - when: 2018 — 2019
+  - when: 2018 to 2019
     role: Founder & Lead Data Scientist
     org: RandomWalk Technologies
     note: >-
       Built Fora, a conversational analytics engine that answered natural-language questions
       over social media data. Ames, Iowa, out of the ISU Startup Factory.
 
-  - when: 2016 — 2017
+  - when: 2016 to 2017
     role: M.S.E., Mechanical Engineering and Applied Mechanics
     org: University of Pennsylvania
     note: >-
       Started as a PhD student in Jordan Raney's Architected Materials Lab, researching
       mechanical metamaterials on a Dean's Research Fellowship, with coursework in numerical
       methods and computational mechanics. I left with a master's after getting into machine
-      learning — Wharton's Modern Data Mining course was the turning point.
+      learning. Wharton's Modern Data Mining course was the turning point.
 
   - when: 2016
     role: B.S., Mechanical Engineering

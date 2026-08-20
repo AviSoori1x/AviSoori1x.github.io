@@ -188,7 +188,7 @@ def build(serve: bool = False) -> None:
         talks=talks,
         media=media,
         timeline=data["timeline"]["items"],
-        page_title=f"{site['name']} — {data['profile']['profile']['role']}, {data['profile']['profile']['org']}",
+        page_title=f"{site['name']} · {data['profile']['profile']['role']}, {data['profile']['profile']['org']}",
         page_desc=data["profile"]["profile"]["meta_desc"],
         canonical="/",
         rel="",
@@ -206,7 +206,7 @@ def build(serve: bool = False) -> None:
             tpl.render(
                 site=site,
                 post=p,
-                page_title=f"{p['title']} — {site['name']}",
+                page_title=f"{p['title']} · {site['name']}",
                 page_desc=p["excerpt"][:180],
                 canonical=p["url"],
                 rel="../" * depth,
@@ -328,7 +328,7 @@ def write_404(env: Environment, site: dict) -> None:
 {% endblock %}"""
         ).render(
             site=site,
-            page_title=f"404 — {site['name']}",
+            page_title=f"404 · {site['name']}",
             page_desc="Page not found",
             canonical="/404.html",
             rel="",

@@ -1,5 +1,5 @@
 /* ============================================================
-   avisoori1x.github.io — preprint / lab-notebook design system
+   avisoori1x.github.io: preprint / lab-notebook design system
    ============================================================ */
 
 @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,300..600&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
@@ -10,7 +10,7 @@
   --ink:        #17150f;
   --ink-2:      #3d382d;
   --muted:      #585245;  /* 7.25:1 on paper */
-  --faint:      #6e6759;  /* 5.24:1 — used at 0.6-0.7rem, so it must clear AA too */
+  --faint:      #6e6759;  /* 5.24:1, used at 0.6-0.7rem, so it must clear AA too */
   --rule:       #ddd6c6;
   --rule-soft:  #e8e2d5;
   --accent:     #c3341a;

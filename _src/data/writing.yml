@@ -1,5 +1,5 @@
 # `secondary: true` keeps a piece in the collapsed fold rather than the
-# selected list — used for lighter, seasonal or heavily co-authored marketing posts.
+# selected list. Used for lighter, seasonal or heavily co-authored marketing posts.
 items:
   - title: Common Sense Product Recommendations using Large Language Models
     publisher: Databricks
@@ -10,7 +10,7 @@ items:
     note: >-
       Uses a language model's world knowledge to propose complementary products, then grounds
       those free-text suggestions against a retailer's real catalogue with embeddings and
-      vector search — knowledge a collaborative-filtering system structurally cannot supply.
+      vector search. It is knowledge a collaborative-filtering system structurally cannot supply.
 
   - title: "Efficient Fine-Tuning with LoRA: A Guide to Optimal Parameter Selection for Large Language Models"
     publisher: Databricks
@@ -19,8 +19,8 @@ items:
     url: https://www.databricks.com/blog/efficient-fine-tuning-lora-guide-llms
     note: >-
       An empirical argument that QLoRA should target every linear layer rather than the
-      attention blocks alone, and that a modest rank suffices — better outputs while training
-      under 1% of parameters.
+      attention blocks alone, and that a modest rank suffices, giving better outputs while
+      training under 1% of parameters.
 
   - title: Harnessing Machine Learning for Anomaly Detection in the Building Products Industry
     publisher: Databricks
