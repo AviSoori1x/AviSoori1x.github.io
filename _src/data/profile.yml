@@ -4,9 +4,9 @@ profile:
   location: San Francisco
   standfirst: >-
     I do robotics foundation model research at Mistral. Mostly vision-language-action
-    policies, and the harder problem of how you'd know whether one is any good. I've
-    been working in deep learning since 2017, and I led the US applied science team
-    here before moving to research.
+    policies, and the simulated environments we use both to train them and to work out
+    whether they're any good. I've been working in deep learning since 2017, and I led
+    the US applied science team here before moving to research.
   meta_desc: >-
     Avinash Sooriyarachchi is a Research Scientist at Mistral AI working on robotics
     foundation models, vision-language-action policies and real-to-sim evaluation.
@@ -16,7 +16,7 @@ profile:
     GitHub sooner or later, and the papers are on Scholar.
 
 now:
-  headline: Robotics foundation models, and how to know when they work
+  headline: Robotics foundation models, and the simulation they train and get tested in
   paragraphs:
     - >-
       Most of my time goes to vision-language-action models, and to the System-2 planner
@@ -24,11 +24,12 @@ now:
       execute. Neither has the high-quality training data it needs in the form it's needed,
       so I build a lot of that too.
     - >-
-      I spend more time on evaluation than on anything else. It's easy to film a robot
-      doing something impressive once, and much harder to say whether the policy is any
-      good. So I build real-to-sim pipelines that take a single real camera frame and
-      rebuild it as a physically valid simulated scene. Then you can run the thing a
-      hundred times and score it.
+      A lot of it comes down to real-to-sim. I build pipelines that take a single real
+      camera frame and rebuild it as a physically valid simulated scene, and those scenes
+      get used two ways. As a post-training environment, a policy can collect experience
+      that would be slow or expensive to gather on real hardware. As an eval harness, you
+      can run a policy a hundred times and score it, instead of filming one good demo and
+      calling it a result.
     - >-
       Robotics isn't the only thing I work on here. I was a lead contributor on
       Shieldstral, a multimodal safety classifier, and on Mistral Small Creative. Before

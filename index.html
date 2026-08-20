@@ -28,7 +28,7 @@
 
 <header class="masthead rise d1">
   <h1><span class="giv">Avinash</span> <span class="sur">Sooriyarachchi</span></h1>
-  <p class="standfirst">I do robotics foundation model research at Mistral. Mostly vision-language-action policies, and the harder problem of how you&#39;d know whether one is any good. I&#39;ve been working in deep learning since 2017, and I led the US applied science team here before moving to research.</p>
+  <p class="standfirst">I do robotics foundation model research at Mistral. Mostly vision-language-action policies, and the simulated environments we use both to train them and to work out whether they&#39;re any good. I&#39;ve been working in deep learning since 2017, and I led the US applied science team here before moving to research.</p>
   <div class="byline">
     <span>Research Scientist</span><span class="sep">/</span>
     <span>Mistral AI</span><span class="sep">/</span>
@@ -42,9 +42,9 @@
   <div class="row">
     <div class="gutter"><span class="num">§01</span>Current work</div>
     <div class="col">
-        <h2 class="title">Robotics foundation models, and how to know when they work</h2>
+        <h2 class="title">Robotics foundation models, and the simulation they train and get tested in</h2>
   <div class="prose lede">
-<p>Most of my time goes to vision-language-action models, and to the System-2 planner sitting above them that has to break a long instruction into steps a policy can execute. Neither has the high-quality training data it needs in the form it&#39;s needed, so I build a lot of that too.</p><p>I spend more time on evaluation than on anything else. It&#39;s easy to film a robot doing something impressive once, and much harder to say whether the policy is any good. So I build real-to-sim pipelines that take a single real camera frame and rebuild it as a physically valid simulated scene. Then you can run the thing a hundred times and score it.</p><p>Robotics isn&#39;t the only thing I work on here. I was a lead contributor on Shieldstral, a multimodal safety classifier, and on Mistral Small Creative. Before any of it I worked on NLP, recommender systems and multimodal models, going back to 2017.</p>  </div>
+<p>Most of my time goes to vision-language-action models, and to the System-2 planner sitting above them that has to break a long instruction into steps a policy can execute. Neither has the high-quality training data it needs in the form it&#39;s needed, so I build a lot of that too.</p><p>A lot of it comes down to real-to-sim. I build pipelines that take a single real camera frame and rebuild it as a physically valid simulated scene, and those scenes get used two ways. As a post-training environment, a policy can collect experience that would be slow or expensive to gather on real hardware. As an eval harness, you can run a policy a hundred times and score it, instead of filming one good demo and calling it a result.</p><p>Robotics isn&#39;t the only thing I work on here. I was a lead contributor on Shieldstral, a multimodal safety classifier, and on Mistral Small Creative. Before any of it I worked on NLP, recommender systems and multimodal models, going back to 2017.</p>  </div>
 
     </div>
   </div>
