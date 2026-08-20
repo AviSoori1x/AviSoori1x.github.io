@@ -109,25 +109,21 @@ body::before {
 }
 .masthead h1 .sur { display: block; }
 
-.masthead-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 2.5rem;
-}
+/* The portrait rides in the same margin column the section labels use, so the
+   masthead sits on the page grid instead of floating against the right edge. */
+.masthead .mark { padding-top: .7rem; }
 /* Source is 256px square, so this must never render above ~128px CSS or it softens. */
 .portrait {
-  flex: none;
+  display: block;
   width: 118px;
   height: 118px;
-  margin-bottom: 1.35rem;
   border-radius: 50%;
   object-fit: cover;
   border: 1px solid var(--rule);
 }
-@media (max-width: 40rem) {
-  .masthead-top { gap: 1.25rem; }
-  .portrait { width: 76px; height: 76px; }
+@media (max-width: 46rem) {
+  .masthead .mark { padding-top: 0; }
+  .portrait { width: 76px; height: 76px; margin-bottom: 1.4rem; }
 }
 
 .standfirst {
