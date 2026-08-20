@@ -21,7 +21,8 @@ now:
     - >-
       Most of my time goes to vision-language-action models, and to the System-2 planner
       sitting above them that has to break a long instruction into steps a policy can
-      execute. Neither has the training data it needs, so I build a lot of that too.
+      execute. Neither has the high-quality training data it needs in the form it's needed,
+      so I build a lot of that too.
     - >-
       I spend more time on evaluation than on anything else. It's easy to film a robot
       doing something impressive once, and much harder to say whether the policy is any
