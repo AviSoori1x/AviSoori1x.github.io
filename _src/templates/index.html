@@ -2,7 +2,13 @@
 {% block content %}
 
 <header class="masthead rise d1">
-  <h1><span class="giv">Avinash</span> <span class="sur">Sooriyarachchi</span></h1>
+  <div class="masthead-top">
+    <h1><span class="giv">Avinash</span> <span class="sur">Sooriyarachchi</span></h1>
+    {% if profile.headshot %}
+    <img class="portrait" src="{{ profile.headshot|u(rel) }}" alt="{{ profile.headshot_alt }}"
+         width="256" height="256" decoding="async">
+    {% endif %}
+  </div>
   <p class="standfirst">{{ profile.standfirst }}</p>
   <div class="byline">
     <span>{{ profile.role }}</span><span class="sep">/</span>

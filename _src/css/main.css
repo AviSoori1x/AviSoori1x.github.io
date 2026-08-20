@@ -108,6 +108,28 @@ body::before {
   margin: 0 0 1.35rem;
 }
 .masthead h1 .sur { display: block; }
+
+.masthead-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2.5rem;
+}
+/* Source is 256px square, so this must never render above ~128px CSS or it softens. */
+.portrait {
+  flex: none;
+  width: 118px;
+  height: 118px;
+  margin-bottom: 1.35rem;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--rule);
+}
+@media (max-width: 40rem) {
+  .masthead-top { gap: 1.25rem; }
+  .portrait { width: 76px; height: 76px; }
+}
+
 .standfirst {
   font-size: 1.19rem;
   line-height: 1.5;

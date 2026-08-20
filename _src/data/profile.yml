@@ -2,6 +2,8 @@ profile:
   role: Research Scientist
   org: Mistral AI
   location: San Francisco
+  headshot: images/avi.jpg
+  headshot_alt: Avinash Sooriyarachchi
   standfirst: >-
     I do robotics foundation model research at Mistral. Mostly vision-language-action
     policies, and the simulated environments we use both to train them and to work out
