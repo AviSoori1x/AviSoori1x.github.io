@@ -1,6 +1,6 @@
 note: >-
-  Mistral AI ships its models as collectively-authored technical reports. Where my
-  contribution is named in the core author block rather than the full lab list, I say so.
+  Mistral ships models as collectively authored technical reports. I've marked the ones
+  where I'm in the core author block.
 
 items:
   - title: Shieldstral
@@ -10,9 +10,9 @@ items:
     url: https://arxiv.org/abs/2607.25857
     role: Core author
     note: >-
-      A 3B policy-adaptive multimodal safety classifier that matches or beats models roughly
-      seven times its size on text safety benchmarks, and sets state of the art on multimodal
-      safety classification, by framing moderation as a binary question against a stated policy.
+      A 3B multimodal safety classifier that matches or beats models around seven times its
+      size on text safety, and sets state of the art on multimodal. Instead of scoring
+      against a fixed taxonomy, it asks whether content violates the policy you hand it.
 
   - title: Robostral Navigate
     venue: arXiv preprint
@@ -21,9 +21,9 @@ items:
     url: https://arxiv.org/abs/2607.20785
     role: Core author
     note: >-
-      An 8B vision-language navigation model that takes only monocular RGB and predicts
-      waypoints by pointing at the next target in the current camera view, operating in image
-      space rather than a robot-specific action space.
+      An 8B vision-language navigation model that works from a single RGB camera. It picks
+      waypoints by pointing at the next target in the current view, so everything happens in
+      image space instead of a robot-specific action space.
 
   - title: Voxtral TTS
     venue: arXiv preprint
@@ -32,9 +32,9 @@ items:
     url: https://arxiv.org/abs/2603.25551
     role: Mistral AI
     note: >-
-      Expressive multilingual text to speech that clones a voice from as little as three
-      seconds of reference audio, pairing autoregressive semantic tokens with flow matching
-      for acoustics.
+      Expressive multilingual text to speech. It clones a voice from as little as three
+      seconds of reference audio, using autoregressive semantic tokens plus flow matching
+      for the acoustics.
 
   - title: Voxtral Realtime
     venue: arXiv preprint
@@ -43,8 +43,9 @@ items:
     url: https://arxiv.org/abs/2602.11298
     role: Mistral AI
     note: >-
-      Natively streaming speech recognition that holds offline transcription quality at
-      sub-second latency, trained end to end for streaming with explicit audio/text alignment.
+      Streaming speech recognition that holds offline transcription quality at sub-second
+      latency. Trained end to end for streaming, with explicit alignment between the audio
+      and text streams.
 
   - title: Ministral 3
     venue: arXiv preprint
@@ -53,8 +54,8 @@ items:
     url: https://arxiv.org/abs/2601.08584
     role: Mistral AI
     note: >-
-      A family of parameter-efficient dense models at 3B, 8B and 14B, each released as base,
-      instruction-tuned and reasoning variants with image understanding, under Apache 2.0.
+      Dense models at 3B, 8B and 14B. Each one ships as a base, an instruction-tuned and a
+      reasoning variant, all of them with image understanding, all Apache 2.0.
 
   - title: Fiber Based Approaches as Medicine Delivery Systems
     venue: ACS Biomaterials Science & Engineering 2(9)
@@ -63,6 +64,6 @@ items:
     url: https://doi.org/10.1021/acsbiomaterials.6b00281
     role: Co-first author
     note: >-
-      A review of micro- and nanofibers as drug carriers, surveying electrospinning,
-      microfluidic, wet-spinning, rotary and self-assembly fabrication routes. From my
-      mechanical engineering research at Iowa State, and still my most-cited paper.
+      A review of micro- and nanofibers as drug carriers, covering electrospinning,
+      microfluidic, wet-spinning, rotary and self-assembly fabrication. This came out of my
+      mechanical engineering research at Iowa State, and it's still my most cited paper.

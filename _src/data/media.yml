@@ -7,9 +7,9 @@ items:
     kind: Podcast
     url: https://www.youtube.com/watch?v=pVDPb9JoFGo
     note: >-
-      A long-form conversation on building products on top of foundation models: fine-tuning,
-      DPO and quantisation, why evaluation and guardrails are the hard part of enterprise
-      deployment, and how to move into applied AI research.
+      Thirty-five minutes on building on top of foundation models. Fine-tuning, DPO and
+      quantization, why evaluation and guardrails end up being the hard part of any enterprise
+      deployment, and how to get into applied AI research.
 
   - title: "Mistral AI on AWS: 3 Features Developers Need to Know"
     venue: AWS Developers
@@ -18,7 +18,7 @@ items:
     kind: Video
     url: https://www.youtube.com/watch?v=yz2a2BiYtJo
     note: >-
-      A walkthrough of the Mistral capabilities that matter most when building on AWS.
+      Short walkthrough of running Mistral models on AWS.
 
   - title: Building a Mixture of Experts Model from Scratch with makeMoE
     venue: Fahd Mirza
@@ -27,5 +27,4 @@ items:
     kind: Coverage
     url: https://www.youtube.com/watch?v=s0_Yd83td9M
     note: >-
-      An independent video walkthrough of makeMoE, one of several third-party explainers the
-      project has attracted.
+      Not mine. Fahd Mirza reads through the makeMoE code, and does a good job of it.

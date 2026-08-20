@@ -3,10 +3,10 @@ items:
     role: Research Scientist
     org: Mistral AI
     note: >-
-      Robotics foundation models: vision-language-action policies, System-2 manipulation
-      planning, and real-to-sim evaluation. Contributor on the Robostral Navigate release, and
-      a lead contributor on Shieldstral and Mistral Small Creative. Joined in 2024 on the
-      applied side and went on to lead the US applied science team.
+      Robotics foundation models, mostly manipulation and navigation. Contributor on the
+      Robostral Navigate release, and a lead contributor on Shieldstral and Mistral Small
+      Creative. I joined in 2024 on the applied side and led the US applied science team
+      before moving to research.
     links:
       - label: Robostral Navigate
         url: https://arxiv.org/abs/2607.20785
@@ -19,23 +19,23 @@ items:
     role: Senior Solutions Architect, AI/ML
     org: Databricks
     note: >-
-      Field engineering, latterly for retail and consumer packaged goods in the Bay Area.
-      Large language model fine-tuning, recommender systems, vector search and streaming ML,
-      with a parallel stream of writing and conference talks.
+      Field engineering, and for the last stretch retail and consumer packaged goods in the
+      Bay Area. LLM fine-tuning, recommender systems, vector search and streaming ML. Most
+      of my writing and conference talks come from this period.
 
   - when: 2019 to 2021
     role: Senior Solutions Architect, AI/ML
     org: SAS
     note: >-
-      Applied machine learning on SAS Viya in Cary, North Carolina, covering explainability,
-      NLP services and model deployment. Led the AutoML prototype solution development team.
+      Applied machine learning on SAS Viya in Cary, North Carolina. Explainability, NLP
+      services and model deployment. I led the AutoML prototype team.
 
   - when: 2018 to 2019
     role: Founder & Lead Data Scientist
     org: RandomWalk Technologies
     note: >-
-      Built Fora, a conversational analytics engine that answered natural-language questions
-      over social media data. Ames, Iowa, out of the ISU Startup Factory.
+      I built Fora, a conversational analytics engine that answered plain-English questions
+      about social media data. Ames, Iowa, out of the ISU Startup Factory.
 
   - when: 2016 to 2017
     role: M.S.E., Mechanical Engineering and Applied Mechanics
@@ -50,5 +50,5 @@ items:
     role: B.S., Mechanical Engineering
     org: Iowa State University
     note: >-
-      Undergraduate research in bio-microfluidics with Nastaran Hashemi, producing a co-first
-      author review in ACS Biomaterials Science & Engineering.
+      Undergraduate research in bio-microfluidics with Nastaran Hashemi. That work became a
+      co-first author review in ACS Biomaterials Science & Engineering.

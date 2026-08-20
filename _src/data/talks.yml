@@ -6,8 +6,8 @@ items:
     kind: Talk
     url: https://youtu.be/FB6H4NwFGzQ
     note: >-
-      Running generative AI workloads on AMD accelerators from within the Databricks
-      platform, and what it takes to make an alternative accelerator stack practical.
+      Running generative AI workloads on AMD accelerators inside Databricks, and what it
+      takes to make a non-NVIDIA stack practical.
 
   - title: "Text to Insights: Building Real-Time Analytics Systems with Generative AI"
     venue: ODSC Generative AI Summit
@@ -16,8 +16,8 @@ items:
     kind: Talk
     url: https://youtu.be/yJ0ywuG_yv4?t=12880
     note: >-
-      Composing language models, vector databases and efficient fine-tuning into a system
-      that turns a plain-English question into a live analytical answer.
+      Wiring language models, vector databases and efficient fine-tuning into something that
+      turns a plain-English question into a live analytical answer.
 
   - title: "Getting Up to Speed on Real-Time Machine Learning"
     venue: ODSC Europe
@@ -26,8 +26,8 @@ items:
     kind: Talk
     url: https://youtu.be/eJqqDZkBrzE
     note: >-
-      What "real time" actually means across streaming inference, feature freshness and
-      online learning, and which parts are worth the operational cost.
+      What people actually mean by "real time" across streaming inference, feature freshness
+      and online learning, and which parts are worth paying for.
 
   - title: "Monetizing Data Assets: Sharing Data, Models and Features"
     venue: Data + AI Summit
@@ -36,8 +36,8 @@ items:
     kind: Talk
     url: https://youtu.be/wj_WtrrEfi8
     note: >-
-      Treating models and feature tables as shareable, governed products rather than
-      artefacts locked inside one team's workspace.
+      Treating models and feature tables as shareable, governed products instead of artifacts
+      locked inside one team's workspace.
 
   - title: Streaming Machine Learning with Databricks and GitHub Actions
     venue: GitHub Universe
@@ -46,8 +46,8 @@ items:
     kind: Talk
     url: https://youtu.be/ogk__G33E-A
     note: >-
-      Continuous delivery for streaming ML, driving model training and deployment on a
-      structured streaming pipeline from CI.
+      Continuous delivery for streaming ML. Model training and deployment driven from CI on a
+      structured streaming pipeline.
 
   - title: Innovating with Multimodality and Reasoning with Mistral AI
     venue: ODSC West
@@ -56,8 +56,8 @@ items:
     kind: Talk
     url: https://odsc.com/speakers/innovating-with-multimodality-and-reasoning-with-mistral-ai/
     note: >-
-      Where multimodal input and explicit reasoning change what you can actually build on a
-      foundation model, presented in the "What's Next in AI" track.
+      Where multimodal input and explicit reasoning change what you can build on a foundation
+      model. Presented in the "What's Next in AI" track.
 
   - title: Innovating with Multimodality and Reasoning with Mistral AI
     venue: AWS GenAI Developer Day

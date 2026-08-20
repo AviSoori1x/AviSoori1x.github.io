@@ -4,15 +4,15 @@ items:
     stars: 812
     url: https://github.com/AviSoori1x/makeMoE
     desc: >-
-      A sparse mixture-of-experts language model written from scratch in pure PyTorch:
-      expert modules, top-k noisy gating, and the initialisation and routing details that
-      actually decide whether an MoE trains. Built in the spirit of Karpathy's makemore, as a
-      readable reference for the architecture behind Mixtral, DBRX and Grok.
+      A sparse mixture-of-experts language model I wrote from scratch in pure PyTorch, in
+      the spirit of Karpathy's makemore. The expert modules are the easy part. Most of the
+      work went into the noisy top-k gating and the initialization, which are what decide
+      whether an MoE trains at all. Meant as a readable reference for the architecture
+      behind Mixtral, DBRX and Grok.
     adoption: >-
-      Used as teaching material by the NeurIPS 2024 tutorial “Dynamic Sparsity in Machine
-      Learning”, whose MoE notebook states it is “inspired by the makeMoE blog post” and trains
-      on data pulled straight from the repo; and listed as assigned reading by the M2L Summer
-      School 2024.
+      The NeurIPS 2024 tutorial on dynamic sparsity builds its mixture-of-experts notebook
+      on this, says so in the notebook, and trains on data pulled straight from the repo.
+      The M2L Summer School 2024 lists it as assigned reading.
     links:
       - label: Repository
         url: https://github.com/AviSoori1x/makeMoE
@@ -30,13 +30,13 @@ items:
     stars: 260
     url: https://github.com/AviSoori1x/seemore
     desc: >-
-      A vision language model implemented from scratch in pure PyTorch: a ViT image encoder, a
-      multimodal projection module, and a character-level autoregressive decoder, assembled end
-      to end so every connection is visible. A follow-up, seeMoE, swaps the decoder for a
-      mixture-of-experts version.
+      Same idea as makeMoE, pointed at vision. A ViT image encoder feeds a multimodal
+      projection module and a character-level autoregressive decoder, wired end to end so you
+      can step through the whole thing. A follow-up,
+      seeMoE, swaps the decoder for a mixture-of-experts version.
     adoption: >-
-      Its architecture diagram is used as the reference VLM diagram in Lab 1 of École
-      Polytechnique's graduate course CSC_52002, Multimodal Generative AI.
+      École Polytechnique's graduate course CSC_52002 uses its architecture diagram as the
+      reference VLM diagram in Lab 1.
     links:
       - label: Repository
         url: https://github.com/AviSoori1x/seemore
@@ -51,9 +51,9 @@ items:
     stars: 46
     url: https://github.com/AviSoori1x/Tuning-the-Finetuning
     desc: >-
-      An empirical exploration of what actually matters when fine-tuning with QLoRA: rank,
-      target modules, and the parameter choices that decide whether a run is worth the GPU
-      hours. The companion write-up is cited in the academic literature.
+      An empirical look at what matters when fine-tuning with QLoRA. The short version is
+      that you should target every linear layer, not just the attention blocks, and that a
+      modest rank is enough.
     links:
       - label: Repository
         url: https://github.com/AviSoori1x/Tuning-the-Finetuning
@@ -64,7 +64,7 @@ items:
     stars: 12
     url: https://github.com/AviSoori1x/multimodal_LLMs
     desc: >-
-      Fine-tuning BLIP-2 and Flan-T5-XL for caption generation with PEFT/LoRA, an early look
+      Fine-tuning BLIP-2 and Flan-T5-XL for caption generation with PEFT/LoRA. An early look
       at parameter-efficient adaptation of multimodal models.
 
   - name: BrickPilot
@@ -89,15 +89,15 @@ items:
     stars: 4
     url: https://github.com/avisoori-databricks/text-to-insights
     desc: >-
-      Going from natural language to SQL to an actual answer, combining language models,
-      vector search and resource-efficient fine-tuning.
+      Going from natural language to SQL to an actual answer, using language models, vector
+      search and resource-efficient fine-tuning.
 
   - name: Explainable-ML-Application
     stars: 3
     url: https://github.com/AviSoori1x/Explainable-ML-Application
     desc: >-
-      Interactive explainable machine learning: a containerised Streamlit application for
-      interrogating model behaviour.
+      Interactive explainable machine learning, as a containerized Streamlit app for poking
+      at model behavior.
     links:
       - label: Repository
         url: https://github.com/AviSoori1x/Explainable-ML-Application

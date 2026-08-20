@@ -3,14 +3,14 @@ profile:
   org: Mistral AI
   location: San Francisco
   standfirst: >-
-    I work on robotics foundation models: vision-language-action policies, the
-    evaluation harnesses that tell us whether they actually work, and the data
-    pipelines that train them. I have worked in deep learning since 2017, and led
-    applied science in the US at Mistral before moving to research.
+    I do robotics foundation model research at Mistral. Mostly vision-language-action
+    policies, and the harder problem of how you'd know whether one is any good. I've
+    been working in deep learning since 2017, and I led the US applied science team
+    here before moving to research.
   meta_desc: >-
-    Avinash Sooriyarachchi is a Research Scientist at Mistral AI, working on robotics
+    Avinash Sooriyarachchi is a Research Scientist at Mistral AI working on robotics
     foundation models, vision-language-action policies and real-to-sim evaluation.
-    Author of makeMoE and seemore.
+    He wrote makeMoE and seemore.
   contact: >-
     LinkedIn is the most reliable way to reach me. Most of what I build ends up on
     GitHub sooner or later, and the papers are on Scholar.
@@ -19,16 +19,17 @@ now:
   headline: Robotics foundation models, and how to know when they work
   paragraphs:
     - >-
-      At Mistral I work on vision-language-action models: the policies themselves, the
-      System-2 planners that decompose a long-horizon instruction into something a policy
-      can execute, and the training data behind both.
+      Most of my time goes to vision-language-action models, and to the System-2 planner
+      sitting above them that has to break a long instruction into steps a policy can
+      execute. Neither has the training data it needs, so I build a lot of that too.
     - >-
-      A lot of my current attention goes to evaluation. Robot policies are easy to demo and
-      hard to measure, so I build real-to-sim pipelines that turn a single real camera frame
-      into a physically-valid simulated scene. That gives you a reproducible, gradeable
-      environment instead of an anecdote.
+      I spend more time on evaluation than on anything else. It's easy to film a robot
+      doing something impressive once, and much harder to say whether the policy is any
+      good. So I build real-to-sim pipelines that take a single real camera frame and
+      rebuild it as a physically valid simulated scene. Then you can run the thing a
+      hundred times and score it.
     - >-
-      Robotics is the current problem rather than the whole arc. At Mistral I have also been
-      a lead contributor on Shieldstral, a multimodal safety classifier, and on Mistral Small
-      Creative. My deep learning work started in 2017, first in NLP and later in recommender
-      systems and multimodal models, so it predates the language model era.
+      Robotics isn't the only thing I work on here. I was a lead contributor on
+      Shieldstral, a multimodal safety classifier, and on Mistral Small Creative. Before
+      any of it I worked on NLP, recommender systems and multimodal models, going back
+      to 2017.
