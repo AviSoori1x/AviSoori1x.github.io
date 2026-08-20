@@ -49,22 +49,18 @@ items:
       Continuous delivery for streaming ML. Model training and deployment driven from CI on a
       structured streaming pipeline.
 
+  # One talk, given twice. `also` keeps the second delivery on the same entry
+  # instead of listing the talk again.
   - title: Innovating with Multimodality and Reasoning with Mistral AI
     venue: ODSC West
     date: "2024"
     sort: "2024-10-31"
     kind: Talk
     url: https://odsc.com/speakers/innovating-with-multimodality-and-reasoning-with-mistral-ai/
+    also:
+      - label: AWS GenAI Developer Day, San Francisco
+        url: https://www.aicamp.ai/event/eventdetails/W2024101509
     note: >-
       Where multimodal input and explicit reasoning change what you can build on a foundation
-      model. Presented in the "What's Next in AI" track.
-
-  - title: Innovating with Multimodality and Reasoning with Mistral AI
-    venue: AWS GenAI Developer Day
-    location: San Francisco
-    date: "2024"
-    sort: "2024-10-15"
-    kind: Talk
-    url: https://www.aicamp.ai/event/eventdetails/W2024101509
-    note: >-
-      The same material for a developer audience at the AWS SF Loft, hosted with AICamp.
+      model. Given in the "What's Next in AI" track, and again for a developer audience at the
+      AWS SF Loft with AICamp.

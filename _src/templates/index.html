@@ -125,7 +125,7 @@
       <span class="e-year">{{ t.date }}</span>
       <span class="e-body">
         <a class="e-title" href="{{ t.url|u(rel) }}">{{ t.title }}</a>
-        <span class="e-meta"><span class="venue">{{ t.venue }}</span>{% if t.location %} · {{ t.location }}{% endif %}{% if t.cospeakers %} · with {{ t.cospeakers }}{% endif %}</span>
+        <span class="e-meta"><span class="venue">{{ t.venue }}</span>{% if t.location %} · {{ t.location }}{% endif %}{% if t.cospeakers %} · with {{ t.cospeakers }}{% endif %}{% for a in t.also %} · also at <a class="lnk" href="{{ a.url|u(rel) }}">{{ a.label }}</a>{% endfor %}</span>
         {% if t.note %}<span class="e-note">{{ t.note }}</span>{% endif %}
       </span>
       <span class="e-tag">{{ t.kind }}</span>

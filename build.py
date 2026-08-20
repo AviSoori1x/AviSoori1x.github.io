@@ -166,6 +166,20 @@ def build(serve: bool = False) -> None:
                 "secondary": p["stem"] in folded,
             }
         )
+    # A piece of work is an entry in exactly one section. Anything a project card
+    # already links (its write-up, its guide) is reachable from that card, so it
+    # must not also appear as a standalone entry under Writing.
+    def norm(u: str) -> str:
+        return (u or "").split("://")[-1].rstrip("/").lstrip("/").lower()
+
+    owned = set()
+    for p in data["projects"]["items"]:
+        owned.add(norm(p.get("url", "")))
+        for link in p.get("links") or []:
+            owned.add(norm(link["url"]))
+    dropped = [w["title"] for w in writing if norm(w["url"]) in owned]
+    writing = [w for w in writing if norm(w["url"]) not in owned]
+
     writing.sort(key=lambda w: str(w.get("sort") or w.get("date")), reverse=True)
     # "secondary" pieces stay in the fold so the selected list reads as research work
     writing_primary = [w for w in writing if not w.get("secondary")]
@@ -173,6 +187,13 @@ def build(serve: bool = False) -> None:
 
     talks = sorted(data["talks"]["items"], key=lambda t: str(t.get("sort") or t.get("date")), reverse=True)
     media = sorted(data["media"]["items"], key=lambda m: str(m.get("sort") or m.get("date")), reverse=True)
+
+    # Nothing should be listed twice anywhere. A talk given at two venues belongs
+    # on one entry via `also`; a write-up belongs to its project card.
+    check_no_duplicates(
+        {"writing": writing, "talks": talks, "media": media, "research": data["research"]["items"]},
+        norm,
+    )
 
     index_html = env.get_template("index.html").render(
         site=site,
@@ -224,6 +245,8 @@ def build(serve: bool = False) -> None:
     )
 
     print(f"built  index + {len(posts)} posts  ->  {OUT}")
+    for t in dropped:
+        print(f"       writing entry owned by a project card, not re-listed: {t[:64]}")
     for p in posts:
         print(f"       {p['url']}")
 
@@ -235,6 +258,24 @@ def build(serve: bool = False) -> None:
         with socketserver.TCPServer(("127.0.0.1", 8000), handler) as httpd:
             print("serving http://127.0.0.1:8000  (ctrl-c to stop)")
             httpd.serve_forever()
+
+
+def check_no_duplicates(sections: dict[str, list], norm) -> None:
+    """Fail the build if one piece of work is listed as an entry more than once."""
+    by_title: dict[str, list[str]] = {}
+    by_url: dict[str, list[str]] = {}
+    for name, items in sections.items():
+        for it in items:
+            by_title.setdefault(re.sub(r"\W+", "", it["title"].lower()), []).append(name)
+            by_url.setdefault(norm(it.get("url", "")), []).append(name)
+    dupes = [(k, v) for k, v in by_title.items() if len(v) > 1]
+    dupes += [(k, v) for k, v in by_url.items() if k and len(v) > 1]
+    if dupes:
+        lines = "\n".join(f"  {k[:70]}  listed in {v}" for k, v in dupes)
+        raise SystemExit(
+            f"duplicate entries across sections:\n{lines}\n"
+            "Use `also:` for a talk given twice, or let the project card own a write-up."
+        )
 
 
 def pygments_css() -> str:

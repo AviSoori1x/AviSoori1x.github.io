@@ -41,9 +41,9 @@ items:
       - label: Repository
         url: https://github.com/AviSoori1x/seemore
       - label: seemore write-up
-        url: https://huggingface.co/blog/AviSoori1x/seemore-vision-language-model
+        url: /2024/04/22/seemore-_Implement_a_Vision_Language_Model_from_Scratch.html
       - label: seeMoE write-up
-        url: https://huggingface.co/blog/AviSoori1x/seemoe
+        url: /2024/05/06/SeeMoE-_Implementing_a_MoE_Vision_Language_Model_from_Scratch.html
       - label: École Polytechnique lab
         url: https://github.com/ArnaudoB/CSC_52002_EP-MultimodalGenAI/blob/main/lab1/lab1.ipynb
 
