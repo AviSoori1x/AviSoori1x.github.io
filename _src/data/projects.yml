@@ -34,9 +34,6 @@ items:
       projection module and a character-level autoregressive decoder, wired end to end so you
       can step through the whole thing. A follow-up,
       seeMoE, swaps the decoder for a mixture-of-experts version.
-    adoption: >-
-      École Polytechnique's graduate course CSC_52002 uses its architecture diagram as the
-      reference VLM diagram in Lab 1.
     links:
       - label: Repository
         url: https://github.com/AviSoori1x/seemore
@@ -44,8 +41,6 @@ items:
         url: /2024/04/22/seemore-_Implement_a_Vision_Language_Model_from_Scratch.html
       - label: seeMoE write-up
         url: /2024/05/06/SeeMoE-_Implementing_a_MoE_Vision_Language_Model_from_Scratch.html
-      - label: École Polytechnique lab
-        url: https://github.com/ArnaudoB/CSC_52002_EP-MultimodalGenAI/blob/main/lab1/lab1.ipynb
 
   - name: Tuning the Finetuning
     stars: 46
