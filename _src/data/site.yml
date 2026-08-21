@@ -24,3 +24,15 @@ links:
     short: hf
     display: huggingface.co/AviSoori1x
     url: https://huggingface.co/AviSoori1x
+
+# Profiles that feed the Person JSON-LD "sameAs" only, so Google fuses them into
+# one entity. Not rendered anywhere on the page.
+same_as_extra:
+  - https://github.com/avisoori-databricks
+  - https://www.youtube.com/@avinashsooriyarachchi994
+  - https://avi-soori.medium.com/
+  - https://www.researchgate.net/profile/Avinash-Sooriyarachchi
+  - https://www.databricks.com/blog/author/avinash-sooriyarachchi
+  # CMS duplicate from a misspelled byline, missing the middle 'a'. Real, and it
+  # holds a first-author post, so it is worth claiming as the same person.
+  - https://www.databricks.com/blog/author/avinash-sooriyarchchi

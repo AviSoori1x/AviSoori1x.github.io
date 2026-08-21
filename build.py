@@ -294,7 +294,8 @@ def person_json_ld(site: dict, profile: dict) -> str:
             "jobTitle": profile["role"],
             "worksFor": {"@type": "Organization", "name": profile["org"]},
             "address": {"@type": "PostalAddress", "addressLocality": profile["location"]},
-            "sameAs": [link["url"] for link in site["links"]],
+            "sameAs": [link["url"] for link in site["links"]]
+            + site.get("same_as_extra", []),
             "description": profile["meta_desc"],
         },
         separators=(",", ":"),
