@@ -1,0 +1,76 @@
+<figure class="fig" id="w-policy">
+  <figcaption class="fig-head"><span class="fig-kicker">INTERACTIVE</span> <span class="fig-title">Change one field, flip the answer</span></figcaption>
+
+  <div class="wp-body">
+
+    <div class="wp-tabs" role="tablist" aria-label="Two contrastive pairs from the paper">
+      <button type="button" class="wp-tab is-on" id="w-policy-tab-a" role="tab" aria-selected="true" aria-controls="w-policy-panel" tabindex="0">
+        <span class="wp-tab-k">A</span>
+        <span class="wp-tab-t">Same document, new query</span>
+        <span class="wp-tab-s">training pair</span>
+      </button>
+      <button type="button" class="wp-tab" id="w-policy-tab-b" role="tab" aria-selected="false" aria-controls="w-policy-panel" tabindex="-1">
+        <span class="wp-tab-k">B</span>
+        <span class="wp-tab-t">Same query, new document</span>
+        <span class="wp-tab-s">evaluation pair</span>
+      </button>
+    </div>
+
+    <div class="wp-panel" id="w-policy-panel" role="tabpanel" aria-labelledby="w-policy-tab-a">
+
+      <div class="wp-choose">
+        <span class="wp-lab" id="w-policy-choose-lab">swap the query</span>
+        <p class="wp-hint" id="w-policy-hint"></p>
+        <div class="wp-seg" id="w-policy-seg" role="radiogroup" aria-labelledby="w-policy-choose-lab" aria-describedby="w-policy-hint"></div>
+      </div>
+
+      <div class="wp-req">
+        <div class="wp-block wp-sys">
+          <div class="wp-block-top"><span class="wp-lab">system, fixed</span></div>
+          <p class="wp-val wp-val-sys" id="w-policy-v-system"></p>
+        </div>
+
+        <div class="wp-block wp-usr">
+          <div class="wp-block-top"><span class="wp-lab">user, adaptive</span></div>
+
+          <div class="wp-field" id="w-policy-f-instruct">
+            <div class="wp-field-top"><code class="wp-tag">&lt;Instruct&gt;</code><span class="wp-state" id="w-policy-s-instruct">fixed</span></div>
+            <p class="wp-val" id="w-policy-v-instruct"></p>
+          </div>
+
+          <div class="wp-field" id="w-policy-f-query">
+            <div class="wp-field-top"><code class="wp-tag">&lt;Query&gt;</code><span class="wp-state" id="w-policy-s-query">fixed</span></div>
+            <p class="wp-val" id="w-policy-v-query"></p>
+            <p class="wp-sub" id="w-policy-qsub" hidden><span class="wp-sub-k">the category it names</span> <span class="wp-sub-t" id="w-policy-qsub-t"></span></p>
+          </div>
+
+          <div class="wp-field" id="w-policy-f-document">
+            <div class="wp-field-top"><code class="wp-tag">&lt;Document&gt;</code><span class="wp-state" id="w-policy-s-document">fixed</span></div>
+            <p class="wp-val" id="w-policy-v-document"></p>
+            <p class="wp-sub" id="w-policy-dsub" hidden><span class="wp-sub-k" id="w-policy-dsub-k"></span> <span class="wp-sub-t" id="w-policy-dsub-t"></span></p>
+          </div>
+        </div>
+      </div>
+
+      <aside class="wp-verdict" id="w-policy-verdict" aria-live="polite">
+        <span class="wp-lab">assistant response</span>
+        <div class="wp-tok" id="w-policy-tok"></div>
+        <div class="wp-flag">
+          <svg class="wp-glyph" id="w-policy-glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"></svg>
+          <span class="wp-flag-t" id="w-policy-flagtxt"></span>
+        </div>
+        <div class="wp-because">
+          <span class="wp-lab" id="w-policy-because-k"></span>
+          <span class="wp-because-t" id="w-policy-because-t"></span>
+        </div>
+        <p class="wp-caveat" id="w-policy-caveat" hidden></p>
+      </aside>
+
+    </div>
+
+    <p class="wp-honest">The yes and no shown here are the labels the paper itself prints for these two worked examples (its Figures 3 and 4). Nothing on this page runs the model, so none of this is a live prediction.</p>
+
+  </div>
+
+  <p class="fig-note">Two of the three tagged fields stay byte for byte identical between the options. Only the third moves, and the answer moves with it. That is what the contrastive data is for: read the query, not just the content.</p>
+</figure>

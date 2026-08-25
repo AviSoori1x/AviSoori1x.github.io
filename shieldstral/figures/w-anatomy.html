@@ -1,0 +1,64 @@
+<figure class="fig" id="w-anatomy">
+  <figcaption class="fig-head"><span class="fig-kicker">INTERACTIVE</span> <span class="fig-title">Assemble a request</span></figcaption>
+
+  <div class="wa-body">
+
+    <div class="wa-rows">
+
+      <div class="wa-row">
+        <div class="wa-row-h">
+          <span class="wa-num">01</span>
+          <span class="wa-lab wa-lab-row" id="w-anatomy-lab-strict">Strictness</span>
+          <span class="wa-tgt">sets a phrase in &lt;Instruct&gt;</span>
+        </div>
+        <div class="wa-seg wa-seg-wide" id="w-anatomy-seg-strict" role="radiogroup" aria-labelledby="w-anatomy-lab-strict"></div>
+      </div>
+
+      <div class="wa-row">
+        <div class="wa-row-h">
+          <span class="wa-num">02</span>
+          <span class="wa-lab wa-lab-row" id="w-anatomy-lab-query">Query type</span>
+          <span class="wa-tgt">sets &lt;Query&gt;</span>
+        </div>
+        <div class="wa-seg wa-seg-wide" id="w-anatomy-seg-query" role="radiogroup" aria-labelledby="w-anatomy-lab-query"></div>
+      </div>
+
+      <div class="wa-row">
+        <div class="wa-row-h">
+          <span class="wa-num">03</span>
+          <span class="wa-lab wa-lab-row" id="w-anatomy-lab-format">Document format</span>
+          <span class="wa-tgt">sets the delimiters in &lt;Document&gt;</span>
+        </div>
+        <div class="wa-seg wa-seg-chips" id="w-anatomy-seg-format" role="radiogroup" aria-labelledby="w-anatomy-lab-format"></div>
+      </div>
+
+    </div>
+
+    <div class="wa-out">
+      <div class="wa-msg">
+        <div class="wa-msg-h"><span class="wa-lab">system message, never changes</span></div>
+        <pre class="wa-pre wa-pre-sys" id="w-anatomy-sys"></pre>
+      </div>
+      <div class="wa-msg">
+        <div class="wa-msg-h">
+          <span class="wa-lab">user message, assembled</span>
+          <span class="wa-copywrap">
+            <span class="wa-copied" id="w-anatomy-copied" role="status" aria-live="polite"></span>
+            <button type="button" class="wa-copy" id="w-anatomy-copy">Copy</button>
+          </span>
+        </div>
+        <pre class="wa-pre" id="w-anatomy-req"></pre>
+      </div>
+    </div>
+
+    <p class="wa-honest">Tinted spans are the only text that moves when you change a control. Field values are taken from the report's own examples, and the strictness sentence is composed from its three tiers.</p>
+
+    <div class="wa-tips">
+      <div class="wa-tips-h"><span class="wa-lab">Prompt engineering notes from the report</span></div>
+      <dl class="wa-dl" id="w-anatomy-tips"></dl>
+    </div>
+
+  </div>
+
+  <p class="fig-note">Nothing here is a hidden setting. Every policy decision you make above ends up as characters in one string, which is the whole reason one checkpoint can be retargeted without retraining.</p>
+</figure>

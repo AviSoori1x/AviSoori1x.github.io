@@ -1,0 +1,42 @@
+<figure class="fig" id="w-bench">
+  <figcaption class="fig-head">
+    <span class="fig-kicker">INTERACTIVE</span>
+    <span class="fig-title">Benchmark explorer: 3B against the field</span>
+  </figcaption>
+
+  <div class="wb-stats" id="w-bench-stats"></div>
+
+  <div class="wb-tabs" id="w-bench-tabs" role="tablist" aria-label="Benchmark tables"></div>
+
+  <div class="wb-body">
+
+    <div class="wb-ctl">
+      <button type="button" class="wb-toggle" id="w-bench-only" aria-pressed="false">
+        Only rows Shieldstral does not win
+      </button>
+      <p class="wb-tally" id="w-bench-tally" aria-live="polite"></p>
+    </div>
+
+    <div class="wb-legend" id="w-bench-legend"></div>
+
+    <div class="wb-panel" id="w-bench-panel" role="tabpanel" tabindex="0">
+      <div class="wb-chart" id="w-bench-chart"></div>
+      <p class="wb-empty" id="w-bench-empty" hidden></p>
+    </div>
+
+    <div class="wb-sr" id="w-bench-sr"></div>
+
+    <details class="wb-disc" id="w-bench-disc-inv">
+      <summary id="w-bench-sum-inv">Benchmark inventory</summary>
+      <div class="wb-scroll"><table class="wb-tbl" id="w-bench-inv"></table></div>
+    </details>
+
+    <details class="wb-disc" id="w-bench-disc-ros">
+      <summary id="w-bench-sum-ros">Baseline roster</summary>
+      <div class="wb-scroll"><table class="wb-tbl" id="w-bench-ros"></table></div>
+    </details>
+
+  </div>
+
+  <p class="fig-note">Every model here is larger than Shieldstral. Use the filter to jump straight to the rows it does not win, then read the gap on each one.</p>
+</figure>

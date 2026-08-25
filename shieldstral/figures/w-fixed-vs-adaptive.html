@@ -1,0 +1,89 @@
+<figure class="fig" id="w-fixed-vs-adaptive">
+  <figcaption class="fig-head"><span class="fig-kicker">INTERACTIVE</span> <span class="fig-title">Where the policy lives</span></figcaption>
+
+  <p class="fa-lede">Both guardrails below are shown the same exchange. Only one of them is also told what
+  this particular deployment cares about. Move the tolerance control and watch which request changes.</p>
+
+  <div class="fa-ctl">
+    <span class="fa-ctl-lab" id="w-fixed-vs-adaptive-ctl-lab">Deployment tolerance</span>
+    <div class="fa-seg" id="w-fixed-vs-adaptive-seg" role="radiogroup" aria-labelledby="w-fixed-vs-adaptive-ctl-lab"></div>
+    <p class="fa-why" id="w-fixed-vs-adaptive-why"></p>
+  </div>
+
+  <div class="fa-cols">
+
+    <section class="fa-col fa-col-fixed" aria-labelledby="w-fixed-vs-adaptive-h-fixed">
+      <div class="fa-col-head">
+        <svg class="fa-glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+          <rect class="fa-glyph-s" x="3.2" y="7" width="9.6" height="6.3" rx="1.1"></rect>
+          <path class="fa-glyph-l" d="M5.6 7V5.2a2.4 2.4 0 0 1 4.8 0V7"></path>
+        </svg>
+        <h4 class="fa-col-name" id="w-fixed-vs-adaptive-h-fixed">Fixed taxonomy guardrail</h4>
+        <span class="fa-col-tag">policy frozen before it shipped</span>
+      </div>
+
+      <div class="fa-req" id="w-fixed-vs-adaptive-fx-req">
+        <div class="fa-row">
+          <div class="fa-row-top"><span class="fa-key">policy</span><span class="fa-state fa-state-none" id="w-fixed-vs-adaptive-fx-s-policy">not an input</span></div>
+          <p class="fa-val fa-val-dim" id="w-fixed-vs-adaptive-fx-policy"></p>
+        </div>
+        <div class="fa-row">
+          <div class="fa-row-top"><span class="fa-key">content</span><span class="fa-state" id="w-fixed-vs-adaptive-fx-s-doc">unchanged</span></div>
+          <p class="fa-val fa-val-doc" id="w-fixed-vs-adaptive-fx-doc"></p>
+        </div>
+      </div>
+
+      <p class="fa-out"><span class="fa-out-k">returns</span> <span class="fa-out-v" id="w-fixed-vs-adaptive-fx-out"></span></p>
+      <p class="fa-stamp" id="w-fixed-vs-adaptive-fx-stamp" aria-live="polite"></p>
+    </section>
+
+    <section class="fa-col fa-col-adaptive" aria-labelledby="w-fixed-vs-adaptive-h-adaptive">
+      <div class="fa-col-head">
+        <svg class="fa-glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+          <path class="fa-glyph-l" d="M2.6 13.4l.7-2.6 7-7 1.9 1.9-7 7z"></path>
+          <path class="fa-glyph-l" d="M10.3 3.8l1.5-1.5 1.9 1.9-1.5 1.5"></path>
+        </svg>
+        <h4 class="fa-col-name" id="w-fixed-vs-adaptive-h-adaptive">Policy adaptive guardrail</h4>
+        <span class="fa-col-tag">policy arrives with the content</span>
+      </div>
+
+      <div class="fa-req" id="w-fixed-vs-adaptive-ad-req">
+        <div class="fa-row">
+          <div class="fa-row-top"><span class="fa-key">system prompt</span><span class="fa-state" id="w-fixed-vs-adaptive-ad-s-system">unchanged</span></div>
+          <p class="fa-val fa-val-sys" id="w-fixed-vs-adaptive-ad-system"></p>
+        </div>
+        <div class="fa-row" id="w-fixed-vs-adaptive-ad-row-instruct">
+          <div class="fa-row-top"><code class="fa-tag">&lt;Instruct&gt;</code><span class="fa-state fa-state-live" id="w-fixed-vs-adaptive-ad-s-instruct">rewritten</span></div>
+          <p class="fa-val fa-val-live" id="w-fixed-vs-adaptive-ad-instruct" aria-live="polite"></p>
+        </div>
+        <div class="fa-row">
+          <div class="fa-row-top"><code class="fa-tag">&lt;Query&gt;</code><span class="fa-state" id="w-fixed-vs-adaptive-ad-s-query">unchanged</span></div>
+          <p class="fa-val" id="w-fixed-vs-adaptive-ad-query"></p>
+        </div>
+        <div class="fa-row">
+          <div class="fa-row-top"><code class="fa-tag">&lt;Document&gt;</code><span class="fa-state" id="w-fixed-vs-adaptive-ad-s-doc">unchanged</span></div>
+          <p class="fa-val fa-val-doc" id="w-fixed-vs-adaptive-ad-doc"></p>
+        </div>
+      </div>
+
+      <p class="fa-out"><span class="fa-out-k">returns</span> <span class="fa-out-v" id="w-fixed-vs-adaptive-ad-out"></span></p>
+      <p class="fa-stamp" id="w-fixed-vs-adaptive-ad-stamp" aria-live="polite"></p>
+    </section>
+
+  </div>
+
+  <div class="fa-roster">
+    <div class="fa-roster-head">
+      <h4 class="fa-roster-title" id="w-fixed-vs-adaptive-roster-title">Who can be re-aimed at inference time</h4>
+      <p class="fa-roster-sub" id="w-fixed-vs-adaptive-roster-sub"></p>
+    </div>
+    <div class="fa-roster-groups" id="w-fixed-vs-adaptive-roster"></div>
+    <p class="fa-roster-foot" id="w-fixed-vs-adaptive-roster-foot"></p>
+  </div>
+
+  <p class="fa-honest" id="w-fixed-vs-adaptive-honest"></p>
+
+  <p class="fig-note">The two requests differ by one field. That field is the whole argument: a fixed model
+  cannot be told that this surface is a cybersecurity research tool and that one is a mental health support
+  platform, because the difference is a property of the deployment, not of the content.</p>
+</figure>

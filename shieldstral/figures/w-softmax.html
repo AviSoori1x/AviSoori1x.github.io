@@ -1,0 +1,96 @@
+<figure class="fig" id="w-softmax">
+  <figcaption class="fig-head"><span class="fig-kicker">INTERACTIVE</span> <span class="fig-title">Two logits, one score</span></figcaption>
+
+  <div class="ss-body">
+
+    <div class="ss-quote" id="w-softmax-quote"></div>
+    <p class="ss-frame" id="w-softmax-frame"></p>
+
+    <p class="ss-illus" id="w-softmax-illus"></p>
+
+    <div class="ss-grid">
+
+      <div class="ss-col ss-col-in">
+        <div class="ss-lab">Presets</div>
+        <div class="ss-presets" id="w-softmax-presets" role="group" aria-label="Preset logit examples"></div>
+
+        <div class="ss-ctl">
+          <div class="ss-ctl-head">
+            <label class="ss-ctl-name ss-yes" for="w-softmax-zyes">z<span class="ss-sub">yes</span> <span class="ss-tok">token &ldquo;yes&rdquo;</span></label>
+            <span class="ss-ctl-val ss-yes" id="w-softmax-val-yes">0.00</span>
+          </div>
+          <svg class="ss-bar" viewBox="0 0 200 7" aria-hidden="true" focusable="false">
+            <rect class="ss-bar-rail" x="0.5" y="0.5" width="199" height="6"></rect>
+            <rect class="ss-bar-fill ss-fill-yes" id="w-softmax-bar-yes" x="100" y="0.5" width="0" height="6"></rect>
+            <line class="ss-bar-zero" x1="100" y1="0" x2="100" y2="7"></line>
+          </svg>
+          <input class="ss-range ss-range-yes" type="range" id="w-softmax-zyes" min="-8" max="8" step="0.1" value="0.5" aria-label="Logit for the yes token">
+        </div>
+
+        <div class="ss-ctl">
+          <div class="ss-ctl-head">
+            <label class="ss-ctl-name ss-no" for="w-softmax-zno">z<span class="ss-sub">no</span> <span class="ss-tok">token &ldquo;no&rdquo;</span></label>
+            <span class="ss-ctl-val ss-no" id="w-softmax-val-no">0.00</span>
+          </div>
+          <svg class="ss-bar" viewBox="0 0 200 7" aria-hidden="true" focusable="false">
+            <rect class="ss-bar-rail" x="0.5" y="0.5" width="199" height="6"></rect>
+            <rect class="ss-bar-fill ss-fill-no" id="w-softmax-bar-no" x="100" y="0.5" width="0" height="6"></rect>
+            <line class="ss-bar-zero" x1="100" y1="0" x2="100" y2="7"></line>
+          </svg>
+          <input class="ss-range ss-range-no" type="range" id="w-softmax-zno" min="-8" max="8" step="0.1" value="0.3" aria-label="Logit for the no token">
+          <div class="ss-scale" aria-hidden="true"><span>-8</span><span>0</span><span>+8</span></div>
+        </div>
+
+        <div class="ss-ctl ss-ctl-tau">
+          <div class="ss-ctl-head">
+            <label class="ss-ctl-name" for="w-softmax-tau">threshold tau</label>
+            <span class="ss-ctl-val" id="w-softmax-val-tau">0.50</span>
+          </div>
+          <input class="ss-range ss-range-tau" type="range" id="w-softmax-tau" min="0.05" max="0.95" step="0.01" value="0.5" aria-label="Decision threshold tau">
+          <p class="ss-tau-note" id="w-softmax-tau-note"></p>
+        </div>
+      </div>
+
+      <div class="ss-col ss-col-out">
+        <div class="ss-lab">Safety score s</div>
+        <div class="ss-score" id="w-softmax-score">0.500</div>
+        <div class="ss-verdict-wrap" id="w-softmax-verdict-wrap" role="status">
+          <span class="ss-glyph" id="w-softmax-glyph" aria-hidden="true"></span>
+          <span class="ss-verdict" id="w-softmax-verdict">not flagged</span>
+          <span class="ss-rule-txt" id="w-softmax-rule">s is at or below tau</span>
+        </div>
+        <p class="ss-dir" id="w-softmax-dir"></p>
+      </div>
+    </div>
+
+    <div class="ss-trackbox">
+      <div class="ss-track-inner">
+        <div class="ss-track">
+          <div class="ss-seg ss-seg-safe" id="w-softmax-seg-safe"></div>
+          <div class="ss-seg ss-seg-flag" id="w-softmax-seg-flag"></div>
+        </div>
+        <div class="ss-tau-tick" id="w-softmax-tau-tick"><span class="ss-tau-lab" id="w-softmax-tau-lab">tau</span></div>
+        <div class="ss-marker" id="w-softmax-marker"><span class="ss-marker-lab" id="w-softmax-marker-lab">s</span><span class="ss-marker-dot" id="w-softmax-marker-dot"></span></div>
+        <div class="ss-ends"><span>0.0 leans no</span><span>leans yes 1.0</span></div>
+      </div>
+    </div>
+
+    <div class="ss-grid ss-grid-2">
+      <div class="ss-col">
+        <div class="ss-lab">The arithmetic</div>
+        <div class="ss-math" id="w-softmax-math"></div>
+        <div class="ss-ident" id="w-softmax-ident"></div>
+      </div>
+
+      <aside class="ss-cost">
+        <div class="ss-lab">What each guardrail emits</div>
+        <div class="ss-cost-rows" id="w-softmax-cost"></div>
+        <p class="ss-cost-note" id="w-softmax-cost-note"></p>
+        <p class="ss-cost-counter" id="w-softmax-cost-counter"></p>
+      </aside>
+    </div>
+
+  </div>
+
+  <p class="fig-note">Slide both logits up by the same amount and nothing moves. Only the gap between them decides the score.</p>
+</figure>

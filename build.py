@@ -343,6 +343,10 @@ def write_feed(site: dict, posts: list[dict]) -> None:
 
 def write_sitemap(site: dict, posts: list[dict]) -> None:
     urls = [f"  <url><loc>{site['url']}/</loc></url>"]
+    # hand-authored pages that live outside _posts/ and are not generated here
+    for page in site.get("extra_pages") or []:
+        urls.append(f"  <url><loc>{site['url']}{page['url']}</loc>"
+                    f"<lastmod>{page['lastmod']}</lastmod></url>")
     for p in posts:
         urls.append(
             f"  <url><loc>{site['url']}{p['url']}</loc>"

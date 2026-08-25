@@ -1,0 +1,57 @@
+<figure class="fig" id="w-deploy">
+  <figcaption class="fig-head"><span class="fig-kicker">INTERACTIVE</span> <span class="fig-title">Running it, and what it will not do</span></figcaption>
+
+  <div class="dp-grid">
+
+    <section class="dp-col dp-left" aria-label="How you actually call it">
+      <div class="dp-lab dp-lab-hd">How you actually call it</div>
+
+      <div class="dp-code">
+        <div class="dp-code-bar">
+          <span class="dp-file">shieldstral.py</span>
+          <button type="button" class="dp-copy" id="w-deploy-copy-py" aria-label="Copy the Python scoring helper to the clipboard">Copy</button>
+        </div>
+        <div class="dp-code-body" id="w-deploy-src"></div>
+      </div>
+
+      <div class="dp-lab dp-lab-row">
+        <span>Serve it</span>
+        <button type="button" class="dp-copy dp-copy-sm" id="w-deploy-copy-sh" aria-label="Copy the serving command to the clipboard">Copy</button>
+      </div>
+      <div class="dp-serve">
+        <span class="dp-prompt" aria-hidden="true">$</span>
+        <code class="dp-serve-cmd" id="w-deploy-serve"></code>
+      </div>
+      <p class="dp-note">The model card puts this at 16 GB of VRAM in BF16, and documents llama.cpp, SGLang and Transformers as alternatives to vLLM.</p>
+      <p class="dp-prov"><span class="dp-prov-tag">Provenance</span> This is the model card reference helper, rewritten against the OpenAI Python client and with the softmax shifted by its maximum, which changes no returned value. The system prompt, the model id and the serving flags are read out of the release data when the page loads rather than retyped here. The snippet is not executed in your browser, so nothing on this page is a live model call.</p>
+      <span class="dp-sr" id="w-deploy-status" role="status" aria-live="polite"></span>
+    </section>
+
+    <section class="dp-col dp-right" aria-label="What it will not do for you">
+      <div class="dp-lab dp-lab-hd">What it will not do for you</div>
+      <p class="dp-src-note">Quoted verbatim from the limitations section of the model card.</p>
+
+      <ol class="dp-lims" id="w-deploy-lims"></ol>
+
+      <div class="dp-own">
+        <span class="dp-own-tag">Our note, with the paper's numbers</span>
+        <div class="dp-own-t">No trace to audit</div>
+        <p class="dp-own-d" id="w-deploy-own-d"></p>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="dp-foot">
+    <div class="dp-foot-col dp-foot-l">
+      <div class="dp-lab dp-lab-hd">Go to the source</div>
+      <div class="dp-links" id="w-deploy-links"></div>
+    </div>
+    <div class="dp-foot-col dp-foot-r">
+      <div class="dp-lab dp-lab-hd">Core contributors</div>
+      <p class="dp-people" id="w-deploy-people"></p>
+    </div>
+  </div>
+
+  <p class="fig-note">Copy the helper, point base_url at your own endpoint, and retarget the policy by editing one string.</p>
+</figure>

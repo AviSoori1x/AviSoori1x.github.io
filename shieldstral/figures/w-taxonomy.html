@@ -1,0 +1,45 @@
+<figure class="fig" id="w-taxonomy">
+  <figcaption class="fig-head"><span class="fig-kicker">INTERACTIVE</span> <span class="fig-title">Adaptability benchmark, per category F1</span></figcaption>
+
+  <div class="tx-bar">
+    <div class="tx-ctl">
+      <label class="tx-lab" for="w-taxonomy-cmp">Compare against</label>
+      <select id="w-taxonomy-cmp"></select>
+    </div>
+    <div class="tx-ctl">
+      <span class="tx-lab" id="w-taxonomy-sortlab">Sort rows by</span>
+      <div class="tx-seg" role="group" aria-labelledby="w-taxonomy-sortlab">
+        <button type="button" data-sort="tax" aria-pressed="true">Taxonomy</button>
+        <button type="button" data-sort="ss" aria-pressed="false">Shieldstral</button>
+        <button type="button" data-sort="gap" aria-pressed="false">Gap</button>
+      </div>
+    </div>
+    <div class="tx-ctl tx-ctl-end">
+      <span class="tx-lab">Depth</span>
+      <button type="button" id="w-taxonomy-all" aria-pressed="false">Expand all</button>
+    </div>
+  </div>
+
+  <dl class="tx-stats" id="w-taxonomy-stats"></dl>
+
+  <div class="tx-legend" id="w-taxonomy-legend"></div>
+
+  <div class="tx-head">
+    <span class="tx-hl tx-hl-name">Category</span>
+    <div class="tx-hl-axis">
+      <div class="tx-axis" aria-hidden="true">
+        <span class="tx-ax tx-ax-a">0</span>
+        <span class="tx-ax tx-ax-b">25</span>
+        <span class="tx-ax tx-ax-c">50</span>
+        <span class="tx-ax tx-ax-d">75</span>
+        <span class="tx-ax tx-ax-e">100</span>
+      </div>
+      <span class="tx-hl tx-hl-f1">F1</span>
+    </div>
+    <span class="tx-hl tx-hl-gap">Gap</span>
+  </div>
+
+  <div class="tx-tree" id="w-taxonomy-tree"></div>
+
+  <p class="fig-note">Gap is Shieldstral minus the comparison model, so a negative value marks a category where Shieldstral trails. Sort by gap to put the largest deficits first, then expand a super class to see which leaf categories are responsible.</p>
+</figure>

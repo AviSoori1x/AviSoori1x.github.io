@@ -1,6 +1,16 @@
 # `secondary: true` keeps a piece in the collapsed fold rather than the
 # selected list. Used for lighter, seasonal or heavily co-authored marketing posts.
 items:
+  - title: "Shieldstral, explained: how a 3B safety model takes its policy at inference time"
+    publisher: avisoori1x
+    date: "2026"
+    sort: "2026-08-25"
+    url: /shieldstral/
+    note: >-
+      An interactive walkthrough of a model I was a core contributor to. Moderation reframed as one
+      yes/no question, so the safety policy arrives as text at inference time instead of being
+      frozen into the weights. Covers the data curation recipe, the training and merge, and where
+      the benchmarks are less flattering.
   - title: Common Sense Product Recommendations using Large Language Models
     publisher: Databricks
     date: "2024"

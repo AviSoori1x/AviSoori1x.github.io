@@ -1,0 +1,191 @@
+<figure class="fig" id="w-contrastive">
+  <figcaption class="fig-head">
+    <span class="fig-kicker">INTERACTIVE</span>
+    <span class="fig-title">Contrastive pair generation: one call, two rows</span>
+  </figcaption>
+
+  <div class="wc-body">
+
+    <p class="wc-src" id="w-contrastive-src">
+      <span class="wc-srctag">from the paper</span>
+      <span class="wc-srctext">Every string below is reproduced from the paper: the template is Appendix E.1, the example pair is Figure 3. Nothing here is a live model call. The paper does not print the safe source text behind this particular example, so step 01 shows that template slot rather than a value.</span>
+    </p>
+
+    <div class="wc-bar">
+      <button type="button" class="wc-run" id="w-contrastive-run">Run the loop</button>
+      <div class="wc-chips" role="group" aria-label="Highlight a step of the generation loop">
+        <button type="button" class="wc-chip" id="w-contrastive-chip-1" aria-pressed="false">01 inputs</button>
+        <button type="button" class="wc-chip" id="w-contrastive-chip-2" aria-pressed="false">02 returns</button>
+        <button type="button" class="wc-chip" id="w-contrastive-chip-3" aria-pressed="false">03 two rows</button>
+      </div>
+      <span class="wc-sr" id="w-contrastive-status" role="status" aria-live="polite"></span>
+    </div>
+
+    <!-- ---------------- step 01 ---------------- -->
+    <section class="wc-step" id="w-contrastive-step-1" aria-labelledby="w-contrastive-h1">
+      <p class="wc-stephead"><span class="wc-num">01</span><span class="wc-sname" id="w-contrastive-h1">Inputs to one call</span></p>
+      <p class="wc-sub">The generation template has four fill-in slots. Braces mark a slot, not a value.</p>
+
+      <div class="wc-slots">
+        <div class="wc-slot">
+          <span class="wc-lab" id="w-contrastive-slot-1-lab"></span>
+          <code class="wc-tok" id="w-contrastive-slot-1-tok"></code>
+          <span class="wc-gloss" id="w-contrastive-slot-1-gloss"></span>
+        </div>
+        <div class="wc-slot wc-p">
+          <span class="wc-lab" id="w-contrastive-slot-2-lab"></span>
+          <code class="wc-tok" id="w-contrastive-slot-2-tok"></code>
+          <span class="wc-gloss" id="w-contrastive-slot-2-gloss"></span>
+        </div>
+        <div class="wc-slot wc-n">
+          <span class="wc-lab" id="w-contrastive-slot-3-lab"></span>
+          <code class="wc-tok" id="w-contrastive-slot-3-tok"></code>
+          <span class="wc-gloss" id="w-contrastive-slot-3-gloss"></span>
+        </div>
+      </div>
+
+      <svg class="wc-fan" viewBox="0 0 300 30" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+        <path d="M50 0 C50 18 150 12 150 30" vector-effect="non-scaling-stroke"/>
+        <path d="M150 0 L150 30" vector-effect="non-scaling-stroke"/>
+        <path d="M250 0 C250 18 150 12 150 30" vector-effect="non-scaling-stroke"/>
+      </svg>
+      <div class="wc-conn wc-only-narrow" aria-hidden="true">
+        <svg viewBox="0 0 12 22" width="12" height="22" aria-hidden="true" focusable="false"><path d="M6 0 V15"/><path d="M2 13 L6 19.5 L10 13"/></svg>
+      </div>
+
+      <div class="wc-call">
+        <span class="wc-calltag">one LLM call</span>
+        <span class="wc-callmeta">temperature <span id="w-contrastive-temp"></span></span>
+      </div>
+    </section>
+
+    <div class="wc-conn" aria-hidden="true">
+      <svg viewBox="0 0 12 22" width="12" height="22" aria-hidden="true" focusable="false"><path d="M6 0 V15"/><path d="M2 13 L6 19.5 L10 13"/></svg>
+    </div>
+
+    <!-- ---------------- step 02 ---------------- -->
+    <section class="wc-step" id="w-contrastive-step-2" aria-labelledby="w-contrastive-h2">
+      <p class="wc-stephead"><span class="wc-num">02</span><span class="wc-sname" id="w-contrastive-h2">What comes back</span></p>
+      <p class="wc-sub">Three fields in one reply. Select a field to trace where it lands in step 03.</p>
+
+      <button type="button" class="wc-ret wc-wide wc-d" data-hl="doc" aria-pressed="false" id="w-contrastive-ret-doc">
+        <span class="wc-lab" id="w-contrastive-ret-doc-lab"></span>
+        <span class="wc-val" id="w-contrastive-ret-doc-val"></span>
+        <span class="wc-goes" id="w-contrastive-ret-doc-goes"></span>
+      </button>
+
+      <div class="wc-retpair">
+        <button type="button" class="wc-ret wc-p" data-hl="pos" aria-pressed="false" id="w-contrastive-ret-pos">
+          <span class="wc-lab" id="w-contrastive-ret-pos-lab"></span>
+          <span class="wc-val" id="w-contrastive-ret-pos-val"></span>
+          <span class="wc-goes" id="w-contrastive-ret-pos-goes"></span>
+        </button>
+        <button type="button" class="wc-ret wc-n" data-hl="neg" aria-pressed="false" id="w-contrastive-ret-neg">
+          <span class="wc-lab" id="w-contrastive-ret-neg-lab"></span>
+          <span class="wc-val" id="w-contrastive-ret-neg-val"></span>
+          <span class="wc-goes" id="w-contrastive-ret-neg-goes"></span>
+        </button>
+      </div>
+    </section>
+
+    <div class="wc-conn" aria-hidden="true">
+      <svg viewBox="0 0 12 22" width="12" height="22" aria-hidden="true" focusable="false"><path d="M6 0 V15"/><path d="M2 13 L6 19.5 L10 13"/></svg>
+    </div>
+
+    <!-- ---------------- step 03 ---------------- -->
+    <section class="wc-step" id="w-contrastive-step-3" aria-labelledby="w-contrastive-h3">
+      <p class="wc-stephead"><span class="wc-num">03</span><span class="wc-sname" id="w-contrastive-h3">Two training rows</span></p>
+      <p class="wc-sub">Same document, different query, opposite answer.</p>
+
+      <div class="wc-rows">
+
+        <div class="wc-cell wc-hd wc-p p1 g1">
+          <span class="wc-rowname">positive row</span>
+          <span class="wc-role" id="w-contrastive-role-pos"></span>
+        </div>
+
+        <div class="wc-cell p1 g2">
+          <span class="wc-tag" id="w-contrastive-tag-i-p"></span>
+          <span class="wc-txt" id="w-contrastive-instruct-p"></span>
+        </div>
+
+        <div class="wc-cell wc-cq wc-p p1 g3" data-hl="pos">
+          <span class="wc-tag" id="w-contrastive-tag-q-p"></span>
+          <span class="wc-txt" id="w-contrastive-query-p"></span>
+        </div>
+
+        <div class="wc-cell wc-cdoc p1 g5" data-hl="doc" id="w-contrastive-doc-p">
+          <span class="wc-tag" id="w-contrastive-tag-d-p"></span>
+          <span class="wc-txt" id="w-contrastive-doc-p-txt"></span>
+        </div>
+
+        <div class="wc-cell wc-ans wc-p p1 g6">
+          <span class="wc-lab">answer token</span>
+          <span class="wc-ansv">
+            <svg viewBox="0 0 10 10" width="9" height="9" aria-hidden="true" focusable="false"><rect x="1" y="1" width="8" height="8" fill="currentColor"/></svg>
+            <span id="w-contrastive-ans-p"></span>
+          </span>
+        </div>
+
+        <div class="wc-tie pS g4">
+          <span class="wc-tieline" aria-hidden="true"></span>
+          <span class="wc-tielab" id="w-contrastive-tie-lab">identical document, byte for byte</span>
+          <span class="wc-tieline" aria-hidden="true"></span>
+        </div>
+
+        <div class="wc-cell wc-hd wc-n p2 g1">
+          <span class="wc-rowname">negative row</span>
+          <span class="wc-role" id="w-contrastive-role-neg"></span>
+        </div>
+
+        <div class="wc-cell p2 g2">
+          <span class="wc-tag" id="w-contrastive-tag-i-n"></span>
+          <span class="wc-txt" id="w-contrastive-instruct-n"></span>
+        </div>
+
+        <div class="wc-cell wc-cq wc-n p2 g3" data-hl="neg">
+          <span class="wc-tag" id="w-contrastive-tag-q-n"></span>
+          <span class="wc-txt" id="w-contrastive-query-n"></span>
+        </div>
+
+        <div class="wc-cell wc-cdoc p2 g5" data-hl="doc" id="w-contrastive-doc-n">
+          <span class="wc-tag" id="w-contrastive-tag-d-n"></span>
+          <span class="wc-txt" id="w-contrastive-doc-n-txt"></span>
+        </div>
+
+        <div class="wc-cell wc-ans wc-n p2 g6">
+          <span class="wc-lab">answer token</span>
+          <span class="wc-ansv">
+            <svg viewBox="0 0 10 10" width="9" height="9" aria-hidden="true" focusable="false"><rect x="1.2" y="1.2" width="7.6" height="7.6" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+            <span id="w-contrastive-ans-n"></span>
+          </span>
+        </div>
+
+      </div>
+
+      <p class="wc-scale" id="w-contrastive-scale"></p>
+    </section>
+
+    <!-- ---------------- prompt disclosure ---------------- -->
+    <details class="wc-disc" id="w-contrastive-disc">
+      <summary class="wc-sum" id="w-contrastive-sum">
+        <span class="wc-sign" id="w-contrastive-sign" aria-hidden="true">+</span>
+        <span class="wc-sumtext" id="w-contrastive-sumtext">Show the generation prompt</span>
+      </summary>
+      <div class="wc-discbody">
+        <div class="wc-meta">
+          <div><span class="wc-lab">prompt</span><span class="wc-metav" id="w-contrastive-pname"></span></div>
+          <div><span class="wc-lab">temperature</span><span class="wc-metav" id="w-contrastive-temp2"></span></div>
+        </div>
+        <div class="wc-sys">
+          <span class="wc-lab">system message</span>
+          <span class="wc-metav" id="w-contrastive-sys"></span>
+        </div>
+        <pre class="wc-pre" id="w-contrastive-pre"></pre>
+      </div>
+    </details>
+
+  </div>
+
+  <p class="fig-note">In this pair the two rows differ in exactly one field, the query, and the answer token flips. Holding the content fixed is the whole point: a model cannot separate these two rows by noticing that the text looks unsafe, because both rows contain the same unsafe text. It has to read what the query is asking about. The paper calls this the iso-content setting, and claims it improves the model's ability to generalise to user-defined policies it never saw in training.</p>
+</figure>

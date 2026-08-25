@@ -1,0 +1,267 @@
+/* ============================================================
+   w-anatomy: request anatomy / prompt builder
+   ============================================================ */
+
+#w-anatomy .wa-body {
+  padding: .95rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.05rem;
+  min-width: 0;
+}
+
+/* ---------- control rows ---------- */
+
+#w-anatomy .wa-rows {
+  display: flex;
+  flex-direction: column;
+  gap: .9rem;
+}
+#w-anatomy .wa-row {
+  min-width: 0;
+}
+#w-anatomy .wa-row-h {
+  display: flex;
+  align-items: baseline;
+  gap: .5rem;
+  flex-wrap: wrap;
+  padding-bottom: .32rem;
+  margin-bottom: .45rem;
+  border-bottom: 1px solid var(--rule-soft);
+}
+#w-anatomy .wa-num {
+  font-family: var(--mono);
+  font-size: .62rem;
+  letter-spacing: .1em;
+  color: var(--faint);
+}
+#w-anatomy .wa-lab {
+  font-family: var(--mono);
+  font-size: .68rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+#w-anatomy .wa-lab-row {
+  color: var(--muted);
+}
+#w-anatomy .wa-tgt {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: .62rem;
+  letter-spacing: .04em;
+  color: var(--faint);
+}
+
+#w-anatomy .wa-seg {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem;
+}
+#w-anatomy .wa-opt {
+  min-width: 0;
+  text-align: left;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: .42rem .6rem;
+  font-family: var(--mono);
+  color: var(--ink-2);
+  cursor: pointer;
+  transition: background .18s ease, border-color .18s ease, color .18s ease;
+}
+#w-anatomy .wa-seg-wide .wa-opt { flex: 1 1 172px; }
+#w-anatomy .wa-seg-chips .wa-opt { flex: 0 1 auto; }
+#w-anatomy .wa-opt:hover {
+  border-color: var(--muted);
+  color: var(--ink);
+}
+#w-anatomy .wa-opt[aria-checked="true"] {
+  background: var(--accent-wash);
+  border-color: var(--accent);
+  color: var(--accent-dim);
+}
+#w-anatomy .wa-opt:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+#w-anatomy .wa-opt-t {
+  display: block;
+  font-size: .74rem;
+  line-height: 1.3;
+}
+#w-anatomy .wa-opt-t::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-right: .45rem;
+  border: 1px solid var(--rule);
+  background: transparent;
+  vertical-align: middle;
+  transition: background .18s ease, border-color .18s ease;
+}
+#w-anatomy .wa-opt:hover .wa-opt-t::before { border-color: var(--muted); }
+#w-anatomy .wa-opt[aria-checked="true"] .wa-opt-t::before {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+#w-anatomy .wa-opt-s {
+  display: block;
+  margin-top: .2rem;
+  padding-left: calc(6px + .45rem + 2px);
+  font-size: .6rem;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  line-height: 1.4;
+  color: var(--faint);
+}
+#w-anatomy .wa-opt[aria-checked="true"] .wa-opt-s { color: var(--accent-dim); }
+
+/* ---------- assembled request ---------- */
+
+#w-anatomy .wa-out {
+  border: 1px solid var(--rule);
+  background: var(--paper);
+  min-width: 0;
+}
+#w-anatomy .wa-msg { min-width: 0; }
+#w-anatomy .wa-msg + .wa-msg { border-top: 1px solid var(--rule); }
+#w-anatomy .wa-msg-h {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem;
+  flex-wrap: wrap;
+  padding: .4rem .7rem;
+  background: var(--paper-2);
+  border-bottom: 1px solid var(--rule-soft);
+}
+#w-anatomy .wa-copywrap {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+#w-anatomy .wa-copied {
+  font-family: var(--mono);
+  font-size: .62rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--safe);
+}
+#w-anatomy .wa-copied.is-fail { color: var(--accent); }
+#w-anatomy .wa-copy {
+  font-size: .66rem;
+  padding: .28rem .55rem;
+  border-radius: 3px;
+}
+
+#w-anatomy .wa-pre {
+  margin: 0;
+  padding: .75rem .8rem .85rem;
+  font-family: var(--mono);
+  font-size: .76rem;
+  line-height: 1.75;
+  color: var(--ink);
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  min-width: 0;
+}
+#w-anatomy .wa-pre-sys {
+  font-size: .72rem;
+  line-height: 1.65;
+  color: var(--faint);
+}
+#w-anatomy .wa-tag { color: var(--accent-dim); }
+#w-anatomy .wa-sw {
+  background: var(--paper-2);
+  border-radius: 2px;
+  padding: 1px 2px;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+#w-anatomy .wa-delim { color: var(--faint); }
+#w-anatomy .wa-sw.is-flash { animation: wa-flash .75s ease-out 1; }
+
+@keyframes wa-flash {
+  from { background-color: var(--accent-wash); }
+  to   { background-color: var(--paper-2); }
+}
+
+#w-anatomy .wa-honest {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: .66rem;
+  line-height: 1.6;
+  color: var(--faint);
+  max-width: none;
+}
+
+/* ---------- tips ---------- */
+
+#w-anatomy .wa-tips {
+  border-top: 1px solid var(--rule);
+  padding-top: .8rem;
+}
+#w-anatomy .wa-dl {
+  margin: .55rem 0 0;
+  padding: 0;
+  border: 1px solid var(--rule-soft);
+  background: var(--paper);
+}
+#w-anatomy .wa-tip {
+  padding: .55rem .65rem .6rem;
+  border-left: 2px solid transparent;
+  transition: background .18s ease, border-color .18s ease;
+}
+#w-anatomy .wa-tip + .wa-tip { border-top: 1px solid var(--rule-soft); }
+#w-anatomy .wa-tip dt {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: .72rem;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+#w-anatomy .wa-tip dd {
+  margin: .25rem 0 0;
+  font-family: var(--serif);
+  font-size: .86rem;
+  line-height: 1.5;
+  color: var(--muted);
+  max-width: none;
+}
+#w-anatomy .wa-tip.is-on {
+  background: var(--accent-wash);
+  border-left-color: var(--accent);
+}
+#w-anatomy .wa-tip.is-on dt { color: var(--accent-dim); }
+#w-anatomy .wa-tip-m {
+  display: inline-block;
+  margin-left: .4rem;
+  padding: 1px 4px;
+  border: 1px solid var(--accent);
+  border-radius: 2px;
+  font-size: .56rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--accent-dim);
+  white-space: nowrap;
+}
+#w-anatomy .wa-tip-m[hidden] { display: none; }
+
+@media (max-width: 420px) {
+  #w-anatomy .wa-body { padding: .75rem; }
+  #w-anatomy .wa-pre { font-size: .72rem; }
+  #w-anatomy .wa-tgt {
+    margin-left: 0;
+    flex-basis: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #w-anatomy .wa-opt,
+  #w-anatomy .wa-opt-t::before,
+  #w-anatomy .wa-tip { transition: none; }
+  #w-anatomy .wa-sw.is-flash { animation: none; }
+}

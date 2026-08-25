@@ -3,6 +3,12 @@ url: https://avisoori1x.github.io
 twitter: aviTwit3
 og_image: images/blogImage.png
 
+# Hand-authored pages under the repo root that build.py does not generate, but
+# which still belong in the sitemap.
+extra_pages:
+  - url: /shieldstral/
+    lastmod: "2026-08-25"
+
 links:
   - label: GitHub
     short: gh

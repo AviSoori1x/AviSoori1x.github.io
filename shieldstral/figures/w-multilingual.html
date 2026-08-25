@@ -1,0 +1,38 @@
+<figure class="fig" id="w-multilingual">
+  <figcaption class="fig-head">
+    <span class="fig-kicker">INTERACTIVE</span>
+    <span class="fig-title">Where the multilingual picture holds, and where it slips</span>
+  </figcaption>
+
+  <div class="ml-body">
+
+    <div class="ml-controls">
+      <div class="ml-ctl">
+        <span class="ml-lab" id="w-multilingual-tasklab">Classify</span>
+        <div class="ml-seg" id="w-multilingual-task" role="group" aria-labelledby="w-multilingual-tasklab"></div>
+      </div>
+      <div class="ml-ctl">
+        <span class="ml-lab" id="w-multilingual-sortlab">Row order</span>
+        <div class="ml-seg" id="w-multilingual-sort" role="group" aria-labelledby="w-multilingual-sortlab"></div>
+      </div>
+      <div class="ml-ctl ml-ctl-key">
+        <span class="ml-lab" id="w-multilingual-scalelab">F1 scale</span>
+        <div class="ml-key" id="w-multilingual-legend" aria-labelledby="w-multilingual-scalelab"></div>
+      </div>
+    </div>
+
+    <div class="ml-weak" id="w-multilingual-weak"></div>
+
+    <div class="ml-scroll" id="w-multilingual-scroll" role="region" aria-label="Language by model F1 heatmap, scrolls sideways">
+      <div class="ml-grid" id="w-multilingual-grid" role="grid" aria-label="F1 by language and model"></div>
+    </div>
+    <p class="ml-hint" id="w-multilingual-hint"></p>
+
+    <div class="ml-detail" id="w-multilingual-detail" aria-live="polite"></div>
+
+    <div class="ml-foot" id="w-multilingual-foot"></div>
+
+  </div>
+
+  <p class="fig-note">Click any cell (or arrow around the grid) to rank every model on that language. Switch the row order to bring the soft rows to the top.</p>
+</figure>

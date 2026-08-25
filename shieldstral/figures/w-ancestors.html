@@ -1,0 +1,47 @@
+<figure class="fig" id="w-ancestors">
+  <figcaption class="fig-head"><span class="fig-kicker">INTERACTIVE</span> <span class="fig-title">One rewrite, one call, a positive row at every level</span></figcaption>
+
+  <div class="anc-wrap">
+
+    <section class="anc-col anc-col-tree">
+      <div class="anc-colhead">
+        <span class="anc-lab" id="w-ancestors-treelab">Evaluation taxonomy</span>
+        <span class="anc-meta" id="w-ancestors-treemeta"></span>
+      </div>
+      <ul class="anc-tree" id="w-ancestors-tree" role="tree" aria-labelledby="w-ancestors-treelab" aria-multiselectable="false"></ul>
+      <p class="anc-keys">Pick a leaf category. Arrow keys move through the tree, Enter opens a branch or picks a leaf. Only leaves emit rows here; the paper also allows a subcategory or a super class to be the target.</p>
+    </section>
+
+    <section class="anc-col anc-col-panel">
+      <div class="anc-colhead">
+        <span class="anc-lab" id="w-ancestors-panlab">Rows emitted</span>
+        <span class="anc-meta" id="w-ancestors-selected"></span>
+      </div>
+
+      <div class="anc-shared">
+        <div class="anc-field">
+          <div class="anc-frow"><span class="anc-flab">Document</span><span class="anc-ftag" id="w-ancestors-doctag"></span></div>
+          <div class="anc-fval" id="w-ancestors-doc"></div>
+          <p class="anc-sharednote">One LLM call produced this rewrite. It is reused byte for byte in all three rows below; only the query changes.</p>
+        </div>
+        <div class="anc-field">
+          <div class="anc-frow"><span class="anc-flab">Instruct</span><span class="anc-ftag" id="w-ancestors-instructtag"></span></div>
+          <div class="anc-fval" id="w-ancestors-instruct"></div>
+          <p class="anc-sharednote">Not shared. The paper resamples the system instruction from a pool of diverse phrasings for every sample, so each row can carry a different wording of the same idea.</p>
+        </div>
+      </div>
+
+      <ol class="anc-rows" id="w-ancestors-rows"></ol>
+
+      <p class="anc-honest" id="w-ancestors-honest"></p>
+
+      <div class="anc-readout" id="w-ancestors-readout"></div>
+
+      <dl class="anc-stats" id="w-ancestors-stats"></dl>
+      <p class="anc-sr" id="w-ancestors-status" role="status" aria-live="polite"></p>
+    </section>
+
+  </div>
+
+  <p class="fig-note" id="w-ancestors-caption"></p>
+</figure>

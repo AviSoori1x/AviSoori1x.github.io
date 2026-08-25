@@ -1,0 +1,77 @@
+<figure class="fig" id="w-combinatorics">
+  <figcaption class="fig-head"><span class="fig-kicker">INTERACTIVE</span> <span class="fig-title">One sample, many training views</span></figcaption>
+
+  <div class="wc-body">
+
+    <div class="wc-bar">
+      <div class="wc-math" id="w-combinatorics-math"></div>
+      <div class="wc-ctrls">
+        <button type="button" class="wc-roll" id="w-combinatorics-roll">Roll once</button>
+        <button type="button" class="wc-roll wc-roll-2" id="w-combinatorics-roll10">Roll 10 times</button>
+        <button type="button" class="wc-roll wc-roll-2" id="w-combinatorics-reset">Clear coverage</button>
+      </div>
+    </div>
+
+    <div class="wc-slots" id="w-combinatorics-slots">
+
+      <div class="wc-slot" id="w-combinatorics-slot-0">
+        <span class="wc-lab">&lt;Instruct&gt; strictness<span class="wc-pin" id="w-combinatorics-pin0">set per dataset</span></span>
+        <span class="wc-val" id="w-combinatorics-v0"></span>
+        <span class="wc-sub" id="w-combinatorics-s0"></span>
+      </div>
+
+      <div class="wc-slot" id="w-combinatorics-slot-1">
+        <span class="wc-lab">&lt;Document&gt; format family<span class="wc-pin" id="w-combinatorics-pin1">resampled per sample</span></span>
+        <span class="wc-val" id="w-combinatorics-v1"></span>
+        <span class="wc-sub" id="w-combinatorics-s1"></span>
+      </div>
+
+      <div class="wc-slot" id="w-combinatorics-slot-2">
+        <span class="wc-lab">&lt;Query&gt; phrasing<span class="wc-pin" id="w-combinatorics-pin2">resampled per sample</span></span>
+        <span class="wc-val wc-val-q" id="w-combinatorics-v2"></span>
+        <span class="wc-sub" id="w-combinatorics-s2"></span>
+      </div>
+
+    </div>
+
+    <div class="wc-view">
+      <div class="wc-view-head">
+        <span class="wc-lab">How the draw assembles into one prompt</span>
+        <span class="wc-answer">
+          <span class="wc-answer-lab">label in the paper</span>
+          <span class="wc-answer-tok" id="w-combinatorics-ans"></span>
+        </span>
+      </div>
+
+      <div class="wc-sys"><span class="wc-fixed">system message, never varies</span><span class="wc-sys-t" id="w-combinatorics-sys"></span></div>
+
+      <div class="wc-field" id="w-combinatorics-f-instruct"><span class="wc-tag">&lt;Instruct&gt;<span class="wc-comp">composed</span></span><span class="wc-txt" id="w-combinatorics-instruct"></span></div>
+      <div class="wc-field" id="w-combinatorics-f-query"><span class="wc-tag">&lt;Query&gt;</span><span class="wc-txt" id="w-combinatorics-query"></span></div>
+      <div class="wc-field wc-doc-field" id="w-combinatorics-f-doc"><span class="wc-tag">&lt;Document&gt;</span><span class="wc-txt" id="w-combinatorics-doc"></span></div>
+    </div>
+
+    <div class="wc-cov">
+      <div class="wc-cov-head">
+        <span class="wc-lab">Coverage of the grid shown here</span>
+        <span class="wc-count" id="w-combinatorics-count"></span>
+      </div>
+      <svg class="wc-grid" id="w-combinatorics-grid" viewBox="0 0 210 34" preserveAspectRatio="xMidYMid meet" role="img" aria-labelledby="w-combinatorics-gridlab"></svg>
+      <div class="wc-key">
+        <span class="wc-key-i"><span class="wc-sw wc-sw-un"></span>not yet drawn</span>
+        <span class="wc-key-i"><span class="wc-sw wc-sw-seen"></span>drawn at least once</span>
+        <span class="wc-key-i"><span class="wc-sw wc-sw-now"></span>current draw</span>
+      </div>
+      <span class="wc-gridlab" id="w-combinatorics-gridlab"></span>
+    </div>
+
+    <div class="wc-honest">
+      <p class="wc-honest-p"><span class="wc-fixed">what is measured</span><span id="w-combinatorics-note-real"></span></p>
+      <p class="wc-honest-p"><span class="wc-fixed">what this does not show</span><span id="w-combinatorics-note-scope"></span></p>
+    </div>
+
+    <p class="wc-live" id="w-combinatorics-live" role="status" aria-live="polite"></p>
+
+  </div>
+
+  <p class="fig-note">Roll a few times. The surface of the prompt keeps moving, the content underneath and the answer do not. The paper's stated reason for doing this is to keep the model robust when an operator rewords their policy, rather than tying it to one house style of prompt.</p>
+</figure>
