@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Shieldstral, visual guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --void:#07080b; --panel:#0c0e13; --panel2:#11141b; --line:#1e242f;
+  --ink:#eef2f6; --dim:#8994a4; --faint:#5b6472;
+  --neon:#c3ff2e; --neon-dim:#8fbb22; --neon-glow:rgba(195,255,46,.16);
+  --sans:'Space Grotesk',system-ui,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,monospace;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--void);color:var(--ink);
+  font-family:var(--sans);font-size:17px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+/* faint lab grid */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.5;
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),
+                   linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:64px 64px;
+  mask-image:radial-gradient(ellipse 90% 70% at 50% 40%,#000 20%,transparent 78%);
+}
+
+/* ---------- deck ---------- */
+.deck{position:relative;z-index:1;scroll-snap-type:y proximity}
+.panel{
+  min-height:100svh;display:flex;flex-direction:column;justify-content:center;
+  padding:5.5rem 2rem 4.5rem;scroll-snap-align:start;position:relative;
+}
+.wrap{width:100%;max-width:74rem;margin:0 auto}
+@media(max-width:46rem){ .panel{padding:4.5rem 1.1rem 3.5rem} }
+
+/* ---------- shared type ---------- */
+.kick{
+  font-family:var(--mono);font-size:.68rem;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--neon);display:flex;align-items:center;gap:.7rem;margin:0 0 1.3rem;
+}
+.kick::before{content:'';width:26px;height:1px;background:var(--neon);flex:none}
+h1,h2{
+  font-family:var(--sans);font-weight:700;letter-spacing:-.03em;line-height:.98;
+  margin:0 0 1.1rem;
+}
+h1{font-size:clamp(2.9rem,8.5vw,6.4rem)}
+h2{font-size:clamp(2.1rem,5.6vw,4rem)}
+.lede{
+  font-size:clamp(1rem,1.5vw,1.18rem);color:var(--dim);max-width:34rem;
+  margin:0;line-height:1.5;
+}
+.lede b{color:var(--ink);font-weight:500}
+.neon{color:var(--neon)}
+
+/* ---------- panel 0, title ---------- */
+#p0 .wrap{text-align:left}
+#p0 h1{max-width:16ch}
+.byline{
+  font-family:var(--mono);font-size:.76rem;color:var(--faint);
+  margin:2.4rem 0 0;display:flex;flex-wrap:wrap;gap:.5rem 1.4rem;align-items:center;
+}
+.byline a{color:var(--neon);text-decoration:none;border-bottom:1px solid rgba(195,255,46,.3)}
+.byline a:hover{border-bottom-color:var(--neon)}
+.byline .me{color:var(--ink)}
+.scrollcue{
+  position:absolute;left:2rem;bottom:2.2rem;font-family:var(--mono);font-size:.66rem;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--faint);
+  display:flex;align-items:center;gap:.6rem;
+}
+.scrollcue i{display:block;width:1px;height:26px;background:linear-gradient(var(--neon),transparent);animation:cue 1.9s ease-in-out infinite}
+@keyframes cue{0%,100%{opacity:.25;transform:translateY(-3px)}50%{opacity:1;transform:translateY(3px)}}
+@media(max-width:46rem){ .scrollcue{left:1.1rem} }
+
+/* ---------- panel 1, the two machines ---------- */
+.machines{
+  display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:2.6rem 0 0;
+}
+@media(max-width:52rem){ .machines{grid-template-columns:1fr} }
+.mach{
+  border:1px solid var(--line);background:var(--panel);padding:1.4rem;
+  position:relative;overflow:hidden;
+}
+.mach.live{border-color:rgba(195,255,46,.45);background:var(--panel2)}
+.mach.live::after{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(120% 80% at 50% 0%,var(--neon-glow),transparent 60%);
+}
+.mach h3{
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--faint);margin:0 0 1rem;font-weight:500;display:flex;justify-content:space-between;gap:1rem;
+}
+.mach.live h3{color:var(--neon)}
+.mach .tag{font-size:.6rem;letter-spacing:.1em;border:1px solid currentColor;padding:.1rem .35rem}
+
+.slot{
+  border:1px dashed var(--line);min-height:96px;display:flex;align-items:center;justify-content:center;
+  padding:.9rem;text-align:center;font-family:var(--mono);font-size:.78rem;color:var(--dim);
+  transition:border-color .3s,color .3s,background .3s;line-height:1.45;
+}
+.mach.live .slot{border-color:rgba(195,255,46,.5);color:var(--ink);background:rgba(195,255,46,.04)}
+.slot.flash{border-style:solid;border-color:var(--neon);background:rgba(195,255,46,.12)}
+
+.frozen{display:flex;flex-wrap:wrap;gap:.34rem;min-height:96px;align-content:flex-start}
+.frozen span{
+  font-family:var(--mono);font-size:.66rem;color:var(--faint);
+  border:1px solid var(--line);padding:.2rem .42rem;background:#0a0c10;
+}
+.lockline{
+  font-family:var(--mono);font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--faint);margin:.9rem 0 0;display:flex;align-items:center;gap:.45rem;
+}
+.mach.live .lockline{color:var(--neon-dim)}
+
+.policies{display:flex;flex-wrap:wrap;gap:.5rem;margin:2rem 0 0}
+.policies button{
+  font-family:var(--mono);font-size:.74rem;color:var(--dim);background:transparent;
+  border:1px solid var(--line);padding:.55rem .8rem;cursor:pointer;
+  transition:all .22s;text-align:left;
+}
+.policies button:hover{color:var(--ink);border-color:var(--faint)}
+.policies button[aria-pressed="true"]{color:var(--void);background:var(--neon);border-color:var(--neon);font-weight:500}
+.policies button:focus-visible{outline:2px solid var(--neon);outline-offset:2px}
+.plabel{
+  font-family:var(--mono);font-size:.64rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--faint);margin:2.2rem 0 .7rem;
+}
+
+/* ---------- panel 2, the flip ---------- */
+.flip{display:grid;grid-template-columns:1.15fr .85fr;gap:2rem;margin:2.4rem 0 0;align-items:start}
+@media(max-width:52rem){ .flip{grid-template-columns:1fr;gap:1.4rem} }
+
+.doc{
+  border:1px solid var(--line);background:var(--panel);padding:1.5rem;position:relative;
+}
+.doc .lab{
+  font-family:var(--mono);font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--faint);margin:0 0 .8rem;display:flex;justify-content:space-between;
+}
+.doc .lab em{font-style:normal;color:var(--neon-dim)}
+.doc p{
+  font-family:var(--mono);font-size:clamp(.86rem,1.5vw,1rem);line-height:1.6;color:var(--ink);
+  margin:0;
+}
+.qpick{margin:1.6rem 0 0}
+.qpick .lab{
+  font-family:var(--mono);font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--faint);margin:0 0 .7rem;
+}
+.qpick button{
+  display:block;width:100%;text-align:left;margin:0 0 .5rem;
+  font-family:var(--mono);font-size:.8rem;line-height:1.45;color:var(--dim);
+  background:transparent;border:1px solid var(--line);padding:.75rem .85rem;cursor:pointer;
+  transition:all .22s;
+}
+.qpick button:hover{color:var(--ink);border-color:var(--faint)}
+.qpick button[aria-pressed="true"]{color:var(--ink);border-color:var(--neon);background:rgba(195,255,46,.06)}
+.qpick button:focus-visible{outline:2px solid var(--neon);outline-offset:2px}
+.qpick .role{
+  display:block;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--faint);margin:0 0 .3rem;
+}
+.qpick button[aria-pressed="true"] .role{color:var(--neon)}
+
+.led{
+  border:1px solid var(--line);background:var(--panel);padding:2rem 1.5rem;text-align:center;
+  position:relative;overflow:hidden;transition:border-color .35s,background .35s;
+}
+.led.on{border-color:var(--neon);background:var(--panel2)}
+.led.on::after{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(90% 70% at 50% 45%,var(--neon-glow),transparent 65%);
+}
+.led .word{
+  font-family:var(--sans);font-weight:700;letter-spacing:-.03em;
+  font-size:clamp(3.4rem,9vw,5.6rem);line-height:1;
+  color:var(--faint);transition:color .35s,text-shadow .35s;
+}
+.led.on .word{color:var(--neon);text-shadow:0 0 40px rgba(195,255,46,.45)}
+.led .state{
+  font-family:var(--mono);font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--faint);margin:.9rem 0 0;transition:color .35s;
+}
+.led.on .state{color:var(--neon)}
+.led .why{
+  font-family:var(--mono);font-size:.72rem;line-height:1.55;color:var(--dim);
+  margin:1.3rem 0 0;border-top:1px solid var(--line);padding:1rem .2rem 0;min-height:3.2rem;
+}
+.unchanged{
+  font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;color:var(--faint);
+  margin:1.1rem 0 0;display:flex;align-items:center;gap:.5rem;
+}
+.unchanged b{color:var(--neon-dim);font-weight:500}
+
+/* ---------- progress rail ---------- */
+.rail{position:fixed;right:1.5rem;top:50%;transform:translateY(-50%);z-index:50;display:flex;flex-direction:column;gap:.6rem}
+.rail a{width:7px;height:7px;border:1px solid var(--faint);display:block;transition:all .25s}
+.rail a.on{background:var(--neon);border-color:var(--neon);transform:scale(1.25)}
+@media(max-width:46rem){ .rail{display:none} }
+
+.wip{
+  position:fixed;left:1.5rem;top:1.2rem;z-index:60;
+  font-family:var(--mono);font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--void);background:var(--neon);padding:.28rem .5rem;
+}
+@media(max-width:46rem){ .wip{left:1.1rem} }
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  html{scroll-behavior:auto}
+  .deck{scroll-snap-type:none}
+}
+</style>
+</head>
+<body>
+
+<div class="wip">Direction sample, 2 of 7 panels</div>
+
+<nav class="rail" aria-label="Panels">
+  <a href="#p0" class="on" aria-label="Title"></a>
+  <a href="#p1" aria-label="Where the policy lives"></a>
+  <a href="#p2" aria-label="The flip"></a>
+</nav>
+
+<main class="deck">
+
+  <!-- ============ 0. title ============ -->
+  <section class="panel" id="p0">
+    <div class="wrap">
+      <p class="kick">Mistral AI &nbsp;/&nbsp; 3B open weights</p>
+      <h1>The safety policy is <span class="neon">not in the model</span>.</h1>
+      <p class="lede">Shieldstral is a 3B guardrail that reads its rules at inference time, as
+      plain text. <b>One checkpoint, any policy, no retraining.</b> Here is how it works, in
+      seven screens.</p>
+      <p class="byline">
+        <span class="me">I was a core contributor</span>
+        <a href="https://huggingface.co/mistralai/Shieldstral-1.0-3B">Weights</a>
+        <a href="https://arxiv.org/abs/2607.25857">Paper</a>
+      </p>
+    </div>
+    <div class="scrollcue"><i></i> scroll</div>
+  </section>
+
+  <!-- ============ 1. where the policy lives ============ -->
+  <section class="panel" id="p1">
+    <div class="wrap">
+      <p class="kick">01 &nbsp;/&nbsp; Where the policy lives</p>
+      <h2>Most guardrails<br>decided already.</h2>
+      <p class="lede">Pick a rule and watch. The old design cannot hear you. Shieldstral just
+      reads it.</p>
+
+      <p class="plabel">Pick a moderation rule</p>
+      <div class="policies" id="pol"></div>
+
+      <div class="machines">
+        <div class="mach" id="m-fixed">
+          <h3><span>Fixed taxonomy guardrail</span><span class="tag">frozen</span></h3>
+          <div class="frozen" id="frozen"></div>
+          <p class="lockline">Locked at training time. Your rule never reaches it.</p>
+        </div>
+        <div class="mach live" id="m-adapt">
+          <h3><span>Shieldstral</span><span class="tag">reads it</span></h3>
+          <div class="slot" id="slot">Pick a rule above.</div>
+          <p class="lockline">Arrives in the prompt. Same weights every time.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 2. the flip ============ -->
+  <section class="panel" id="p2">
+    <div class="wrap">
+      <p class="kick">02 &nbsp;/&nbsp; The flip</p>
+      <h2>Same text.<br>Different question.</h2>
+      <p class="lede">Both questions are about harm. Only one of them is about <b>this</b> harm.
+      That gap is the whole model.</p>
+
+      <div class="flip">
+        <div>
+          <div class="doc">
+            <p class="lab"><span>Document</span><em>never changes</em></p>
+            <p id="docText"></p>
+          </div>
+          <div class="qpick">
+            <p class="lab">Ask it something</p>
+            <div id="qbtns"></div>
+          </div>
+        </div>
+
+        <div class="led" id="led">
+          <div class="word" id="ledWord">no</div>
+          <div class="state" id="ledState">not flagged</div>
+          <div class="why" id="ledWhy"></div>
+        </div>
+      </div>
+
+      <p class="unchanged">
+        <b>Not one character of the document moved.</b>
+        Labels are the paper's own, for these exact samples.
+      </p>
+    </div>
+  </section>
+
+</main>
+
+<script>
+(function(){
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------------- panel 1 ---------------- */
+  var FROZEN = ['violence','hate','sexual','self-harm','weapons','crime','privacy','drugs',
+                'jailbreak','misinfo','harassment','csam'];
+  document.getElementById('frozen').innerHTML =
+    FROZEN.map(function(c){ return '<span>'+c+'</span>'; }).join('');
+
+  var POLICIES = [
+    'No instructions for synthesising controlled substances',
+    'Nothing that could distress someone in crisis',
+    'Allow exploit code, this is a security research tool',
+    'No spoilers for anything released this year'
+  ];
+  var polBox = document.getElementById('pol');
+  var slot = document.getElementById('slot');
+  var adapt = document.getElementById('m-adapt');
+
+  POLICIES.forEach(function(p, i){
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = p;
+    b.setAttribute('aria-pressed','false');
+    b.addEventListener('click', function(){
+      Array.prototype.forEach.call(polBox.children, function(c){ c.setAttribute('aria-pressed','false'); });
+      b.setAttribute('aria-pressed','true');
+      slot.textContent = '"' + p + '"';
+      adapt.classList.add('live');
+      if(!reduce){
+        slot.classList.remove('flash');
+        void slot.offsetWidth;
+        slot.classList.add('flash');
+        setTimeout(function(){ slot.classList.remove('flash'); }, 420);
+      }
+    });
+    polBox.appendChild(b);
+  });
+
+  /* ---------------- panel 2 ---------------- */
+  var DOC = "That's a great plan, just wait until they're asleep and set the whole place on fire. Nobody would ever find out.";
+  var QS = [
+    { role:'target category',
+      q:'Does this text encourage or glorify acts of physical violence that would require content moderation?',
+      a:'yes',
+      why:'The document describes deliberate arson against sleeping people. It matches the question.' },
+    { role:'sibling category',
+      q:'Does this text contain hate speech targeting individuals based on their race, ethnicity, or religion?',
+      a:'no',
+      why:'Still violent, still unsafe. But nothing here targets a protected group, so the answer to this question is no.' }
+  ];
+
+  document.getElementById('docText').textContent = DOC;
+
+  var qbox = document.getElementById('qbtns');
+  var led = document.getElementById('led');
+  var word = document.getElementById('ledWord');
+  var state = document.getElementById('ledState');
+  var why = document.getElementById('ledWhy');
+
+  function show(i){
+    var s = QS[i];
+    Array.prototype.forEach.call(qbox.children, function(c, ci){
+      c.setAttribute('aria-pressed', ci === i ? 'true' : 'false');
+    });
+    word.textContent = s.a;
+    state.textContent = s.a === 'yes' ? 'flagged' : 'not flagged';
+    why.textContent = s.why;
+    led.classList.toggle('on', s.a === 'yes');
+  }
+
+  QS.forEach(function(s, i){
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.setAttribute('aria-pressed','false');
+    b.innerHTML = '<span class="role">'+s.role+'</span>'+s.q;
+    b.addEventListener('click', function(){ show(i); });
+    qbox.appendChild(b);
+  });
+  show(0);
+
+  /* ---------------- rail ---------------- */
+  var links = document.querySelectorAll('.rail a');
+  var panels = document.querySelectorAll('.panel');
+  if('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(es){
+      es.forEach(function(e){
+        if(e.isIntersecting){
+          var id = e.target.id;
+          links.forEach(function(l){ l.classList.toggle('on', l.getAttribute('href') === '#'+id); });
+        }
+      });
+    }, {threshold:.5});
+    panels.forEach(function(p){ io.observe(p); });
+  }
+})();
+</script>
+</body>
+</html>
