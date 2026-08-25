@@ -4,10 +4,9 @@ twitter: aviTwit3
 og_image: images/blogImage.png
 
 # Hand-authored pages under the repo root that build.py does not generate, but
-# which still belong in the sitemap.
-extra_pages:
-  - url: /shieldstral/
-    lastmod: "2026-08-25"
+# which still belong in the sitemap. The Shieldstral explainer is deliberately
+# absent while it is in review, so it stays out of the index.
+extra_pages: []
 
 links:
   - label: GitHub

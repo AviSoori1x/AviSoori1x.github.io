@@ -59,6 +59,12 @@ DESC = ("An interactive walkthrough of Shieldstral, Mistral AI's 3B policy-adapt
         "curation recipe, the training and merge, and what the benchmarks do and do not show. "
         "By Avinash Sooriyarachchi, a core contributor to the model.")
 URL = "https://avisoori1x.github.io/shieldstral/"
+
+# While the page is under review it lives at its final URL so it can actually be
+# opened in a browser, but it stays out of the index and is not linked from the
+# site. Flip to False to publish, and re-add the writing.yml entry and the
+# sitemap extra_pages entry at the same time.
+PREVIEW = True
 IMG = "https://avisoori1x.github.io/images/blogImage.png"
 
 LD = (
@@ -82,6 +88,7 @@ html = f"""<!DOCTYPE html>
 <title>{TITLE}</title>
 <meta name="description" content="{DESC}">
 <link rel="canonical" href="{URL}">
+{'<meta name="robots" content="noindex,nofollow">' if PREVIEW else ''}
 <meta name="author" content="Avinash Sooriyarachchi">
 
 <meta property="og:type" content="article">
