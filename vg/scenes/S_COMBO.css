@@ -1,0 +1,191 @@
+.sc-s_combo{
+  width:100%;height:100%;max-height:760px;display:flex;flex-direction:column;
+  gap:9px;font-family:var(--fb);
+}
+.sc-s_combo .sr{
+  position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);
+  clip-path:inset(50%);white-space:nowrap;
+}
+
+/* ---------- header ---------- */
+.sc-s_combo .hd{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.sc-s_combo .eyy{
+  font-family:var(--fm);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--amber);
+}
+.sc-s_combo .ctr{display:flex;align-items:center;gap:7px}
+.sc-s_combo .ctr button{
+  font-family:var(--fm);font-size:11px;letter-spacing:.06em;color:var(--ink2);
+  background:var(--panel);border:1px solid var(--line);border-radius:8px;
+  padding:6px 11px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;
+  transition:border-color .2s,color .2s,background .2s;
+}
+.sc-s_combo .ctr button:hover{color:var(--ink);border-color:rgba(255,180,84,.45)}
+.sc-s_combo .ctr button:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+.sc-s_combo .roll{
+  color:var(--ink)!important;font-weight:700;
+  background:var(--amber-w)!important;border-color:rgba(255,180,84,.5)!important;
+}
+.sc-s_combo .roll:active{transform:translateY(1px)}
+.sc-s_combo .roll .die{
+  width:9px;height:9px;border-radius:2px;background:var(--amber);display:inline-block;flex:none;
+}
+.sc-s_combo .aut .dot{
+  width:7px;height:7px;border-radius:50%;background:var(--amber);display:inline-block;flex:none;
+}
+.sc-s_combo .aut.off .dot{background:transparent;box-shadow:inset 0 0 0 1px var(--ink4)}
+.sc-s_combo .aut.off{color:var(--ink4)}
+.sc-s_combo .rst{color:var(--ink3)!important}
+
+/* ---------- the product ---------- */
+.sc-s_combo .prod{
+  display:grid;grid-template-columns:1fr auto 1fr auto 1fr auto minmax(0,1.15fr);
+  align-items:stretch;gap:8px;flex:none;
+}
+.sc-s_combo .fac{
+  background:var(--panel);border:1px solid var(--line);border-radius:12px;
+  padding:10px 12px 11px;display:flex;flex-direction:column;min-width:0;
+}
+.sc-s_combo .cnt{
+  font-family:var(--fd);font-weight:700;font-size:clamp(24px,3.6vw,40px);line-height:1;
+  letter-spacing:-.04em;color:var(--amber);
+}
+.sc-s_combo .dim{
+  font-family:var(--fm);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink4);margin:5px 0 8px;
+}
+.sc-s_combo .val{
+  font-family:var(--fm);font-size:clamp(11px,1.42vw,13.5px);font-weight:700;color:var(--ink);
+  border-top:1px solid var(--line2);padding:8px 0 0;overflow-wrap:anywhere;
+}
+.sc-s_combo .sub{
+  font-family:var(--fm);font-size:10px;line-height:1.5;color:var(--ink3);
+  margin:3px 0 0;overflow-wrap:anywhere;
+}
+.sc-s_combo .op{
+  align-self:center;font-family:var(--fm);font-size:15px;color:var(--ink4);
+}
+.sc-s_combo .tot{
+  background:var(--panel2);border:1px solid rgba(255,180,84,.28);border-radius:12px;
+  padding:8px 14px 11px;display:flex;flex-direction:column;justify-content:center;min-width:0;
+}
+.sc-s_combo .expr{display:none}
+.sc-s_combo .big{
+  font-family:var(--fd);font-weight:700;font-size:clamp(50px,8.4vw,90px);line-height:.92;
+  letter-spacing:-.05em;color:var(--amber);
+}
+.sc-s_combo .tlab{
+  font-family:var(--fm);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--ink3);margin:6px 0 0;line-height:1.4;
+}
+.sc-s_combo .seen{font-family:var(--fm);font-size:11px;color:var(--ink2);margin:5px 0 0}
+
+/* ---------- the rendered training view ---------- */
+.sc-s_combo .view{
+  background:var(--panel);border:1px solid var(--line);border-radius:12px;
+  padding:11px 15px 13px;position:relative;min-height:0;
+}
+.sc-s_combo .view::after{
+  content:'';position:absolute;left:0;top:11px;bottom:11px;width:2px;border-radius:2px;
+  background:var(--amber);opacity:.55;
+}
+.sc-s_combo .vh{
+  display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+  border-bottom:1px solid var(--line2);padding:0 0 8px;margin:0 0 4px;
+}
+.sc-s_combo .vht{
+  font-family:var(--fm);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink3);
+}
+.sc-s_combo .vhn{font-family:var(--fm);font-size:10.5px;color:var(--ink4)}
+.sc-s_combo .fld{padding:9px 0 0}
+.sc-s_combo .ftop{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:0 0 4px}
+.sc-s_combo .fname{
+  font-family:var(--fm);font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--amber);font-weight:700;
+}
+.sc-s_combo .fmeta{font-family:var(--fm);font-size:9.5px;color:var(--ink4);overflow-wrap:anywhere}
+.sc-s_combo .fbody{display:block}
+.sc-s_combo .ln{
+  display:block;font-family:var(--fm);font-size:clamp(11px,1.5vw,13.5px);line-height:1.55;
+  color:var(--ink);white-space:pre-wrap;overflow-wrap:anywhere;
+}
+.sc-s_combo .ln.soft{color:var(--ink3)}
+.sc-s_combo .ln.q{color:var(--cyan)}
+.sc-s_combo .dl{color:var(--amber);font-weight:700}
+.sc-s_combo .ct{color:var(--ink)}
+
+/* ---------- coverage ---------- */
+.sc-s_combo .cov{
+  background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 14px 11px;
+}
+.sc-s_combo .ch{
+  display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:0 0 8px;
+}
+.sc-s_combo .cht{
+  font-family:var(--fm);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink3);
+}
+.sc-s_combo .chn{font-family:var(--fm);font-size:11px;color:var(--ink2)}
+.sc-s_combo .covgrid{
+  display:grid;grid-template-columns:minmax(0,auto) repeat(var(--cols),minmax(0,1fr));
+  gap:3px 3px;align-items:center;
+}
+.sc-s_combo .corner{display:block}
+.sc-s_combo .gh{
+  font-family:var(--fm);font-size:9.5px;color:var(--ink3);white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis;padding:0 0 1px 1px;min-width:0;
+}
+.sc-s_combo .gh.hot{color:var(--amber)}
+.sc-s_combo .sh{
+  font-family:var(--fm);font-size:9px;color:var(--ink4);text-align:center;line-height:1.2;
+}
+.sc-s_combo .sh.hot{color:var(--amber);font-weight:700}
+.sc-s_combo .rl{
+  font-family:var(--fm);font-size:9.5px;color:var(--ink3);white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis;padding:0 9px 0 0;min-width:0;
+}
+.sc-s_combo .rl.hot{color:var(--amber);font-weight:700}
+.sc-s_combo .rl.hot::before{content:'\203A\00a0'}
+.sc-s_combo .cell{
+  display:block;height:clamp(9px,1.5vw,13px);border-radius:3px;
+  background:var(--bg2);box-shadow:inset 0 0 0 1px var(--line);
+  transition:background .25s,box-shadow .25s;
+}
+.sc-s_combo .cell.gsep{margin-left:7px}
+.sc-s_combo .cell.on{background:rgba(255,180,84,.5);box-shadow:inset 0 0 0 1px rgba(255,180,84,.7)}
+.sc-s_combo .cell.now{
+  background:var(--amber);box-shadow:0 0 0 2px var(--bg),0 0 0 3.5px var(--ink);
+}
+.sc-s_combo .leg{display:flex;flex-wrap:wrap;gap:4px 14px;margin:9px 0 0}
+.sc-s_combo .lg{
+  font-family:var(--fm);font-size:9.5px;letter-spacing:.04em;color:var(--ink4);
+  display:inline-flex;align-items:center;gap:6px;
+}
+.sc-s_combo .lg.fill::before,
+.sc-s_combo .lg.ring::before{content:'';width:9px;height:9px;border-radius:3px;flex:none}
+.sc-s_combo .lg.fill::before{background:rgba(255,180,84,.5);box-shadow:inset 0 0 0 1px rgba(255,180,84,.7)}
+.sc-s_combo .lg.ring::before{background:var(--amber);box-shadow:0 0 0 1.5px var(--ink)}
+
+/* ---------- footer ---------- */
+.sc-s_combo .foot{
+  font-size:11px;line-height:1.52;color:var(--ink4);
+}
+.sc-s_combo .foot b{color:var(--ink3);font-weight:600}
+
+/* ---------- narrow ---------- */
+@media(max-width:70rem){
+  .sc-s_combo{max-height:none;gap:9px}
+  .sc-s_combo .prod{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .sc-s_combo .op{display:none}
+  .sc-s_combo .tot{grid-column:1 / -1;padding:10px 13px 12px}
+  .sc-s_combo .expr{
+    display:block;font-family:var(--fm);font-size:10px;letter-spacing:.14em;
+    color:var(--ink3);margin:0 0 4px;
+  }
+  .sc-s_combo .big{font-size:clamp(46px,13vw,66px)}
+  .sc-s_combo .sub{display:none}
+  .sc-s_combo .cnt{font-size:clamp(22px,6.4vw,30px)}
+  .sc-s_combo .gh{font-size:8px}
+  .sc-s_combo .rl{font-size:8.5px;padding-right:6px}
+  .sc-s_combo .cell.gsep{margin-left:4px}
+  .sc-s_combo .foot{font-size:10.5px}
+}

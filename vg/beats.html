@@ -1,0 +1,437 @@
+<!-- ==================== ACT I ==================== -->
+<div class="actdiv a1"><div class="stack">
+  <p class="n">Act I</p>
+  <h2>The idea</h2>
+  <p>A guardrail whose rules are not in its weights. What that costs, and what it buys.</p>
+</div></div>
+
+<div class="beat a1" data-s="S_FROZEN" data-act="1" data-sec="§1" data-title="Frozen at training time">
+  <div class="stack"><div class="card">
+    <span class="num">01<span class="sec">§1</span></span>
+    <h3>Most guardrails decided already</h3>
+    <p>A guardrail model sits between your users and your language model. The usual design trains
+    a classifier against a <b>fixed taxonomy</b>: content in, a label from a fixed vocabulary out.</p>
+    <p>The report names two costs. Public safety datasets disagree with each other, so there is no
+    one-size-fits-all taxonomy to model. And a fixed model returns the same label no matter who is
+    asking. Its example: content that is fine for a cybersecurity research tool could be deeply
+    harmful on a mental health platform.</p>
+    <div class="try">Drop a rule into either machine. Only one of them can hear you.</div>
+  </div></div>
+</div>
+
+<div class="beat a1" data-s="S_QA" data-act="1" data-sec="§2" data-title="Binary question answering">
+  <div class="stack"><div class="card">
+    <span class="num">02<span class="sec">§2</span></span>
+    <h3>Everything becomes one yes or no</h3>
+    <p>Shieldstral answers <b>one yes/no question about one document</b>, and the caller supplies
+    the question. That is the whole reformulation.</p>
+    <p>A binary toxicity set, a fifteen-category hate taxonomy, a jailbreak detector and a refusal
+    corpus stop being four different problems. They become four sources of the same kind of row.</p>
+  </div></div>
+</div>
+
+<div class="beat a1" data-s="S_REQUEST" data-act="1" data-sec="§2" data-title="The three fields">
+  <div class="stack"><div class="card">
+    <span class="num">03<span class="sec">§2</span></span>
+    <h3>Three fields, and only one of them moves</h3>
+    <p>A fixed system message sets the meta task and restricts the answer to yes or no. Then three
+    tagged fields do the work.</p>
+    <p><span class="k">&lt;Instruct&gt;</span> is the framing: what surface is this, how strict.
+    <span class="k">&lt;Query&gt;</span> is the actual question. <span class="k">&lt;Document&gt;</span>
+    is the content, text or image or both.</p>
+    <p>Keep the instruction constant across a product surface, change the query per policy.</p>
+    <div class="try">Assemble a request. Change the strictness and watch which words move.</div>
+  </div></div>
+</div>
+
+<div class="beat a1" data-s="S_HEAD" data-act="1" data-sec="§2" data-title="Two logits">
+  <div class="stack"><div class="card">
+    <span class="num">04<span class="sec">§2</span></span>
+    <h3>Two logits, and nothing else</h3>
+    <p>Training is ordinary cross-entropy over the full vocabulary. Inference reads out
+    <b>exactly two token ids</b>, yes and no, and softmaxes over just those.</p>
+    <p>One forward pass, one token, a continuous score thresholded at 0.5.</p>
+    <div class="try">Drag the two logits. Only the gap between them matters.</div>
+    <div class="warnc">There is no reasoning trace. When it flags something you disagree with,
+    there is nothing to read.</div>
+  </div></div>
+</div>
+
+<div class="beat a1" data-s="S_ISOCONTENT" data-act="1" data-sec="§3.3" data-title="Same text, new question">
+  <div class="stack"><div class="card">
+    <span class="num">05<span class="sec">§3.3</span></span>
+    <h3>Same text. Different question.</h3>
+    <p>This is the moment the whole design turns on. One document, frozen. Two questions, both
+    about harm. The verdict flips.</p>
+    <p>The report calls this the <b>iso-content</b> setting, and it generates training data this
+    way on purpose.</p>
+    <div class="try">Swap the question. Not one character of the document moves.</div>
+  </div></div>
+</div>
+
+<div class="beat a1" data-s="S_ISOQUERY" data-act="1" data-sec="§4.1" data-title="Same question, new text">
+  <div class="stack"><div class="card">
+    <span class="num">06<span class="sec">§4.1</span></span>
+    <h3>Now hold the question still</h3>
+    <p>Harder test. One question, two documents, both rewritten from the same innocuous sentence.
+    Both are unsafe by any ordinary reading. Only one matches the question.</p>
+    <p>A model that has merely learned <em>this text feels dangerous</em> answers yes to both. This
+    is <b>iso-query</b>, and it is how the model gets evaluated.</p>
+  </div></div>
+</div>
+
+<div class="beat a1" data-s="S_UNIFY" data-act="1" data-sec="§3" data-title="Datasets that disagree">
+  <div class="stack"><div class="card">
+    <span class="num">07<span class="sec">§3</span></span>
+    <h3>Datasets that disagree, folded into one objective</h3>
+    <p>Binary flags, multi-label taxonomies, severity scales. Force them into a shared category
+    set and you need a lossy mapping for every one.</p>
+    <p>Turn each dataset's own labels into questions phrased in <b>that dataset's own terms</b> and
+    the single yes/no objective absorbs all of them. Nothing has to agree with anything else.</p>
+  </div></div>
+</div>
+
+<!-- ==================== ACT II ==================== -->
+<div class="actdiv a2"><div class="stack">
+  <p class="n">Act II</p>
+  <h2>The data</h2>
+  <p>Fifty-four million rows. The architecture is a paragraph, the pipeline is the paper.</p>
+</div></div>
+
+<div class="beat a2" data-s="S_MOUNTAIN" data-act="2" data-sec="§3" data-title="54.1M rows">
+  <div class="stack"><div class="card">
+    <span class="num">08<span class="sec">§3</span></span>
+    <h3>Fifty-four million rows</h3>
+    <p>Roughly <b>54.1M</b> samples in three very unequal buckets: 45.2M from public datasets,
+    4.4M synthetic contrastive text, 4.5M multimodal.</p>
+    <p>Public text dominates by an order of magnitude. The two smaller buckets are about the same
+    size as each other, and the multimodal one is small for a reason that comes up in beat 19.</p>
+  </div></div>
+</div>
+
+<div class="beat a2" data-s="S_PROCESSOR" data-act="2" data-sec="§3.1" data-title="One processor per dataset">
+  <div class="stack"><div class="card">
+    <span class="num">09<span class="sec">§3.1</span></span>
+    <h3>One hand-written processor per dataset</h3>
+    <p>Every source dataset gets a processor, designed by hand from that dataset's documentation.
+    It encodes the labelling logic, the category mappings and the instruction templates for that
+    source.</p>
+    <p>This is the unglamorous half of the contribution and there is no way around it. Somebody
+    read each dataset and wrote down what its labels mean.</p>
+  </div></div>
+</div>
+
+<div class="beat a2" data-s="S_STRICT" data-act="2" data-sec="§3.1" data-title="Strictness tiers">
+  <div class="stack"><div class="card">
+    <span class="num">10<span class="sec">§3.1</span></span>
+    <h3>Strictness is assigned per dataset</h3>
+    <p>An LLM paraphrases each processor's instruction templates. The variants encode the task
+    framing, the domain, and one of three <b>strictness tiers</b>.</p>
+    <p>Adversarial jailbreak and visual safety data get strict templates. General safety, hate and
+    toxicity get moderate. Response quality and dialogue moderation get lenient.</p>
+    <p>Different tiers give the model examples with different intended decision boundaries. That is
+    where the strictness control at inference time comes from.</p>
+  </div></div>
+</div>
+
+<div class="beat a2" data-s="S_QTYPES" data-act="2" data-sec="§3.1" data-title="Three query types">
+  <div class="stack"><div class="card">
+    <span class="num">11<span class="sec">§3.1</span></span>
+    <h3>Three shapes of question</h3>
+    <p>Category-specific queries for datasets with fine-grained taxonomies. Binary queries about
+    overall safety. And dedicated refusal-detection queries, for working out whether a response is
+    a refusal rather than whether it is harmful.</p>
+    <p>Each has multiple paraphrase variants in a pool.</p>
+  </div></div>
+</div>
+
+<div class="beat a2" data-s="S_FORMATS" data-act="2" data-sec="§3.1" data-title="Seven document formats">
+  <div class="stack"><div class="card">
+    <span class="num">12<span class="sec">§3.1</span></span>
+    <h3>Seven ways to write down a conversation</h3>
+    <p>Prompt and response pairs get rendered through one of seven format families. Bracketed,
+    XML, Markdown, role-based, and three more.</p>
+    <p>Every one is a delimiter convention some real system uses. Training across all of them is
+    meant to stop the model depending on any single one.</p>
+    <div class="try">Flip through the formats. Same exchange, seven skins.</div>
+  </div></div>
+</div>
+
+<div class="beat a2" data-s="S_COMBO" data-act="2" data-sec="§3.1" data-title="The randomisation space">
+  <div class="stack"><div class="card">
+    <span class="num">13<span class="sec">§3.1</span></span>
+    <h3>One sample, many views</h3>
+    <p>At training time each sample draws an instruction phrasing and a query variant from its
+    processor's pools. Prompt and response examples also draw one of the seven formats.</p>
+    <p>So across epochs the same content shows up under many framings, and the model has no fixed
+    wording to memorise.</p>
+    <div class="try">Roll it. Watch how far one row can travel.</div>
+  </div></div>
+</div>
+
+<div class="beat a2" data-s="S_POS" data-act="2" data-sec="§3.2" data-title="Positives">
+  <div class="stack"><div class="card">
+    <span class="num">14<span class="sec">§3.2</span></span>
+    <h3>Ask the same harmful text three ways</h3>
+    <p>For each piece of harmful content the pipeline emits positives at several granularities: a
+    coarse binary query, a category-specific query, and where the annotation supports it a
+    target-group-specific one.</p>
+    <p>All three are labelled yes. The model learns that the same violation answers to a broad
+    question and a narrow one.</p>
+  </div></div>
+</div>
+
+<div class="beat a2" data-s="S_NEG" data-act="2" data-sec="§3.2" data-title="Hard negatives">
+  <div class="stack"><div class="card">
+    <span class="num">15<span class="sec">§3.2</span></span>
+    <h3>Unsafe content, correct answer no</h3>
+    <p>Three negative strategies. <b>Category-based</b> pairs content violating A with queries about
+    B and C. <b>Demographic-based</b> pairs content targeting one group with queries about unrelated
+    groups. <b>Safe-content</b> pairs genuinely safe text with ordinary harm queries.</p>
+    <p>The first two are the interesting ones. The document is unsafe and the answer is still no.
+    That is exactly the discrimination a naive harm detector fails.</p>
+  </div></div>
+</div>
+
+<div class="beat a2" data-s="S_FILTER" data-act="2" data-sec="§3.2" data-title="Balance and filtering">
+  <div class="stack"><div class="card">
+    <span class="num">16<span class="sec">§3.2</span></span>
+    <h3>Rebalance, then throw away the wrong labels</h3>
+    <p>Contrastive construction produces far more negatives than positives, since any absent
+    category is a hard negative while positives are limited to what the annotation asserts. Each
+    positive gets duplicated with freshly paraphrased instruction and query to lift the ratio.</p>
+    <p>Then, because public safety datasets contain incorrect labels, an open-source LLM
+    cross-validates them at the binary and per-category levels and disagreements are dropped.</p>
+  </div></div>
+</div>
+
+<div class="beat a2" data-s="S_REWRITE" data-act="2" data-sec="§3.3" data-title="The rewrite loop">
+  <div class="stack"><div class="card">
+    <span class="num">17<span class="sec">§3.3</span></span>
+    <h3>One call in, two contradictory rows out</h3>
+    <p>Public data lacks near-miss pairs, so they get generated. An LLM receives a safe source
+    text, a <b>target category</b> and a <b>sibling category</b>, and returns three things: an unsafe
+    rewrite hitting the target while avoiding the sibling, a query about the target, and a query
+    about the sibling.</p>
+    <p>Positive is rewrite plus target query, answer yes. Negative is the identical rewrite plus
+    sibling query, answer no.</p>
+    <div class="meas">4.4M samples come out of this stage.</div>
+  </div></div>
+</div>
+
+<div class="beat a2" data-s="S_ANCESTOR" data-act="2" data-sec="§3.3" data-title="Free positives">
+  <div class="stack"><div class="card">
+    <span class="num">18<span class="sec">§3.3</span></span>
+    <h3>Free positives, all the way up the tree</h3>
+    <p>The training taxonomy is hierarchical, 11 super classes and 73 leaves. Content violating a
+    leaf necessarily violates every ancestor above it.</p>
+    <p>So the pipeline reuses the same rewrite with ancestor-level queries, all labelled yes. Extra
+    positive rows at <b>zero additional generation cost</b>, and the model learns to recognise the
+    violation at several granularities.</p>
+    <div class="try">Pick a leaf. Watch the free rows stack up.</div>
+  </div></div>
+</div>
+
+<div class="beat a2" data-s="S_IMGSCARCE" data-act="2" data-sec="§3.4" data-title="Images are different">
+  <div class="stack"><div class="card">
+    <span class="num">19<span class="sec">§3.4</span></span>
+    <h3>You cannot rewrite an image</h3>
+    <p>Image moderation datasets are fewer, smaller and narrower. Worse, the trick from beat 17
+    does not transfer: unsafe images cannot simply be generated synthetically the way unsafe text
+    can be rewritten.</p>
+    <p>So the pipeline borrows. General-purpose classification and object-detection datasets supply
+    an enormous pool of naturally safe images as high-quality negatives.</p>
+  </div></div>
+</div>
+
+<div class="beat a2" data-s="S_IMGQUERY" data-act="2" data-sec="§3.4" data-title="Mutate the query">
+  <div class="stack"><div class="card">
+    <span class="num">20<span class="sec">§3.4</span></span>
+    <h3>If you cannot move the picture, move the question</h3>
+    <p>About <b>2,000</b> query phrasings generated from a fixed fourteen-subcategory visual
+    moderation taxonomy covering NSFW, violence, hate and illegal content.</p>
+    <p>Around <b>30%</b> are inverse formulations, asking whether an image is <em>safe from</em>
+    something rather than whether it contains it, so the model handles both polarities.</p>
+  </div></div>
+</div>
+
+<div class="beat a2" data-s="S_RERANK" data-act="2" data-sec="§3.4" data-title="Asymmetric filtering">
+  <div class="stack"><div class="card">
+    <span class="num">21<span class="sec">§3.4</span></span>
+    <h3>Two different bars for two different pools</h3>
+    <p>A vision-language reranker scores every image and query pair to catch mislabelled source
+    data and hallucinated labels. The thresholds are deliberately <b>asymmetric</b>.</p>
+    <p>Lenient on the rare violation samples so they survive. Strict on the abundant negatives,
+    where throwing away anything doubtful costs little.</p>
+    <div class="try">Drag the two cuts apart and watch which samples survive.</div>
+  </div></div>
+</div>
+
+<!-- ==================== ACT III ==================== -->
+<div class="actdiv a3"><div class="stack">
+  <p class="n">Act III</p>
+  <h2>The training</h2>
+  <p>Two checkpoints that are wrong in opposite directions, and the merge that fixes it.</p>
+</div></div>
+
+<div class="beat a3" data-s="S_BASE" data-act="3" data-sec="§5" data-title="The base model">
+  <div class="stack"><div class="card">
+    <span class="num">22<span class="sec">§5</span></span>
+    <h3>3B, with eyes</h3>
+    <p>The base is <b>Ministral-3-3B-Base-2512</b> from the Mistral 3 family, with native multimodal
+    support through a Pixtral vision encoder.</p>
+    <p>That is why text and image moderation share one interface instead of being two models bolted
+    together. One checkpoint takes text, images or both.</p>
+  </div></div>
+</div>
+
+<div class="beat a3" data-s="S_LORA" data-act="3" data-sec="§6.1" data-title="LoRA vs SFT">
+  <div class="stack"><div class="card">
+    <span class="num">23<span class="sec">§6.1</span></span>
+    <h3>LoRA, because it made no difference</h3>
+    <p>Fine-tuning runs LoRA on the language model parameters with cross-entropy on the single
+    output token. Both LoRA and full SFT were tried.</p>
+    <div class="meas">Full SFT is 0.7 F1 ahead on Aegis v2 validation. LoRA is 0.5 ahead on the
+    taxonomy validation set. The report treats that as no significant difference and takes LoRA
+    for the training efficiency.</div>
+  </div></div>
+</div>
+
+<div class="beat a3" data-s="S_TWOCKPT" data-act="3" data-sec="§6.2" data-title="P and PG">
+  <div class="stack"><div class="card">
+    <span class="num">24<span class="sec">§6.2</span></span>
+    <h3>Two checkpoints, wrong in opposite directions</h3>
+    <p><b>P</b> trains on public safety data only. <b>PG</b> adds the generated taxonomy data from
+    Act II.</p>
+    <p>P is calibrated to the standard benchmark and weak on unseen fine-grained policies. PG is
+    strong on fine-grained policies and drifts on the benchmark. Neither one is what you want to
+    ship.</p>
+  </div></div>
+</div>
+
+<div class="beat a3" data-s="S_MERGE" data-act="3" data-sec="§6.2" data-title="The SLERP merge">
+  <div class="stack"><div class="card">
+    <span class="num">25<span class="sec">§6.2</span></span>
+    <h3>Interpolate the weights, keep both strengths</h3>
+    <p>Spherical linear interpolation, with a third ingredient: a 0.1 slice of the base
+    <b>Ministral-3B-Instruct</b>, because general instruction following transfers to the safety task.</p>
+    <p>Final recipe <span class="k">0.6 PG + 0.3 P + 0.1 I</span>, produced through pairwise merges.</p>
+    <div class="try">Five recipes were measured. Nothing exists between them, so there is no slider
+    here on purpose.</div>
+  </div></div>
+</div>
+
+<div class="beat a3" data-s="S_STAGES" data-act="3" data-sec="§7.4" data-title="Stage ablation">
+  <div class="stack"><div class="card">
+    <span class="num">26<span class="sec">§7.4</span></span>
+    <h3>Where the capability actually comes from</h3>
+    <p>On the fine-grained taxonomy validation set, the untrained base model scores <b>zero</b> F1,
+    zero precision, zero recall. It never predicts a violation at all. Its accuracy is 37.8, which
+    is the trap: that looks like partial competence and it is nothing of the kind.</p>
+    <div class="meas">0.0 with no safety training. 61.1 on public data alone, on a taxonomy it has
+    never seen. 84.4 once the generated data goes in. 88.7 after the merge.</div>
+    <div class="warnc">Precision falls from 90.8 to 75.9 as recall climbs from 46.0 to 95.0. The
+    gain is real and it moves the operating point.</div>
+  </div></div>
+</div>
+
+<!-- ==================== ACT IV ==================== -->
+<div class="actdiv a4"><div class="stack">
+  <p class="n">Act IV</p>
+  <h2>Does it hold up</h2>
+  <p>An evaluation built to be different, the numbers, and the places it loses.</p>
+</div></div>
+
+<div class="beat a4" data-s="S_EVALTAX" data-act="4" data-sec="§4.2" data-title="A different taxonomy">
+  <div class="stack"><div class="card">
+    <span class="num">27<span class="sec">§4.2</span></span>
+    <h3>Built on purpose not to match</h3>
+    <p>Generate training data from a taxonomy and evaluate on a taxonomy, and you might just be
+    measuring memorisation. So the evaluation taxonomy is designed separately.</p>
+    <p>Training has 11 super classes and 73 leaves. Evaluation has 12, 26 and 52, with exactly two
+    leaves per subcategory. Different names, different granularity, different groupings, and
+    different LLMs and seeds for generation and verification.</p>
+    <div class="meas">Ten of the twelve evaluation super classes have a loose training counterpart.
+    No leaf maps one to one.</div>
+  </div></div>
+</div>
+
+<div class="beat a4" data-s="S_EVALGEN" data-act="4" data-sec="§4.1" data-title="Fixed queries">
+  <div class="stack"><div class="card">
+    <span class="num">28<span class="sec">§4.1</span></span>
+    <h3>One canonical question per category</h3>
+    <p>Training randomises the phrasing. Evaluation does the opposite: one manually authored query
+    per category, <b>90</b> in total, applied uniformly. That takes template luck out of the
+    measurement.</p>
+    <p>A second LLM then verifies every sample, checking the label is right and the sample is
+    answerable against the fixed query. Mismatches are discarded.</p>
+  </div></div>
+</div>
+
+<div class="beat a4" data-s="S_TEXT" data-act="4" data-sec="§7.1" data-title="Text results">
+  <div class="stack"><div class="card">
+    <span class="num">29<span class="sec">§7.1</span></span>
+    <h3>Level with a model seven times its size</h3>
+    <p>Across the text safety benchmarks Shieldstral averages <b>84.9</b> F1, tied exactly with
+    GPT-OSS-Safeguard-20B, while being the smallest model in the comparison at 3B against 4B to 20B.</p>
+    <div class="try">Filter to the rows where it does not win. There are plenty.</div>
+  </div></div>
+</div>
+
+<div class="beat a4" data-s="S_MM" data-act="4" data-sec="§7.3" data-title="Multimodal results">
+  <div class="stack"><div class="card">
+    <span class="num">30<span class="sec">§7.3</span></span>
+    <h3>The clearest win is on images</h3>
+    <p><b>83.8</b> average F1 across the three multimodal benchmarks against 77.6 for OmniGuard-7B,
+    the next highest, at under half the parameters.</p>
+    <p>It loses LlavaGuard to LlavaGuard, 72.0 against 81.4. Some of that benchmark's test images
+    were unavailable, so every model there is scored on the available subset.</p>
+  </div></div>
+</div>
+
+<div class="beat a4" data-s="S_ADAPT" data-act="4" data-sec="§7.2" data-title="Adaptability">
+  <div class="stack"><div class="card">
+    <span class="num">31<span class="sec">§7.2</span></span>
+    <h3>Second place, on purpose</h3>
+    <p>On the adaptability benchmark GPT-OSS-Safeguard-20B wins with <b>94.1</b> to Shieldstral's
+    <b>91.3</b>. The report is upfront about why: per-category policy prompts, reasoning that
+    decomposes an unfamiliar policy, and roughly seven times the parameters.</p>
+    <p>Shieldstral gives up those points and returns one token instead of a reasoning trace. Whether
+    that trade is right depends on whether you pay for the guardrail on every request.</p>
+  </div></div>
+</div>
+
+<div class="beat a4" data-s="S_LANG" data-act="4" data-sec="App. A" data-title="Language holes">
+  <div class="stack"><div class="card">
+    <span class="num">32<span class="sec">App. A</span></span>
+    <h3>The holes are in the low-resource languages</h3>
+    <p>Twelve languages are officially supported and the benchmarks reach 17 and 28. Performance is
+    not uniform, and the report says so.</p>
+    <div class="meas">Indonesian prompt classification is 55.5 F1. The same language on response
+    classification is 94.1. That is the widest gap in the table.</div>
+    <div class="try">Sort by Shieldstral's score to bring the weak cells to the top.</div>
+  </div></div>
+</div>
+
+<div class="beat a4" data-s="S_RUN" data-act="4" data-sec="card" data-title="Running it">
+  <div class="stack"><div class="card">
+    <span class="num">33<span class="sec">model card</span></span>
+    <h3>Twelve lines to a verdict</h3>
+    <p>Apache 2.0, fits in 16GB of VRAM in BF16, serves through vLLM, llama.cpp, SGLang or
+    Transformers.</p>
+    <p>The one non-obvious part: the endpoint hands back token logprobs, not a score. You pull the
+    yes and no values yourself and renormalise.</p>
+  </div></div>
+</div>
+
+<div class="beat a4" data-s="S_LIMITS" data-act="4" data-sec="card" data-title="Limits">
+  <div class="stack"><div class="card">
+    <span class="num">34<span class="sec">model card</span></span>
+    <h3>What it will not do for you</h3>
+    <p>Coverage is uneven across languages and domains. Synthetic and public labels still carry
+    noise. Obfuscated or very long inputs degrade it, and it was trained to 32k tokens even though
+    the architecture goes further.</p>
+    <p>And the one that follows from the architecture rather than the data: a single-token verdict
+    has nothing attached to inspect.</p>
+  </div></div>
+</div>
