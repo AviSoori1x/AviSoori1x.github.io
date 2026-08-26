@@ -29,7 +29,7 @@
   --fb:'IBM Plex Sans',ui-sans-serif,system-ui,-apple-system,sans-serif;
   --fm:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
 
-  --artR:640px; --txtw:380px; --cardfs:15px; --sh:100svh; --dx:20px;
+  --artR:min(50vw,760px); --txtw:392px; --cardfs:15px; --sh:100svh; --dx:20px;
 }
 
 *,*::before,*::after{box-sizing:border-box}
@@ -88,6 +88,12 @@ a.chip:hover{border-color:var(--blue);color:var(--blue)}
   transition:opacity .34s ease,visibility 0s linear .34s;
 }
 .scene.on{opacity:1;visibility:visible;transition:opacity .34s ease,visibility 0s linear 0s}
+
+/* the figures build themselves in as you arrive, which is most of what made the
+   reference feel alive. Delay is set per element by the engine. */
+@keyframes figIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.scene.on svg>*{animation:figIn .52s cubic-bezier(.22,.61,.36,1) backwards}
+@media(prefers-reduced-motion:reduce){ .scene.on svg>*{animation:none} }
 
 /* ---------------- beats ---------------- */
 #beats{position:relative;z-index:2;pointer-events:none}
@@ -818,6 +824,19 @@ window.SS = {"evalTaxonomy":[{"id":"SC1","name":"Physical Harm","subs":[{"name":
     g.appendChild(t);
     p.appendChild(g);
     g._w = w;
+    // width was estimated from character count and under-measured, so long
+    // labels ran outside the pill. Measure once laid out and resize.
+    requestAnimationFrame(function () {
+      try {
+        var real = t.getComputedTextLength();
+        if (real + pad * 2 > w - 1) {
+          var nw = real + pad * 2;
+          g.firstChild.setAttribute('width', nw);
+          t.setAttribute('x', x + nw / 2);
+          g._w = nw;
+        }
+      } catch (e) {}
+    });
     return g;
   }
 
@@ -947,6 +966,17 @@ window.SS = {"evalTaxonomy":[{"id":"SC1","name":"Physical Harm","subs":[{"name":
       cx += b._w + 7;
     });
     p.appendChild(g);
+    // pills settle at their measured width, so re-flow the row afterwards
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        var rx = x;
+        btns.forEach(function (b2) {
+          var cur = parseFloat(b2.firstChild.getAttribute('x'));
+          b2.setAttribute('transform', 'translate(' + (rx - cur) + ',0)');
+          rx += b2._w + 7;
+        });
+      });
+    });
     if (btns.length) btns[0].dispatchEvent(new Event('click'));
     return { g: g, btns: btns, pick: function (i) { btns[i].dispatchEvent(new Event('click')); } };
   }
@@ -1357,9 +1387,9 @@ window.SCENES = window.SCENES || {};
       { n: h.multimodalSamples, lab: 'multimodal, image plus text', col: C.blue }
     ];
     K.big(s, 0, 62, h.totalSamples + 'M', { size: 72, color: C.ink });
-    K.text(s, 0, 88, 'samples, at one mark per ' + (PER * 1000) + ',000 rows', { size: 14, color: C.ink3 });
+    K.text(s, 0, 100, 'samples, at one mark per ' + (PER * 1000) + ',000 rows', { size: 14, color: C.ink3 });
 
-    var x = 0, y = 118, col = 0;
+    var x = 0, y = 130, col = 0;
     parts.forEach(function (p) {
       var marks = Math.round(p.n / PER);
       for (var i = 0; i < marks; i++) {
@@ -1493,7 +1523,7 @@ window.SCENES = window.SCENES || {};
     K.label(s, 0, 14, 'pools in this data file');
     [[nS, 'strictness tiers'], [nF, 'document formats'], [nQ, 'query types']].forEach(function (p, i) {
       K.big(s, i * 214, 84, String(p[0]), { size: 58, color: A });
-      K.text(s, i * 214, 110, p[1], { size: 13.5, color: C.ink2 });
+      K.text(s, i * 214, 124, p[1], { size: 13.5, color: C.ink2 });
       if (i < 2) K.text(s, i * 214 + 150, 76, '×', { size: 26, color: C.ink3 });
     });
     K.panel(s, 0, 140, 640, 76, { fill: T.amber, stroke: A });
@@ -1698,7 +1728,7 @@ window.SCENES = window.SCENES || {};
     K.head(s, 'Move the question, not the picture', 'including the inverse phrasing of every category');
     var h = api.SS.headline;
     K.big(s, 0, 60, h.imageQueryPhrasings, { size: 62, color: A });
-    K.text(s, 0, 88, 'query phrasings, from a fixed ' + h.imageSubcats + ' subcategory visual taxonomy',
+    K.text(s, 0, 102, 'query phrasings, from a fixed ' + h.imageSubcats + ' subcategory visual taxonomy',
       { size: 14.5, color: C.ink2 });
 
     K.panel(s, 0, 120, 150, 150, { fill: T.ink });
@@ -2067,8 +2097,8 @@ window.SCENES = window.SCENES || {};
     var B = api.SS.benchmarks || {}, h = api.SS.headline;
     var tabs = [['prompt', B.promptClassification], ['response', B.responseClassification]];
     K.big(s, 0, 54, h.textF1 + '', { size: 58, color: G });
-    K.text(s, 108, 46, 'mean F1 across the text benchmarks,', { size: 14.5, color: C.ink2 });
-    K.text(s, 108, 66, 'level with GPT-OSS-Safeguard-20B at ' + h.textTiedWith, { size: 14.5, color: C.ink2 });
+    K.text(s, 176, 46, 'mean F1 across the text benchmarks,', { size: 14.5, color: C.ink2 });
+    K.text(s, 176, 66, 'level with GPT-OSS-Safeguard-20B at ' + h.textTiedWith, { size: 14.5, color: C.ink2 });
     var body = K.n('g', {}); s.appendChild(body);
     K.switcher(s, 0, 84, ['prompt classification', 'response classification'], function (i) {
       body.innerHTML = '';
@@ -2086,8 +2116,8 @@ window.SCENES = window.SCENES || {};
     K.head(s, 'The strongest result is on images', 'three multimodal benchmarks, one of them a loss');
     var h = api.SS.headline, t = (api.SS.benchmarks || {}).multimodal;
     K.big(s, 0, 54, h.multimodalF1 + '', { size: 58, color: G });
-    K.text(s, 108, 46, 'mean F1 across the three image benchmarks,', { size: 14.5, color: C.ink2 });
-    K.text(s, 108, 66, 'against ' + h.multimodalNextBest + ' for the next highest', { size: 14.5, color: C.ink2 });
+    K.text(s, 176, 46, 'mean F1 across the three image benchmarks,', { size: 14.5, color: C.ink2 });
+    K.text(s, 176, 66, 'against ' + h.multimodalNextBest + ' for the next highest', { size: 14.5, color: C.ink2 });
     K.label(s, 0, 110, 'shieldstral 3b in teal');
     benchBlock(s, t, 126);
     K.text(s, 0, 330, 'It loses LlavaGuard to LlavaGuard-7B. Some of that benchmark test images were',
@@ -2242,6 +2272,15 @@ window.SCENES = window.SCENES || {};
     host.classList.add('scene');
     host.setAttribute('data-scene', id);
     art.appendChild(host);
+    // stagger the entrance so the figure assembles rather than snapping in
+    requestAnimationFrame(function () {
+      var sv = host.querySelector('svg');
+      if (!sv) return;
+      var kids = sv.children, step = Math.min(26, 620 / Math.max(1, kids.length));
+      for (var i = 0; i < kids.length; i++) {
+        kids[i].style.animationDelay = (i * step).toFixed(0) + 'ms';
+      }
+    });
     built[id] = { host: host, handle: handle };
     return built[id];
   }

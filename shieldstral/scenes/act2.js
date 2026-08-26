@@ -15,9 +15,9 @@ window.SCENES = window.SCENES || {};
       { n: h.multimodalSamples, lab: 'multimodal, image plus text', col: C.blue }
     ];
     K.big(s, 0, 62, h.totalSamples + 'M', { size: 72, color: C.ink });
-    K.text(s, 0, 88, 'samples, at one mark per ' + (PER * 1000) + ',000 rows', { size: 14, color: C.ink3 });
+    K.text(s, 0, 100, 'samples, at one mark per ' + (PER * 1000) + ',000 rows', { size: 14, color: C.ink3 });
 
-    var x = 0, y = 118, col = 0;
+    var x = 0, y = 130, col = 0;
     parts.forEach(function (p) {
       var marks = Math.round(p.n / PER);
       for (var i = 0; i < marks; i++) {
@@ -151,7 +151,7 @@ window.SCENES = window.SCENES || {};
     K.label(s, 0, 14, 'pools in this data file');
     [[nS, 'strictness tiers'], [nF, 'document formats'], [nQ, 'query types']].forEach(function (p, i) {
       K.big(s, i * 214, 84, String(p[0]), { size: 58, color: A });
-      K.text(s, i * 214, 110, p[1], { size: 13.5, color: C.ink2 });
+      K.text(s, i * 214, 124, p[1], { size: 13.5, color: C.ink2 });
       if (i < 2) K.text(s, i * 214 + 150, 76, '×', { size: 26, color: C.ink3 });
     });
     K.panel(s, 0, 140, 640, 76, { fill: T.amber, stroke: A });
@@ -356,7 +356,7 @@ window.SCENES = window.SCENES || {};
     K.head(s, 'Move the question, not the picture', 'including the inverse phrasing of every category');
     var h = api.SS.headline;
     K.big(s, 0, 60, h.imageQueryPhrasings, { size: 62, color: A });
-    K.text(s, 0, 88, 'query phrasings, from a fixed ' + h.imageSubcats + ' subcategory visual taxonomy',
+    K.text(s, 0, 102, 'query phrasings, from a fixed ' + h.imageSubcats + ' subcategory visual taxonomy',
       { size: 14.5, color: C.ink2 });
 
     K.panel(s, 0, 120, 150, 150, { fill: T.ink });

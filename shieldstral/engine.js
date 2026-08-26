@@ -29,6 +29,15 @@
     host.classList.add('scene');
     host.setAttribute('data-scene', id);
     art.appendChild(host);
+    // stagger the entrance so the figure assembles rather than snapping in
+    requestAnimationFrame(function () {
+      var sv = host.querySelector('svg');
+      if (!sv) return;
+      var kids = sv.children, step = Math.min(26, 620 / Math.max(1, kids.length));
+      for (var i = 0; i < kids.length; i++) {
+        kids[i].style.animationDelay = (i * step).toFixed(0) + 'ms';
+      }
+    });
     built[id] = { host: host, handle: handle };
     return built[id];
   }

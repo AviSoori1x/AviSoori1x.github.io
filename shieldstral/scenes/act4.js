@@ -98,8 +98,8 @@ window.SCENES = window.SCENES || {};
     var B = api.SS.benchmarks || {}, h = api.SS.headline;
     var tabs = [['prompt', B.promptClassification], ['response', B.responseClassification]];
     K.big(s, 0, 54, h.textF1 + '', { size: 58, color: G });
-    K.text(s, 108, 46, 'mean F1 across the text benchmarks,', { size: 14.5, color: C.ink2 });
-    K.text(s, 108, 66, 'level with GPT-OSS-Safeguard-20B at ' + h.textTiedWith, { size: 14.5, color: C.ink2 });
+    K.text(s, 176, 46, 'mean F1 across the text benchmarks,', { size: 14.5, color: C.ink2 });
+    K.text(s, 176, 66, 'level with GPT-OSS-Safeguard-20B at ' + h.textTiedWith, { size: 14.5, color: C.ink2 });
     var body = K.n('g', {}); s.appendChild(body);
     K.switcher(s, 0, 84, ['prompt classification', 'response classification'], function (i) {
       body.innerHTML = '';
@@ -117,8 +117,8 @@ window.SCENES = window.SCENES || {};
     K.head(s, 'The strongest result is on images', 'three multimodal benchmarks, one of them a loss');
     var h = api.SS.headline, t = (api.SS.benchmarks || {}).multimodal;
     K.big(s, 0, 54, h.multimodalF1 + '', { size: 58, color: G });
-    K.text(s, 108, 46, 'mean F1 across the three image benchmarks,', { size: 14.5, color: C.ink2 });
-    K.text(s, 108, 66, 'against ' + h.multimodalNextBest + ' for the next highest', { size: 14.5, color: C.ink2 });
+    K.text(s, 176, 46, 'mean F1 across the three image benchmarks,', { size: 14.5, color: C.ink2 });
+    K.text(s, 176, 66, 'against ' + h.multimodalNextBest + ' for the next highest', { size: 14.5, color: C.ink2 });
     K.label(s, 0, 110, 'shieldstral 3b in teal');
     benchBlock(s, t, 126);
     K.text(s, 0, 330, 'It loses LlavaGuard to LlavaGuard-7B. Some of that benchmark test images were',

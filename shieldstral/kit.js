@@ -150,6 +150,19 @@
     g.appendChild(t);
     p.appendChild(g);
     g._w = w;
+    // width was estimated from character count and under-measured, so long
+    // labels ran outside the pill. Measure once laid out and resize.
+    requestAnimationFrame(function () {
+      try {
+        var real = t.getComputedTextLength();
+        if (real + pad * 2 > w - 1) {
+          var nw = real + pad * 2;
+          g.firstChild.setAttribute('width', nw);
+          t.setAttribute('x', x + nw / 2);
+          g._w = nw;
+        }
+      } catch (e) {}
+    });
     return g;
   }
 
@@ -279,6 +292,17 @@
       cx += b._w + 7;
     });
     p.appendChild(g);
+    // pills settle at their measured width, so re-flow the row afterwards
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        var rx = x;
+        btns.forEach(function (b2) {
+          var cur = parseFloat(b2.firstChild.getAttribute('x'));
+          b2.setAttribute('transform', 'translate(' + (rx - cur) + ',0)');
+          rx += b2._w + 7;
+        });
+      });
+    });
     if (btns.length) btns[0].dispatchEvent(new Event('click'));
     return { g: g, btns: btns, pick: function (i) { btns[i].dispatchEvent(new Event('click')); } };
   }

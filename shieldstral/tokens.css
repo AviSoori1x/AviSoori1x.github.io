@@ -10,7 +10,7 @@
   --fb:'IBM Plex Sans',ui-sans-serif,system-ui,-apple-system,sans-serif;
   --fm:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
 
-  --artR:640px; --txtw:380px; --cardfs:15px; --sh:100svh; --dx:20px;
+  --artR:min(50vw,760px); --txtw:392px; --cardfs:15px; --sh:100svh; --dx:20px;
 }
 
 *,*::before,*::after{box-sizing:border-box}
@@ -69,6 +69,12 @@ a.chip:hover{border-color:var(--blue);color:var(--blue)}
   transition:opacity .34s ease,visibility 0s linear .34s;
 }
 .scene.on{opacity:1;visibility:visible;transition:opacity .34s ease,visibility 0s linear 0s}
+
+/* the figures build themselves in as you arrive, which is most of what made the
+   reference feel alive. Delay is set per element by the engine. */
+@keyframes figIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.scene.on svg>*{animation:figIn .52s cubic-bezier(.22,.61,.36,1) backwards}
+@media(prefers-reduced-motion:reduce){ .scene.on svg>*{animation:none} }
 
 /* ---------------- beats ---------------- */
 #beats{position:relative;z-index:2;pointer-events:none}
