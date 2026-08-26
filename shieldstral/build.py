@@ -6,7 +6,7 @@
   engine.js       scroll engine, scene registry, rail, status
   scenes/*.js     the live art, one file per act
   scenes/*.css    scoped styles for those scenes
-  ../shieldstral/data.js   window.SS, generated from the paper
+  data.js         window.SS, generated from the paper by the two scripts here
 """
 import pathlib
 import re
@@ -17,15 +17,45 @@ SCENES = HERE / "scenes"
 tokens = (HERE / "tokens.css").read_text(encoding="utf-8")
 beats = (HERE / "beats.html").read_text(encoding="utf-8")
 engine = (HERE / "engine.js").read_text(encoding="utf-8")
-data = (HERE.parent / "shieldstral" / "data.js").read_text(encoding="utf-8")
+data = (HERE / "data.js").read_text(encoding="utf-8")
 
 # one file pair per scene, so a single broken scene cannot take the rest down
+
+def bump(css: str) -> str:
+    """Lift small type across every scene stylesheet.
+
+    Thirty-four agents each picked their own sizes and the result ran from 7.4px
+    to 11px, which is unreadable. This is a monotonic map, so relative hierarchy
+    inside a scene is preserved, with a hard floor. Anything already 20px or more
+    is display type and is left alone.
+    """
+    def one(m):
+        old = float(m.group(1))
+        if old >= 20:
+            return m.group(0)
+        new = round(max(old, 12.6 + (old - 7.4) * 0.58), 1)
+        return m.group(0).replace(m.group(1), str(new))
+
+    # bare px sizes, and the px floor inside clamp(Npx, ...)
+    css = re.sub(r'font-size:\s*([0-9.]+)px', one, css)
+    css = re.sub(r'font-size:\s*clamp\(\s*([0-9.]+)px', one, css)
+    # small rem sizes too
+    def onerem(m):
+        old = float(m.group(1))
+        if old >= 1.25:
+            return m.group(0)
+        new = round(max(old, 0.79 + (old - 0.46) * 0.58), 3)
+        return m.group(0).replace(m.group(1), str(new))
+    css = re.sub(r'font-size:\s*([0-9.]*\.?[0-9]+)rem', onerem, css)
+    return css
+
+
 scene_css, scene_js, acts = [], [], []
 for j in sorted(SCENES.glob("*.js")):
     n = j.stem
     c = j.with_suffix(".css")
     if c.exists():
-        scene_css.append(f"/* ---- {n} ---- */\n" + c.read_text(encoding="utf-8").strip())
+        scene_css.append(f"/* ---- {n} ---- */\n" + bump(c.read_text(encoding="utf-8")).strip())
     scene_js.append(f"/* ---- {n} ---- */\n" + j.read_text(encoding="utf-8").strip())
     acts.append(n)
 
@@ -42,7 +72,7 @@ DESC = ("A visual guide to Shieldstral, Mistral AI's 3B policy-adaptive multimod
         "classifier. Thirty-four scenes covering the binary question-answering reformulation, "
         "the 54.1M-sample data pipeline, the training and merge, and where the numbers are less "
         "flattering. By Avinash Sooriyarachchi, a core contributor to the model.")
-URL = "https://avisoori1x.github.io/vg/"
+URL = "https://avisoori1x.github.io/shieldstral/"
 
 HERO = """
 <div class="hero">
