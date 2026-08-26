@@ -251,8 +251,9 @@ window.SCENES = window.SCENES || {};
     K.label(s, 0, 108, 'then read the two logprobs yourself');
     K.code(s, 0, 118, 640, [
       { t: 'SYSTEM = (', c: '#c8cfdb' },
-      { t: '  "' + sp.slice(0, 62) + '"', c: '#d8a657' },
-      { t: '  "' + sp.slice(62) + '"', c: '#d8a657' },
+      { t: '  "' + sp.slice(0, 52) + '"', c: '#d8a657' },
+      { t: '  "' + sp.slice(52, 104) + '"', c: '#d8a657' },
+      { t: '  "' + sp.slice(104) + '"', c: '#d8a657' },
       { t: ')', c: '#c8cfdb' },
       { t: '', c: '#c8cfdb' },
       { t: 'r = client.chat.completions.create(', c: '#c8cfdb' },

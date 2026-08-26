@@ -40,8 +40,10 @@
     // engineering grid behind everything, then a grain wash over the top
     var bg = n('rect', { x: -40, y: -120, width: W + 200, height: H + 320,
       fill: 'url(#' + ids.gd + ')', 'pointer-events': 'none' });
-    bg.setAttribute('mask', '');
+    bg.style.animation = 'none';   // texture is not content, never animate it
+    bg.setAttribute('data-deco', '1');
     svg.appendChild(bg);
+    svg._deco = bg;
     svg._grainAfter = true;
     root.appendChild(svg);
     // Trim the board to whatever the scene actually drew. A fixed height left a
@@ -50,7 +52,9 @@
       try {
         // place the honesty line under whatever was drawn, then fit the board
         if (svg._foot) {
+          if (svg._deco) svg._deco.setAttribute('display', 'none');
           var fb = svg.getBBox();
+          if (svg._deco) svg._deco.removeAttribute('display');
           wrap(svg._foot, 92).forEach(function (ln, i) {
             var tn = n('text', {
               x: 0, y: fb.y + fb.height + 26 + i * 14,
@@ -62,16 +66,38 @@
           });
           svg._foot = null;
         }
+        // The decorative grid spans far beyond the artwork, and getBBox counts it,
+        // so the fit was sizing to the grid and leaving the drawing small in the
+        // top left. Hide the deco while measuring.
+        if (svg._deco) svg._deco.setAttribute('display', 'none');
         var bb = svg.getBBox(), pad = 10;
         var x0 = Math.min(0, bb.x - pad), y0 = Math.min(0, bb.y - pad);
         var x1 = Math.max(W, bb.x + bb.width + pad);
         var y1 = bb.y + bb.height + pad;
+        // The panel is about as tall as the viewport. Left alone, a short figure
+        // sat in the top left with a third of the panel dead beneath it, which
+        // every reviewer flagged on every figure. Pad up to a floor and split the
+        // slack, so the drawing sits centred in the space it is given.
+        var FLOOR = 660, ch = y1 - y0;
+        if (ch < FLOOR) {
+          var slack = FLOOR - ch;
+          y0 -= slack * 0.44;
+          y1 += slack * 0.56;
+        }
+        if (svg._deco) {
+          svg._deco.removeAttribute('display');
+          svg._deco.setAttribute('x', x0 - 20);
+          svg._deco.setAttribute('y', y0 - 20);
+          svg._deco.setAttribute('width', (x1 - x0) + 40);
+          svg._deco.setAttribute('height', (y1 - y0) + 40);
+        }
         svg.setAttribute('viewBox', x0 + ' ' + y0 + ' ' + (x1 - x0) + ' ' + (y1 - y0));
         if (svg._grainAfter) {
           svg._grainAfter = false;
           var gn = n('rect', { x: x0, y: y0, width: x1 - x0, height: y1 - y0,
-            filter: 'url(#' + svg._ids.gr + ')', opacity: .05,
+            filter: 'url(#' + svg._ids.gr + ')', opacity: .045,
             'mix-blend-mode': 'multiply', 'pointer-events': 'none' });
+          gn.style.animation = 'none';
           svg.appendChild(gn);
         }
       } catch (e) {}

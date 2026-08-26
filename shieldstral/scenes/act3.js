@@ -10,42 +10,72 @@ window.SCENES = window.SCENES || {};
     return null;
   }
 
-  /* 22 what the checkpoint actually is */
+  /* 22 the actual architecture, end to end */
   window.SCENES.S_BASE = function (root, api) {
-    var s = K.board(root, { alt: 'What the shipped checkpoint is made of.' });
+    var s = K.board(root, { alt: 'Architecture from input through to the two output logits.' });
     K.head(s, 'What the checkpoint actually is',
            'the 3B is the language model, not the artifact');
+    var Wd = 640;
 
-    K.label(s, 0, 16, 'the stack');
-    K.panel(s, 0, 28, 340, 62, { fill: T.purple, stroke: P });
-    K.mono(s, 18, 54, 'Ministral-3-3B-Base-2512', { size: 14, color: C.ink });
-    K.label(s, 18, 74, '3B causal language model', { color: P });
-    K.panel(s, 0, 96, 340, 62, { stroke: C.line });
-    K.mono(s, 18, 122, 'Pixtral vision encoder', { size: 14, color: C.ink });
-    K.label(s, 18, 142, 'additional parameters, on top', { color: C.ink3 });
-    K.arrow(s, 348, 94, 400, 94, { color: C.line });
-    K.panel(s, 408, 60, 232, 62, { stroke: P, fill: T.purple });
-    K.mono(s, 426, 86, 'larger than 3B', { size: 15, color: P, weight: 700 });
-    K.label(s, 426, 106, 'what you download', { color: P });
+    /* --- inputs --- */
+    K.label(s, 0, 18, 'input');
+    // image tile, drawn as a neutral glyph
+    K.panel(s, 0, 30, 108, 84, { flat: true, fill: 'rgba(31,37,48,.04)' });
+    s.appendChild(K.n('circle', { cx: 34, cy: 58, r: 9, fill: 'none', stroke: C.ink3 }));
+    s.appendChild(K.n('path', { d: 'M12 100 L44 66 L66 88 L82 74 L96 100 Z',
+      fill: 'none', stroke: C.ink3, 'stroke-width': 1.4 }));
+    K.label(s, 0, 128, 'image, optional', { size: 9 });
 
-    K.label(s, 0, 200, 'what LoRA touches');
-    K.panel(s, 0, 212, 340, 44, { fill: T.purple, stroke: P });
-    K.mono(s, 18, 240, 'language model parameters', { size: 13, color: P });
-    K.panel(s, 356, 212, 284, 44, { stroke: C.line, fill: 'rgba(31,37,48,.03)' });
-    K.mono(s, 374, 240, 'vision encoder, untouched', { size: 13, color: C.ink3 });
+    K.panel(s, 124, 30, 236, 84);
+    K.mono(s, 138, 52, '<Instruct>', { size: 11.5, color: C.ink3 });
+    K.mono(s, 138, 72, '<Query>', { size: 11.5, color: P, weight: 700 });
+    K.mono(s, 138, 92, '<Document>', { size: 11.5, color: C.ink3 });
+    K.label(s, 124, 128, 'the prompt, where the policy lives', { size: 9 });
 
-    K.label(s, 0, 296, 'and the model that ships is a merge, not a run');
-    var mix = [['PG', 0.6, P], ['P', 0.3, C.ink3], ['Instruct', 0.1, C.amber]];
-    var cx = 0;
+    /* --- encoder --- */
+    K.arrow(s, 54, 120, 54, 168, { color: C.line });
+    K.panel(s, 0, 176, 108, 56, { stroke: C.line });
+    K.mono(s, 14, 200, 'Pixtral', { size: 12, color: C.ink });
+    K.label(s, 14, 218, 'vision encoder', { size: 8.6 });
+    K.label(s, 0, 248, 'frozen', { color: C.ink3, size: 9 });
+
+    K.arrow(s, 108, 204, 146, 204, { color: C.line });
+    K.arrow(s, 240, 120, 240, 190, { color: C.line });
+
+    /* --- the language model --- */
+    K.panel(s, 150, 176, 300, 132, { fill: T.purple, stroke: P });
+    K.mono(s, 166, 202, 'Ministral-3-3B', { size: 15, color: C.ink, weight: 700 });
+    K.label(s, 166, 220, '3B causal language model', { color: P });
+    for (var i = 0; i < 9; i++) {
+      s.appendChild(K.n('rect', { x: 166 + i * 31, y: 238, width: 25, height: 40, rx: 3,
+        fill: 'rgba(107,63,168,' + (0.16 + i * 0.045) + ')' }));
+    }
+    K.label(s, 166, 296, 'lora adapters here, and only here', { color: P, size: 9 });
+
+    /* --- the head --- */
+    K.arrow(s, 452, 240, 486, 240, { color: C.line });
+    K.panel(s, 494, 176, 146, 132, { stroke: C.line });
+    K.label(s, 508, 200, 'output head', { color: C.ink3 });
+    K.mono(s, 508, 226, 'z_yes', { size: 12.5, color: C.red });
+    K.bar(s, 560, 216, 66, 11, 0.82, { color: C.red });
+    K.mono(s, 508, 254, 'z_no', { size: 12.5, color: C.teal });
+    K.bar(s, 560, 244, 66, 11, 0.26, { color: C.teal });
+    K.label(s, 508, 288, 'softmax, two tokens', { size: 8.6 });
+
+    /* --- what ships --- */
+    K.label(s, 0, 348, 'and the checkpoint that ships is a merge, not a run');
+    var mix = [['PG', 0.6, P], ['P', 0.3, C.ink3], ['Instruct', 0.1, C.amber]], cx = 0;
     mix.forEach(function (m) {
-      var w = m[1] * 640;
-      s.appendChild(K.n('rect', { x: cx, y: 310, width: w - 3, height: 30, rx: 5, fill: m[2] }));
-      K.mono(s, cx + 10, 330, m[0] + ' ' + m[1], { size: 12.5, color: '#fff' });
+      var w = m[1] * Wd;
+      s.appendChild(K.n('rect', { x: cx, y: 360, width: w - 3, height: 32, rx: 5, fill: m[2] }));
+      K.mono(s, cx + 12, 381, m[0] + ' ' + m[1], { size: 12.5, color: '#fff', weight: 700 });
       cx += w;
     });
-    K.text(s, 0, 366, 'The third component is Ministral-3B-Instruct, the base instruct checkpoint.',
-      { size: 14, color: C.ink2 });
-    K.foot(s, 'Section 5 gives the base and the encoder, section 6.1 says LoRA is applied to the language model parameters, and section 6.2 gives the merge.');
+    K.callout(s, 0, 406, Wd,
+      'The 3B counts the language model. The vision encoder is additional, so the download is '
+      + 'larger, and the third merge component is the base instruct checkpoint.',
+      { color: P, tint: T.purple, cols: 70 });
+    K.foot(s, 'Section 5 gives the base and the encoder, 6.1 says LoRA is applied to the language model parameters, 6.2 gives the merge.');
   };
 
   /* 23 LoRA against full SFT */

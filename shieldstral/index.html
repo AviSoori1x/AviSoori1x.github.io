@@ -29,7 +29,10 @@
   --fb:'IBM Plex Sans',ui-sans-serif,system-ui,-apple-system,sans-serif;
   --fm:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
 
-  --artR:min(50vw,760px); --txtw:392px; --cardfs:15px; --sh:100svh; --dx:20px;
+  --artR:min(54vw,840px); --txtw:400px; --cardfs:15px; --sh:100svh;
+  --gapC:52px;
+  --pageW:calc(var(--artR) + var(--gapC) + var(--txtw));
+  --dx:max(24px, calc((100vw - var(--pageW)) / 2));
 }
 
 *,*::before,*::after{box-sizing:border-box}
@@ -93,12 +96,13 @@ a.chip:hover{border-color:var(--blue);color:var(--blue)}
    reference feel alive. Delay is set per element by the engine. */
 @keyframes figIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 .scene.on svg>*{animation:figIn .52s cubic-bezier(.22,.61,.36,1) backwards}
+.scene svg>defs,.scene svg>rect[fill^='url'],.scene svg>rect[filter]{animation:none!important}
 @media(prefers-reduced-motion:reduce){ .scene.on svg>*{animation:none} }
 
 /* ---------------- beats ---------------- */
 #beats{position:relative;z-index:2;pointer-events:none}
 .beat{min-height:118svh;display:flex;align-items:center;pointer-events:none}
-.stack{margin-left:calc(var(--dx) + var(--artR) + 44px);width:var(--txtw);pointer-events:auto}
+.stack{margin-left:calc(var(--dx) + var(--artR) + var(--gapC));width:var(--txtw);pointer-events:auto}
 .card{
   background:var(--panel);border:1px solid var(--line);border-radius:12px;
   padding:20px 22px 19px;box-shadow:0 10px 34px rgba(20,25,34,.09),0 2px 6px rgba(20,25,34,.05);
@@ -136,7 +140,7 @@ h3{
 
 /* ---------------- act dividers ---------------- */
 .actdiv{position:relative;z-index:2;pointer-events:none;padding:14svh 0 6svh}
-.actdiv .stack{pointer-events:auto;width:auto;max-width:var(--txtw)}
+.actdiv .stack{pointer-events:auto;width:auto;max-width:640px}
 .actdiv .an{font-family:var(--fm);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink3);margin:0 0 8px}
 .actdiv h2{font-family:var(--fd);font-weight:700;font-size:clamp(28px,3.4vw,44px);line-height:1.04;letter-spacing:-.025em;margin:0 0 10px}
 .actdiv p{color:var(--ink3);font-size:14.5px;margin:0}
@@ -720,8 +724,10 @@ window.SS = {"evalTaxonomy":[{"id":"SC1","name":"Physical Harm","subs":[{"name":
     // engineering grid behind everything, then a grain wash over the top
     var bg = n('rect', { x: -40, y: -120, width: W + 200, height: H + 320,
       fill: 'url(#' + ids.gd + ')', 'pointer-events': 'none' });
-    bg.setAttribute('mask', '');
+    bg.style.animation = 'none';   // texture is not content, never animate it
+    bg.setAttribute('data-deco', '1');
     svg.appendChild(bg);
+    svg._deco = bg;
     svg._grainAfter = true;
     root.appendChild(svg);
     // Trim the board to whatever the scene actually drew. A fixed height left a
@@ -730,7 +736,9 @@ window.SS = {"evalTaxonomy":[{"id":"SC1","name":"Physical Harm","subs":[{"name":
       try {
         // place the honesty line under whatever was drawn, then fit the board
         if (svg._foot) {
+          if (svg._deco) svg._deco.setAttribute('display', 'none');
           var fb = svg.getBBox();
+          if (svg._deco) svg._deco.removeAttribute('display');
           wrap(svg._foot, 92).forEach(function (ln, i) {
             var tn = n('text', {
               x: 0, y: fb.y + fb.height + 26 + i * 14,
@@ -742,16 +750,38 @@ window.SS = {"evalTaxonomy":[{"id":"SC1","name":"Physical Harm","subs":[{"name":
           });
           svg._foot = null;
         }
+        // The decorative grid spans far beyond the artwork, and getBBox counts it,
+        // so the fit was sizing to the grid and leaving the drawing small in the
+        // top left. Hide the deco while measuring.
+        if (svg._deco) svg._deco.setAttribute('display', 'none');
         var bb = svg.getBBox(), pad = 10;
         var x0 = Math.min(0, bb.x - pad), y0 = Math.min(0, bb.y - pad);
         var x1 = Math.max(W, bb.x + bb.width + pad);
         var y1 = bb.y + bb.height + pad;
+        // The panel is about as tall as the viewport. Left alone, a short figure
+        // sat in the top left with a third of the panel dead beneath it, which
+        // every reviewer flagged on every figure. Pad up to a floor and split the
+        // slack, so the drawing sits centred in the space it is given.
+        var FLOOR = 660, ch = y1 - y0;
+        if (ch < FLOOR) {
+          var slack = FLOOR - ch;
+          y0 -= slack * 0.44;
+          y1 += slack * 0.56;
+        }
+        if (svg._deco) {
+          svg._deco.removeAttribute('display');
+          svg._deco.setAttribute('x', x0 - 20);
+          svg._deco.setAttribute('y', y0 - 20);
+          svg._deco.setAttribute('width', (x1 - x0) + 40);
+          svg._deco.setAttribute('height', (y1 - y0) + 40);
+        }
         svg.setAttribute('viewBox', x0 + ' ' + y0 + ' ' + (x1 - x0) + ' ' + (y1 - y0));
         if (svg._grainAfter) {
           svg._grainAfter = false;
           var gn = n('rect', { x: x0, y: y0, width: x1 - x0, height: y1 - y0,
-            filter: 'url(#' + svg._ids.gr + ')', opacity: .05,
+            filter: 'url(#' + svg._ids.gr + ')', opacity: .045,
             'mix-blend-mode': 'multiply', 'pointer-events': 'none' });
+          gn.style.animation = 'none';
           svg.appendChild(gn);
         }
       } catch (e) {}
@@ -1804,32 +1834,66 @@ window.SCENES = window.SCENES || {};
     K.foot(s, 'Images are drawn as neutral placeholders. Nothing unsafe is depicted anywhere in this guide.');
   };
 
-  /* 20 mutate the query */
+  /* 20 an image actually going through moderation */
   window.SCENES.S_IMGQUERY = function (root, api) {
-    var s = K.board(root, { alt: 'Query mutation, including inverse phrasings.' });
-    K.head(s, 'Move the question, not the picture', 'including the inverse phrasing of every category');
+    var s = K.board(root, { alt: 'One image moderated against a direct and an inverse query.' });
+    K.head(s, 'One picture, moderated twice',
+           'move the question, not the image');
     var h = api.SS.headline;
-    K.big(s, 0, 60, h.imageQueryPhrasings, { size: 62, color: A });
-    K.text(s, 0, 102, 'query phrasings, from a fixed ' + h.imageSubcats + ' subcategory visual taxonomy',
-      { size: 14.5, color: C.ink2 });
 
-    K.panel(s, 0, 120, 150, 150, { fill: T.ink });
-    s.appendChild(K.n('rect', { x: 42, y: 162, width: 66, height: 66, rx: 4, fill: 'none', stroke: C.ink3 }));
-    K.label(s, 0, 288, 'one image');
-
-    var pair = [
-      ['direct', 'Does this image contain violence?', 'no', C.teal],
-      ['inverse, about ' + h.inversePct + '% of the pool', 'Is this image safe from violence?', 'yes', C.red]
+    var VIEWS = [
+      { tag: 'direct', q: 'Does this image contain violence?', a: false,
+        note: 'the plain framing, answered no' },
+      { tag: 'inverse, about ' + h.inversePct + '% of the pool',
+        q: 'Is this image safe from violence?', a: true,
+        note: 'same picture, opposite correct answer' }
     ];
-    pair.forEach(function (p, i) {
-      var y = 128 + i * 84;
-      K.panel(s, 176, y, 464, 66, { stroke: i ? A : C.line, fill: i ? T.amber : '#fff' });
-      K.label(s, 192, y + 22, p[0], { color: i ? A : C.ink3 });
-      K.mono(s, 192, y + 46, p[1], { size: 12.5, color: C.ink });
-      K.big(s, 580, y + 48, p[2], { size: 22, color: p[3] });
+    var body = K.n('g', {});
+
+    /* the pipeline, drawn once */
+    K.label(s, 0, 20, 'the path one sample takes');
+    var STEPS = [
+      ['image', 0], ['vision encoder', 150], ['language model', 314], ['yes / no', 486]
+    ];
+    STEPS.forEach(function (st, i) {
+      var x = st[1], w = i === 0 ? 116 : (i === 3 ? 154 : 140);
+      K.panel(s, x, 34, w, 62, { stroke: i === 3 ? A : C.line, fill: i === 3 ? T.amber : '#fff' });
+      K.mono(s, x + 16, 62, st[0], { size: 12.5, color: i === 3 ? A : C.ink });
+      if (i === 0) {
+        s.appendChild(K.n('circle', { cx: x + 88, cy: 52, r: 6, fill: 'none', stroke: C.ink3 }));
+        s.appendChild(K.n('path', { d: 'M' + (x + 84) + ' 84 L' + (x + 100) + ' 68 L' + (x + 112)
+          + ' 78 L' + (x + 122) + ' 70 L' + (x + 128) + ' 84 Z',
+          fill: 'none', stroke: C.ink3, 'stroke-width': 1.2 }));
+      }
+      if (i < 3) K.arrow(s, x + w + 4, 65, st[1] + w + (i === 0 ? 40 : 12), 65, { color: C.line });
     });
-    K.text(s, 0, 330, 'Same picture, opposite correct answers. Both are valid training views.',
-      { size: 14, color: C.ink2 });
+    K.label(s, 0, 116, 'the query rides alongside, in the prompt', { size: 9.4 });
+
+    s.appendChild(body);
+    K.switcher(s, 0, 138, VIEWS.map(function (v) { return v.tag; }), function (i) {
+      body.innerHTML = '';
+      var v = VIEWS[i];
+      /* the image tile, large */
+      K.panel(body, 0, 190, 210, 150, { fill: 'rgba(31,37,48,.04)' });
+      body.appendChild(K.n('circle', { cx: 62, cy: 236, r: 15, fill: 'none', stroke: C.ink3, 'stroke-width': 1.4 }));
+      body.appendChild(K.n('path', { d: 'M18 322 L74 262 L118 302 L150 274 L192 322 Z',
+        fill: 'none', stroke: C.ink3, 'stroke-width': 1.6 }));
+      K.label(body, 0, 362, 'neutral placeholder', { size: 9 });
+
+      K.panel(body, 232, 190, 408, 66, { stroke: A, fill: T.amber });
+      K.label(body, 250, 214, 'query', { color: A });
+      K.mono(body, 250, 238, v.q, { size: 13, color: C.ink });
+
+      K.arrow(body, 436, 260, 436, 288, { color: C.line });
+      K.verdict(body, 250, 330, v.a, { size: 56 });
+      K.mono(body, 380, 314, v.note, { size: 13.5, color: C.ink2 });
+      s.appendChild(body);
+    }, { tint: 'amber' });
+
+    K.callout(s, 0, 396, 640,
+      h.imageQueryPhrasings + ' query phrasings from a fixed ' + h.imageSubcats
+      + '-subcategory visual taxonomy. Images cannot be rewritten, so the diversity is put '
+      + 'entirely into the question.', { color: A, tint: T.amber, cols: 70 });
     K.foot(s, 'The two example questions are phrased for this figure. The phrasing count, the taxonomy size and the inverse share are the report own.');
   };
 
@@ -1885,42 +1949,72 @@ window.SCENES = window.SCENES || {};
     return null;
   }
 
-  /* 22 what the checkpoint actually is */
+  /* 22 the actual architecture, end to end */
   window.SCENES.S_BASE = function (root, api) {
-    var s = K.board(root, { alt: 'What the shipped checkpoint is made of.' });
+    var s = K.board(root, { alt: 'Architecture from input through to the two output logits.' });
     K.head(s, 'What the checkpoint actually is',
            'the 3B is the language model, not the artifact');
+    var Wd = 640;
 
-    K.label(s, 0, 16, 'the stack');
-    K.panel(s, 0, 28, 340, 62, { fill: T.purple, stroke: P });
-    K.mono(s, 18, 54, 'Ministral-3-3B-Base-2512', { size: 14, color: C.ink });
-    K.label(s, 18, 74, '3B causal language model', { color: P });
-    K.panel(s, 0, 96, 340, 62, { stroke: C.line });
-    K.mono(s, 18, 122, 'Pixtral vision encoder', { size: 14, color: C.ink });
-    K.label(s, 18, 142, 'additional parameters, on top', { color: C.ink3 });
-    K.arrow(s, 348, 94, 400, 94, { color: C.line });
-    K.panel(s, 408, 60, 232, 62, { stroke: P, fill: T.purple });
-    K.mono(s, 426, 86, 'larger than 3B', { size: 15, color: P, weight: 700 });
-    K.label(s, 426, 106, 'what you download', { color: P });
+    /* --- inputs --- */
+    K.label(s, 0, 18, 'input');
+    // image tile, drawn as a neutral glyph
+    K.panel(s, 0, 30, 108, 84, { flat: true, fill: 'rgba(31,37,48,.04)' });
+    s.appendChild(K.n('circle', { cx: 34, cy: 58, r: 9, fill: 'none', stroke: C.ink3 }));
+    s.appendChild(K.n('path', { d: 'M12 100 L44 66 L66 88 L82 74 L96 100 Z',
+      fill: 'none', stroke: C.ink3, 'stroke-width': 1.4 }));
+    K.label(s, 0, 128, 'image, optional', { size: 9 });
 
-    K.label(s, 0, 200, 'what LoRA touches');
-    K.panel(s, 0, 212, 340, 44, { fill: T.purple, stroke: P });
-    K.mono(s, 18, 240, 'language model parameters', { size: 13, color: P });
-    K.panel(s, 356, 212, 284, 44, { stroke: C.line, fill: 'rgba(31,37,48,.03)' });
-    K.mono(s, 374, 240, 'vision encoder, untouched', { size: 13, color: C.ink3 });
+    K.panel(s, 124, 30, 236, 84);
+    K.mono(s, 138, 52, '<Instruct>', { size: 11.5, color: C.ink3 });
+    K.mono(s, 138, 72, '<Query>', { size: 11.5, color: P, weight: 700 });
+    K.mono(s, 138, 92, '<Document>', { size: 11.5, color: C.ink3 });
+    K.label(s, 124, 128, 'the prompt, where the policy lives', { size: 9 });
 
-    K.label(s, 0, 296, 'and the model that ships is a merge, not a run');
-    var mix = [['PG', 0.6, P], ['P', 0.3, C.ink3], ['Instruct', 0.1, C.amber]];
-    var cx = 0;
+    /* --- encoder --- */
+    K.arrow(s, 54, 120, 54, 168, { color: C.line });
+    K.panel(s, 0, 176, 108, 56, { stroke: C.line });
+    K.mono(s, 14, 200, 'Pixtral', { size: 12, color: C.ink });
+    K.label(s, 14, 218, 'vision encoder', { size: 8.6 });
+    K.label(s, 0, 248, 'frozen', { color: C.ink3, size: 9 });
+
+    K.arrow(s, 108, 204, 146, 204, { color: C.line });
+    K.arrow(s, 240, 120, 240, 190, { color: C.line });
+
+    /* --- the language model --- */
+    K.panel(s, 150, 176, 300, 132, { fill: T.purple, stroke: P });
+    K.mono(s, 166, 202, 'Ministral-3-3B', { size: 15, color: C.ink, weight: 700 });
+    K.label(s, 166, 220, '3B causal language model', { color: P });
+    for (var i = 0; i < 9; i++) {
+      s.appendChild(K.n('rect', { x: 166 + i * 31, y: 238, width: 25, height: 40, rx: 3,
+        fill: 'rgba(107,63,168,' + (0.16 + i * 0.045) + ')' }));
+    }
+    K.label(s, 166, 296, 'lora adapters here, and only here', { color: P, size: 9 });
+
+    /* --- the head --- */
+    K.arrow(s, 452, 240, 486, 240, { color: C.line });
+    K.panel(s, 494, 176, 146, 132, { stroke: C.line });
+    K.label(s, 508, 200, 'output head', { color: C.ink3 });
+    K.mono(s, 508, 226, 'z_yes', { size: 12.5, color: C.red });
+    K.bar(s, 560, 216, 66, 11, 0.82, { color: C.red });
+    K.mono(s, 508, 254, 'z_no', { size: 12.5, color: C.teal });
+    K.bar(s, 560, 244, 66, 11, 0.26, { color: C.teal });
+    K.label(s, 508, 288, 'softmax, two tokens', { size: 8.6 });
+
+    /* --- what ships --- */
+    K.label(s, 0, 348, 'and the checkpoint that ships is a merge, not a run');
+    var mix = [['PG', 0.6, P], ['P', 0.3, C.ink3], ['Instruct', 0.1, C.amber]], cx = 0;
     mix.forEach(function (m) {
-      var w = m[1] * 640;
-      s.appendChild(K.n('rect', { x: cx, y: 310, width: w - 3, height: 30, rx: 5, fill: m[2] }));
-      K.mono(s, cx + 10, 330, m[0] + ' ' + m[1], { size: 12.5, color: '#fff' });
+      var w = m[1] * Wd;
+      s.appendChild(K.n('rect', { x: cx, y: 360, width: w - 3, height: 32, rx: 5, fill: m[2] }));
+      K.mono(s, cx + 12, 381, m[0] + ' ' + m[1], { size: 12.5, color: '#fff', weight: 700 });
       cx += w;
     });
-    K.text(s, 0, 366, 'The third component is Ministral-3B-Instruct, the base instruct checkpoint.',
-      { size: 14, color: C.ink2 });
-    K.foot(s, 'Section 5 gives the base and the encoder, section 6.1 says LoRA is applied to the language model parameters, and section 6.2 gives the merge.');
+    K.callout(s, 0, 406, Wd,
+      'The 3B counts the language model. The vision encoder is additional, so the download is '
+      + 'larger, and the third merge component is the base instruct checkpoint.',
+      { color: P, tint: T.purple, cols: 70 });
+    K.foot(s, 'Section 5 gives the base and the encoder, 6.1 says LoRA is applied to the language model parameters, 6.2 gives the merge.');
   };
 
   /* 23 LoRA against full SFT */
@@ -2344,8 +2438,9 @@ window.SCENES = window.SCENES || {};
     K.label(s, 0, 108, 'then read the two logprobs yourself');
     K.code(s, 0, 118, 640, [
       { t: 'SYSTEM = (', c: '#c8cfdb' },
-      { t: '  "' + sp.slice(0, 62) + '"', c: '#d8a657' },
-      { t: '  "' + sp.slice(62) + '"', c: '#d8a657' },
+      { t: '  "' + sp.slice(0, 52) + '"', c: '#d8a657' },
+      { t: '  "' + sp.slice(52, 104) + '"', c: '#d8a657' },
+      { t: '  "' + sp.slice(104) + '"', c: '#d8a657' },
       { t: ')', c: '#c8cfdb' },
       { t: '', c: '#c8cfdb' },
       { t: 'r = client.chat.completions.create(', c: '#c8cfdb' },

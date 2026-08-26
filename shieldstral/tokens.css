@@ -10,7 +10,10 @@
   --fb:'IBM Plex Sans',ui-sans-serif,system-ui,-apple-system,sans-serif;
   --fm:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
 
-  --artR:min(50vw,760px); --txtw:392px; --cardfs:15px; --sh:100svh; --dx:20px;
+  --artR:min(54vw,840px); --txtw:400px; --cardfs:15px; --sh:100svh;
+  --gapC:52px;
+  --pageW:calc(var(--artR) + var(--gapC) + var(--txtw));
+  --dx:max(24px, calc((100vw - var(--pageW)) / 2));
 }
 
 *,*::before,*::after{box-sizing:border-box}
@@ -74,12 +77,13 @@ a.chip:hover{border-color:var(--blue);color:var(--blue)}
    reference feel alive. Delay is set per element by the engine. */
 @keyframes figIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 .scene.on svg>*{animation:figIn .52s cubic-bezier(.22,.61,.36,1) backwards}
+.scene svg>defs,.scene svg>rect[fill^='url'],.scene svg>rect[filter]{animation:none!important}
 @media(prefers-reduced-motion:reduce){ .scene.on svg>*{animation:none} }
 
 /* ---------------- beats ---------------- */
 #beats{position:relative;z-index:2;pointer-events:none}
 .beat{min-height:118svh;display:flex;align-items:center;pointer-events:none}
-.stack{margin-left:calc(var(--dx) + var(--artR) + 44px);width:var(--txtw);pointer-events:auto}
+.stack{margin-left:calc(var(--dx) + var(--artR) + var(--gapC));width:var(--txtw);pointer-events:auto}
 .card{
   background:var(--panel);border:1px solid var(--line);border-radius:12px;
   padding:20px 22px 19px;box-shadow:0 10px 34px rgba(20,25,34,.09),0 2px 6px rgba(20,25,34,.05);
@@ -117,7 +121,7 @@ h3{
 
 /* ---------------- act dividers ---------------- */
 .actdiv{position:relative;z-index:2;pointer-events:none;padding:14svh 0 6svh}
-.actdiv .stack{pointer-events:auto;width:auto;max-width:var(--txtw)}
+.actdiv .stack{pointer-events:auto;width:auto;max-width:640px}
 .actdiv .an{font-family:var(--fm);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink3);margin:0 0 8px}
 .actdiv h2{font-family:var(--fd);font-weight:700;font-size:clamp(28px,3.4vw,44px);line-height:1.04;letter-spacing:-.025em;margin:0 0 10px}
 .actdiv p{color:var(--ink3);font-size:14.5px;margin:0}

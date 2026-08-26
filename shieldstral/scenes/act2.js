@@ -350,32 +350,66 @@ window.SCENES = window.SCENES || {};
     K.foot(s, 'Images are drawn as neutral placeholders. Nothing unsafe is depicted anywhere in this guide.');
   };
 
-  /* 20 mutate the query */
+  /* 20 an image actually going through moderation */
   window.SCENES.S_IMGQUERY = function (root, api) {
-    var s = K.board(root, { alt: 'Query mutation, including inverse phrasings.' });
-    K.head(s, 'Move the question, not the picture', 'including the inverse phrasing of every category');
+    var s = K.board(root, { alt: 'One image moderated against a direct and an inverse query.' });
+    K.head(s, 'One picture, moderated twice',
+           'move the question, not the image');
     var h = api.SS.headline;
-    K.big(s, 0, 60, h.imageQueryPhrasings, { size: 62, color: A });
-    K.text(s, 0, 102, 'query phrasings, from a fixed ' + h.imageSubcats + ' subcategory visual taxonomy',
-      { size: 14.5, color: C.ink2 });
 
-    K.panel(s, 0, 120, 150, 150, { fill: T.ink });
-    s.appendChild(K.n('rect', { x: 42, y: 162, width: 66, height: 66, rx: 4, fill: 'none', stroke: C.ink3 }));
-    K.label(s, 0, 288, 'one image');
-
-    var pair = [
-      ['direct', 'Does this image contain violence?', 'no', C.teal],
-      ['inverse, about ' + h.inversePct + '% of the pool', 'Is this image safe from violence?', 'yes', C.red]
+    var VIEWS = [
+      { tag: 'direct', q: 'Does this image contain violence?', a: false,
+        note: 'the plain framing, answered no' },
+      { tag: 'inverse, about ' + h.inversePct + '% of the pool',
+        q: 'Is this image safe from violence?', a: true,
+        note: 'same picture, opposite correct answer' }
     ];
-    pair.forEach(function (p, i) {
-      var y = 128 + i * 84;
-      K.panel(s, 176, y, 464, 66, { stroke: i ? A : C.line, fill: i ? T.amber : '#fff' });
-      K.label(s, 192, y + 22, p[0], { color: i ? A : C.ink3 });
-      K.mono(s, 192, y + 46, p[1], { size: 12.5, color: C.ink });
-      K.big(s, 580, y + 48, p[2], { size: 22, color: p[3] });
+    var body = K.n('g', {});
+
+    /* the pipeline, drawn once */
+    K.label(s, 0, 20, 'the path one sample takes');
+    var STEPS = [
+      ['image', 0], ['vision encoder', 150], ['language model', 314], ['yes / no', 486]
+    ];
+    STEPS.forEach(function (st, i) {
+      var x = st[1], w = i === 0 ? 116 : (i === 3 ? 154 : 140);
+      K.panel(s, x, 34, w, 62, { stroke: i === 3 ? A : C.line, fill: i === 3 ? T.amber : '#fff' });
+      K.mono(s, x + 16, 62, st[0], { size: 12.5, color: i === 3 ? A : C.ink });
+      if (i === 0) {
+        s.appendChild(K.n('circle', { cx: x + 88, cy: 52, r: 6, fill: 'none', stroke: C.ink3 }));
+        s.appendChild(K.n('path', { d: 'M' + (x + 84) + ' 84 L' + (x + 100) + ' 68 L' + (x + 112)
+          + ' 78 L' + (x + 122) + ' 70 L' + (x + 128) + ' 84 Z',
+          fill: 'none', stroke: C.ink3, 'stroke-width': 1.2 }));
+      }
+      if (i < 3) K.arrow(s, x + w + 4, 65, st[1] + w + (i === 0 ? 40 : 12), 65, { color: C.line });
     });
-    K.text(s, 0, 330, 'Same picture, opposite correct answers. Both are valid training views.',
-      { size: 14, color: C.ink2 });
+    K.label(s, 0, 116, 'the query rides alongside, in the prompt', { size: 9.4 });
+
+    s.appendChild(body);
+    K.switcher(s, 0, 138, VIEWS.map(function (v) { return v.tag; }), function (i) {
+      body.innerHTML = '';
+      var v = VIEWS[i];
+      /* the image tile, large */
+      K.panel(body, 0, 190, 210, 150, { fill: 'rgba(31,37,48,.04)' });
+      body.appendChild(K.n('circle', { cx: 62, cy: 236, r: 15, fill: 'none', stroke: C.ink3, 'stroke-width': 1.4 }));
+      body.appendChild(K.n('path', { d: 'M18 322 L74 262 L118 302 L150 274 L192 322 Z',
+        fill: 'none', stroke: C.ink3, 'stroke-width': 1.6 }));
+      K.label(body, 0, 362, 'neutral placeholder', { size: 9 });
+
+      K.panel(body, 232, 190, 408, 66, { stroke: A, fill: T.amber });
+      K.label(body, 250, 214, 'query', { color: A });
+      K.mono(body, 250, 238, v.q, { size: 13, color: C.ink });
+
+      K.arrow(body, 436, 260, 436, 288, { color: C.line });
+      K.verdict(body, 250, 330, v.a, { size: 56 });
+      K.mono(body, 380, 314, v.note, { size: 13.5, color: C.ink2 });
+      s.appendChild(body);
+    }, { tint: 'amber' });
+
+    K.callout(s, 0, 396, 640,
+      h.imageQueryPhrasings + ' query phrasings from a fixed ' + h.imageSubcats
+      + '-subcategory visual taxonomy. Images cannot be rewritten, so the diversity is put '
+      + 'entirely into the question.', { color: A, tint: T.amber, cols: 70 });
     K.foot(s, 'The two example questions are phrased for this figure. The phrasing count, the taxonomy size and the inverse share are the report own.');
   };
 
