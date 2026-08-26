@@ -45,7 +45,7 @@ DESC = ("An open-weight moderation model that reads its rule as plain text at in
         "time. Thirty-four live figures on the method, the data pipeline, the training, "
         "and where the numbers are less flattering.")
 
-URL = "https://avisoori1x.github.io/shieldstral/"
+URL = "https://avisoori1x.github.io/shieldstral_1/"
 
 HERO = """
 <div class="hero">

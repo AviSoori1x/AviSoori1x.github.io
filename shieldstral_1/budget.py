@@ -16,7 +16,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 VENV = "/mnt/vast/home/avi/science/website/.venv/bin/python"
-URL = "http://127.0.0.1:8412/shieldstral/"
+URL = "http://127.0.0.1:8412/shieldstral_1/"
 
 MAX_NODES = 34      # text-bearing leaf elements in the figure
 MAX_OVERLAP = 0     # pairs of text boxes sitting on top of each other

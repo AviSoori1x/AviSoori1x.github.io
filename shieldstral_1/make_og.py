@@ -36,7 +36,7 @@ CARD = """<!DOCTYPE html><html><head><meta charset="utf-8">
   .art{width:300px;height:300px;border-radius:14px;overflow:hidden;
        box-shadow:0 26px 60px rgba(20,25,34,.20);border:1px solid rgba(31,37,48,.14);
        transform:rotate(-3deg)}
-  .art img{width:100%;height:100%;object-fit:cover;display:block}
+  .art svg{width:100%;height:100%;display:block}
   .verdict{position:absolute;right:44px;bottom:150px;background:#fff;border:1px solid rgba(31,37,48,.14);
            border-radius:12px;padding:14px 20px;box-shadow:0 16px 40px rgba(20,25,34,.16)}
   .verdict .w{font-family:'Sora',sans-serif;font-weight:700;font-size:44px;line-height:1;color:#0f6e56}
@@ -56,7 +56,50 @@ CARD = """<!DOCTYPE html><html><head><meta charset="utf-8">
   </div>
 </div>
 <div class="right">
-  <div class="art"><img src="TILE"></div>
+  <div class="art"><svg viewBox="0 0 300 300" width="300" height="300">
+  <defs>
+    <linearGradient id="fur" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffd23f"/>
+      <stop offset=".45" stop-color="#ff9c1a"/>
+      <stop offset="1" stop-color="#e8590c"/>
+    </linearGradient>
+    <linearGradient id="ear" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ff7a1a"/><stop offset="1" stop-color="#d94a08"/>
+    </linearGradient>
+  </defs>
+  <rect width="300" height="300" fill="#fdf6ec"/>
+  <!-- the Mistral banding, as a backdrop -->
+  <g opacity=".22">
+    <rect x="24" y="228" width="252" height="14" rx="3" fill="#ffd23f"/>
+    <rect x="24" y="248" width="252" height="14" rx="3" fill="#ff9c1a"/>
+    <rect x="24" y="268" width="252" height="14" rx="3" fill="#e8590c"/>
+  </g>
+  <!-- ears -->
+  <path d="M74 96 L84 34 L136 74 Z" fill="url(#ear)"/>
+  <path d="M226 96 L216 34 L164 74 Z" fill="url(#ear)"/>
+  <path d="M88 92 L94 56 L124 80 Z" fill="#ffb9a3"/>
+  <path d="M212 92 L206 56 L176 80 Z" fill="#ffb9a3"/>
+  <!-- head -->
+  <ellipse cx="150" cy="150" rx="86" ry="78" fill="url(#fur)"/>
+  <!-- stripes -->
+  <g stroke="#d94a08" stroke-width="7" stroke-linecap="round" opacity=".55" fill="none">
+    <path d="M118 92 L112 74"/><path d="M150 86 L150 66"/><path d="M182 92 L188 74"/>
+  </g>
+  <!-- eyes -->
+  <ellipse cx="120" cy="146" rx="15" ry="19" fill="#1f2430"/>
+  <ellipse cx="180" cy="146" rx="15" ry="19" fill="#1f2430"/>
+  <circle cx="125" cy="139" r="5" fill="#fff"/>
+  <circle cx="185" cy="139" r="5" fill="#fff"/>
+  <!-- muzzle -->
+  <path d="M150 172 l-11 -9 h22 Z" fill="#c2410c"/>
+  <path d="M150 172 v11 M150 183 q-13 10 -24 1 M150 183 q13 10 24 1"
+        stroke="#a3350a" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <!-- whiskers -->
+  <g stroke="#a3350a" stroke-width="4" stroke-linecap="round" opacity=".75">
+    <path d="M96 168 L52 158"/><path d="M96 180 L54 182"/>
+    <path d="M204 168 L248 158"/><path d="M204 180 L246 182"/>
+  </g>
+</svg></div>
   <div class="verdict"><div class="w">no</div><div class="k">not flagged</div></div>
 </div>
 </body></html>"""
@@ -77,9 +120,7 @@ print("rendered", out)
 
 
 def main():
-    import json
-    tiles = json.loads((HERE / 'tiles.js').read_text().split('= ', 1)[1].rstrip(';\n'))
-    card = CARD.replace('TILE', tiles.get('blocks', ''))
+    card = CARD
     tmp = pathlib.Path('/tmp/_og_card.html')
     tmp.write_text(card, encoding='utf-8')
     shot = pathlib.Path('/tmp/_og_shot.py')

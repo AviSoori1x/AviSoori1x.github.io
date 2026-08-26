@@ -15,7 +15,7 @@ import sys
 from pathlib import Path
 
 VENV = "/mnt/vast/home/avi/science/website/.venv/bin/python"
-URL = sys.argv[1] if len(sys.argv) > 1 else "http://127.0.0.1:8412/shieldstral/"
+URL = sys.argv[1] if len(sys.argv) > 1 else "http://127.0.0.1:8412/shieldstral_1/"
 
 PROBE = r'''
 import json, sys
