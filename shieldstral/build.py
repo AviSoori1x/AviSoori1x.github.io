@@ -41,10 +41,10 @@ for j in scene_js:
 missing = [w for w in wanted if w not in have]
 
 TITLE = "Shieldstral, taken apart"
-DESC = ("A visual guide to Shieldstral, an open-weight multimodal moderation model from "
-        "Mistral AI. Thirty-four scenes covering the binary question-answering reformulation, "
-        "the 54.1M-sample data pipeline, the training and merge, and where the numbers are less "
-        "flattering. By Avinash Sooriyarachchi, a core contributor to the model.")
+DESC = ("An open-weight moderation model that reads its rule as plain text at inference "
+        "time. Thirty-four live figures on the method, the data pipeline, the training, "
+        "and where the numbers are less flattering.")
+
 URL = "https://avisoori1x.github.io/shieldstral/"
 
 HERO = """
@@ -104,10 +104,23 @@ html = f"""<!DOCTYPE html>
 <meta name="description" content="{DESC}">
 <link rel="canonical" href="{URL}">
 <meta property="og:type" content="article">
+<meta property="og:site_name" content="Avinash Sooriyarachchi">
 <meta property="og:title" content="{TITLE}">
 <meta property="og:description" content="{DESC}">
 <meta property="og:url" content="{URL}">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="{URL}og.png">
+<meta property="og:image:secure_url" content="{URL}og.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="{TITLE}">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@aviTwit3">
+<meta name="twitter:creator" content="@aviTwit3">
+<meta name="twitter:title" content="{TITLE}">
+<meta name="twitter:description" content="{DESC}">
+<meta name="twitter:image" content="{URL}og.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
