@@ -63,13 +63,23 @@ window.SCENES = window.SCENES || {};
     /* row three: what ships */
     K.label(s, 0, 320, 'the checkpoint that ships is a three-way merge');
     var mix = [['PG', 0.6, P], ['P', 0.3, C.ink3], ['Instruct', 0.1, C.amber]], cx = 0;
+    // The 0.1 slice is only 64px wide, so a label inside it overflowed. The bar
+    // carries the proportion, the names sit under it as a legend.
     mix.forEach(function (m) {
       var w = m[1] * 640;
-      s.appendChild(K.n('rect', { x: cx, y: 332, width: w - 3, height: 30, rx: 5, fill: m[2] }));
-      K.mono(s, cx + 12, 352, m[0] + ' ' + m[1], { size: 12, color: '#fff', weight: 700 });
+      s.appendChild(K.n('rect', { x: cx, y: 332, width: w - 3, height: 26, rx: 5, fill: m[2] }));
+      if (w > 90) {
+        K.mono(s, cx + 12, 350, m[1].toFixed(1), { size: 12, color: '#fff', weight: 700 });
+      }
       cx += w;
     });
-    K.callout(s, 0, 380, 640,
+    var lx = 0;
+    mix.forEach(function (m) {
+      s.appendChild(K.n('rect', { x: lx, y: 372, width: 9, height: 9, rx: 2, fill: m[2] }));
+      K.mono(s, lx + 15, 381, m[0] + ' ' + m[1].toFixed(1), { size: 11.5, color: C.ink2 });
+      lx += 118;
+    });
+    K.callout(s, 0, 398, 640,
       'Two safety checkpoints and a slice of the base instruct model, '
       + 'Ministral-3B-Instruct.', { color: P, tint: T.purple, cols: 70 });
     K.foot(s, 'Dimensions and layer counts come from params.json in the Hugging Face repo. Parameter totals are computed from those shapes and are approximate.');

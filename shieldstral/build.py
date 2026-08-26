@@ -54,8 +54,9 @@ HERO = """
   <p class="sub">Shieldstral is an open-weight <b>moderation model</b>. It carries no fixed list of
   harm categories. You hand it the moderation criterion as plain text at inference time and it
   answers one yes/no question about one document.</p>
-  <p class="sub" style="margin-top:14px">This is my attempt to break down the paper visually, so you
-  can scroll through it instead of reading the PDF. I worked on the model.</p>
+  <p class="sub" style="margin-top:14px">I worked on Shieldstral, and this is my attempt to lay the
+  paper out visually, so you can scroll through the method and see how each piece actually behaves
+  rather than take the PDF's word for it.</p>
 
   <div class="metastrip">
     <span class="chip"><a href="https://arxiv.org/abs/2607.25857">arXiv <b>2607.25857</b></a></span>
