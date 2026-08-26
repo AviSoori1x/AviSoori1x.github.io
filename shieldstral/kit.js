@@ -469,11 +469,32 @@
     return lines.length * lh;
   }
 
+  /** a placeholder photograph, rendered rather than drawn as outline clip art */
+  function photo(p, x, y, w, h, which, o) {
+    o = o || {};
+    var src = (window.SS_TILES || {})[which || 'landscape'];
+    var g = n('g', {});
+    var cid = 'ph' + (++UID);
+    var d = n('defs', {});
+    var cp = n('clipPath', { id: cid });
+    cp.appendChild(n('rect', { x: x, y: y, width: w, height: h, rx: o.r == null ? 8 : o.r }));
+    d.appendChild(cp);
+    g.appendChild(d);
+    if (src) {
+      g.appendChild(n('image', { href: src, x: x, y: y, width: w, height: h,
+        preserveAspectRatio: 'xMidYMid slice', 'clip-path': 'url(#' + cid + ')' }));
+    }
+    g.appendChild(n('rect', { x: x, y: y, width: w, height: h, rx: o.r == null ? 8 : o.r,
+      fill: 'none', stroke: 'rgba(31,37,48,.22)' }));
+    p.appendChild(g);
+    return g;
+  }
+
   window.KIT = {
     W: W, H: H, C: C, TINT: TINT, n: n,
     board: board, panel: panel, label: label, mono: mono, text: text, big: big,
     chip: chip, bar: bar, arrow: arrow, code: code, verdict: verdict,
     wrap: wrap, para: para, foot: foot, switcher: switcher,
-    head: head, callout: callout, lede: lede
+    head: head, callout: callout, lede: lede, photo: photo
   };
 })();

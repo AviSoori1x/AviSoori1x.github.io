@@ -6,8 +6,8 @@ window.SCENES = window.SCENES || {};
 
   /* ---- 01 frozen list versus an open slot ---- */
   window.SCENES.S_FROZEN = function (root, api) {
-    var s = K.board(root, { alt: 'A fixed taxonomy guardrail beside a policy adaptive one.' });
-    K.head(s, 'Most guardrails already decided', 'one of these two can hear you, the other cannot');
+    var s = K.board(root, { alt: 'A fixed taxonomy moderation model beside a policy adaptive one.' });
+    K.head(s, 'Most of them decided already', 'one of these two can hear you, the other cannot');
     var SSd = api.SS;
     var cats = ['violence', 'hate', 'sexual', 'self-harm', 'weapons', 'crime',
                 'privacy', 'drugs', 'jailbreak', 'csam'];

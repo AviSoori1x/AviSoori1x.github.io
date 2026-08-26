@@ -331,10 +331,9 @@ window.SCENES = window.SCENES || {};
 
     K.label(s, 0, 122, 'images');
     K.panel(s, 0, 134, 280, 58, { fill: T.ink });
-    for (var i = 0; i < 3; i++) {
-      s.appendChild(K.n('rect', { x: 16 + i * 34, y: 150, width: 26, height: 26, rx: 3,
-        fill: 'none', stroke: C.ink3 }));
-    }
+    ['landscape', 'interior', 'objects'].forEach(function (w, i) {
+      K.photo(s, 16 + i * 62, 142, 54, 42, w, { r: 4 });
+    });
     K.arrow(s, 288, 163, 344, 163, { color: C.red, dash: '4 4' });
     K.panel(s, 352, 134, 288, 58, { stroke: C.red, fill: T.red });
     K.mono(s, 368, 168, 'cannot simply be generated', { size: 13, color: C.red });
@@ -343,74 +342,51 @@ window.SCENES = window.SCENES || {};
     K.panel(s, 0, 244, 640, 96);
     K.text(s, 18, 274, 'General purpose classification and object detection datasets supply', { size: 13.5, color: C.ink2 });
     K.text(s, 18, 294, 'a large pool of naturally safe images to serve as negatives.', { size: 13.5, color: C.ink2 });
-    for (i = 0; i < 22; i++) {
-      s.appendChild(K.n('rect', { x: 18 + i * 27, y: 310, width: 20, height: 16, rx: 2,
-        fill: 'none', stroke: C.teal, opacity: .7 }));
+    var TW = ['landscape', 'interior', 'objects'];
+    for (i = 0; i < 16; i++) {
+      K.photo(s, 18 + i * 38, 306, 32, 26, TW[i % 3], { r: 3 });
     }
     K.foot(s, 'Images are drawn as neutral placeholders. Nothing unsafe is depicted anywhere in this guide.');
   };
 
   /* 20 an image actually going through moderation */
   window.SCENES.S_IMGQUERY = function (root, api) {
-    var s = K.board(root, { alt: 'One image moderated against a direct and an inverse query.' });
-    K.head(s, 'One picture, moderated twice',
-           'move the question, not the image');
+    var s = K.board(root, { alt: 'One picture moderated against a direct and an inverse query.' });
+    K.head(s, 'One picture, moderated twice', 'move the question, not the image');
     var h = api.SS.headline;
-
     var VIEWS = [
       { tag: 'direct', q: 'Does this image contain violence?', a: false,
-        note: 'the plain framing, answered no' },
-      { tag: 'inverse, about ' + h.inversePct + '% of the pool',
+        note: 'the plain framing. Nothing here matches, so no.' },
+      { tag: 'inverse, ~' + h.inversePct + '% of the pool',
         q: 'Is this image safe from violence?', a: true,
-        note: 'same picture, opposite correct answer' }
+        note: 'the same picture, and now the correct answer is yes.' }
     ];
+
+    /* the picture, once, large, on the left */
+    K.label(s, 0, 18, 'the document');
+    K.photo(s, 0, 30, 246, 184, 'landscape');
+    K.label(s, 0, 232, 'a rendered stand-in, nothing real is shown', { size: 8.6 });
+
     var body = K.n('g', {});
-
-    /* the pipeline, drawn once */
-    K.label(s, 0, 20, 'the path one sample takes');
-    var STEPS = [
-      ['image', 0], ['vision encoder', 150], ['language model', 314], ['yes / no', 486]
-    ];
-    STEPS.forEach(function (st, i) {
-      var x = st[1], w = i === 0 ? 116 : (i === 3 ? 154 : 140);
-      K.panel(s, x, 34, w, 62, { stroke: i === 3 ? A : C.line, fill: i === 3 ? T.amber : '#fff' });
-      K.mono(s, x + 16, 62, st[0], { size: 12.5, color: i === 3 ? A : C.ink });
-      if (i === 0) {
-        s.appendChild(K.n('circle', { cx: x + 88, cy: 52, r: 6, fill: 'none', stroke: C.ink3 }));
-        s.appendChild(K.n('path', { d: 'M' + (x + 84) + ' 84 L' + (x + 100) + ' 68 L' + (x + 112)
-          + ' 78 L' + (x + 122) + ' 70 L' + (x + 128) + ' 84 Z',
-          fill: 'none', stroke: C.ink3, 'stroke-width': 1.2 }));
-      }
-      if (i < 3) K.arrow(s, x + w + 4, 65, st[1] + w + (i === 0 ? 40 : 12), 65, { color: C.line });
-    });
-    K.label(s, 0, 116, 'the query rides alongside, in the prompt', { size: 9.4 });
-
-    s.appendChild(body);
-    K.switcher(s, 0, 138, VIEWS.map(function (v) { return v.tag; }), function (i) {
+    K.label(s, 282, 18, 'the question');
+    K.switcher(s, 282, 30, VIEWS.map(function (v) { return v.tag; }), function (i) {
       body.innerHTML = '';
       var v = VIEWS[i];
-      /* the image tile, large */
-      K.panel(body, 0, 190, 210, 150, { fill: 'rgba(31,37,48,.04)' });
-      body.appendChild(K.n('circle', { cx: 62, cy: 236, r: 15, fill: 'none', stroke: C.ink3, 'stroke-width': 1.4 }));
-      body.appendChild(K.n('path', { d: 'M18 322 L74 262 L118 302 L150 274 L192 322 Z',
-        fill: 'none', stroke: C.ink3, 'stroke-width': 1.6 }));
-      K.label(body, 0, 362, 'neutral placeholder', { size: 9 });
-
-      K.panel(body, 232, 190, 408, 66, { stroke: A, fill: T.amber });
-      K.label(body, 250, 214, 'query', { color: A });
-      K.mono(body, 250, 238, v.q, { size: 13, color: C.ink });
-
-      K.arrow(body, 436, 260, 436, 288, { color: C.line });
-      K.verdict(body, 250, 330, v.a, { size: 56 });
-      K.mono(body, 380, 314, v.note, { size: 13.5, color: C.ink2 });
+      K.panel(body, 282, 74, 358, 78, { stroke: A, fill: T.amber });
+      K.para(body, 300, 102, v.q, 36, { size: 13.5, color: C.ink, lh: 19 });
+      K.arrow(body, 461, 158, 461, 186, { color: C.line });
+      K.panel(body, 282, 194, 358, 92);
+      K.verdict(body, 300, 246, v.a, { size: 46 });
+      K.para(body, 386, 232, v.note, 30, { size: 12.5, color: C.ink2, lh: 17 });
       s.appendChild(body);
     }, { tint: 'amber' });
+    s.appendChild(body);
 
-    K.callout(s, 0, 396, 640,
+    K.callout(s, 0, 306, 640,
       h.imageQueryPhrasings + ' query phrasings from a fixed ' + h.imageSubcats
-      + '-subcategory visual taxonomy. Images cannot be rewritten, so the diversity is put '
-      + 'entirely into the question.', { color: A, tint: T.amber, cols: 70 });
-    K.foot(s, 'The two example questions are phrased for this figure. The phrasing count, the taxonomy size and the inverse share are the report\'s own.');
+      + '-subcategory visual taxonomy. Pictures cannot be rewritten, so all the variety goes '
+      + 'into the question.', { color: A, tint: T.amber, cols: 68 });
+    K.foot(s, 'The two questions are phrased for this figure. The phrasing count, the taxonomy size and the inverse share are the report\'s own.');
   };
 
   /* 21 asymmetric cut */

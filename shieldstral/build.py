@@ -18,6 +18,7 @@ tokens = (HERE / "tokens.css").read_text(encoding="utf-8")
 beats = (HERE / "beats.html").read_text(encoding="utf-8")
 engine = (HERE / "engine.js").read_text(encoding="utf-8")
 kit = (HERE / "kit.js").read_text(encoding="utf-8")
+tiles = (HERE / "tiles.js").read_text(encoding="utf-8")
 data = (HERE / "data.js").read_text(encoding="utf-8")
 
 # one file pair per scene, so a single broken scene cannot take the rest down
@@ -40,8 +41,8 @@ for j in scene_js:
 missing = [w for w in wanted if w not in have]
 
 TITLE = "Shieldstral, taken apart"
-DESC = ("A visual guide to Shieldstral, Mistral AI's policy-adaptive multimodal safety "
-        "classifier. Thirty-four scenes covering the binary question-answering reformulation, "
+DESC = ("A visual guide to Shieldstral, an open-weight multimodal moderation model from "
+        "Mistral AI. Thirty-four scenes covering the binary question-answering reformulation, "
         "the 54.1M-sample data pipeline, the training and merge, and where the numbers are less "
         "flattering. By Avinash Sooriyarachchi, a core contributor to the model.")
 URL = "https://avisoori1x.github.io/shieldstral/"
@@ -50,17 +51,17 @@ HERO = """
 <div class="hero">
   <div class="eyebrow">a visual guide &nbsp;&middot;&nbsp; paper results, with labelled schematics</div>
   <h1>Shieldstral,<br>taken <em>apart</em></h1>
-  <p class="sub">A guardrail built on a <b>3B language model</b> with a vision encoder on top. It takes its
-  moderation criterion as plain text <b>at inference time</b>,
-  answers one yes/no question about one document, and emits a single token. This walks
-  the whole method, the reformulation, the 54.1M-sample data pipeline, the two checkpoints and the
-  merge, and the places it loses, in <b>34 scenes</b>.</p>
-  <p class="byline"><b>Avinash Sooriyarachchi</b>, one of the core contributors on Shieldstral.<br>
-  Where the report is vague I have said so rather than filled the gap.</p>
+  <p class="sub">Shieldstral is an open-weight <b>moderation model</b>. Instead of scoring content
+  against a fixed list of harm categories, it reads the moderation criterion as plain text at
+  inference time and answers one yes/no question about one document.</p>
+  <p class="sub" style="margin-top:14px">This is a visual guide to how it works. I worked on the
+  model, so this walks the method the way I would explain it to a colleague: the reformulation, the
+  data pipeline, the training and the merge, and the results including the ones that are less
+  flattering.</p>
+
   <div class="metastrip">
     <span class="chip"><a href="https://arxiv.org/abs/2607.25857">arXiv <b>2607.25857</b></a></span>
     <span class="chip"><a href="https://huggingface.co/mistralai/Shieldstral-1.0-3B">weights <b>Apache 2.0</b></a></span>
-    <span class="chip">34 <b>scenes</b></span>
     <span class="chip">text F1 <b>84.9</b></span>
     <span class="chip">multimodal F1 <b>83.8</b></span>
   </div>
@@ -122,6 +123,7 @@ html = f"""<!DOCTYPE html>
 {data}
 </script>
 <script>
+{tiles}
 {kit}
 window.SCENES = window.SCENES || {{}};
 {chr(10).join(scene_js)}

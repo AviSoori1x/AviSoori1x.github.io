@@ -13,72 +13,66 @@ window.SCENES = window.SCENES || {};
   /* 22 the actual architecture, end to end */
   window.SCENES.S_BASE = function (root, api) {
     var s = K.board(root, { alt: 'Architecture from input through to the two output logits.' });
+    K.head(s, 'What the checkpoint actually is', 'the 3B counts the language model, not the download');
     var A_ = api.SS.arch || { lm: {}, vision: {} };
-    K.head(s, 'What the checkpoint actually is',
-           'the 3B is the language model, not the artifact');
-    var Wd = 640;
 
-    /* --- inputs --- */
-    K.label(s, 0, 18, 'input');
-    // image tile, drawn as a neutral glyph
-    K.panel(s, 0, 30, 108, 84, { flat: true, fill: 'rgba(31,37,48,.04)' });
-    s.appendChild(K.n('circle', { cx: 34, cy: 58, r: 9, fill: 'none', stroke: C.ink3 }));
-    s.appendChild(K.n('path', { d: 'M12 100 L44 66 L66 88 L82 74 L96 100 Z',
-      fill: 'none', stroke: C.ink3, 'stroke-width': 1.4 }));
-    K.label(s, 0, 128, 'image, optional', { size: 9 });
+    /* row one: the two inputs */
+    K.label(s, 0, 16, 'in');
+    K.photo(s, 0, 26, 92, 68, 'objects', { r: 6 });
+    K.label(s, 0, 108, 'image, optional', { size: 8.6 });
 
-    K.panel(s, 124, 30, 236, 84);
-    K.mono(s, 138, 52, '<Instruct>', { size: 11.5, color: C.ink3 });
-    K.mono(s, 138, 72, '<Query>', { size: 11.5, color: P, weight: 700 });
-    K.mono(s, 138, 92, '<Document>', { size: 11.5, color: C.ink3 });
-    K.label(s, 124, 128, 'the prompt, where the policy lives', { size: 9 });
+    K.panel(s, 112, 26, 210, 68);
+    K.mono(s, 128, 48, '<Instruct>', { size: 11, color: C.ink3 });
+    K.mono(s, 128, 66, '<Query>', { size: 11, color: P, weight: 700 });
+    K.mono(s, 128, 84, '<Document>', { size: 11, color: C.ink3 });
+    K.label(s, 112, 108, 'the prompt', { size: 8.6 });
 
-    /* --- encoder --- */
-    K.arrow(s, 54, 120, 54, 168, { color: C.line });
-    K.panel(s, 0, 176, 108, 56, { stroke: C.line });
-    K.mono(s, 14, 200, 'Pixtral', { size: 12, color: C.ink });
-    K.label(s, 14, 218, 'vision encoder', { size: 8.6 });
-    K.label(s, 14, 232, A_.vision.dim + 'd  ' + A_.vision.layers + ' layers', { size: 8.2 });
-    K.label(s, 0, 248, 'frozen', { color: C.ink3, size: 9 });
+    /* row two: encoder and language model, side by side, one clear flow */
+    K.arrow(s, 46, 118, 46, 152, { color: C.line });
+    K.panel(s, 0, 160, 92, 74, { stroke: C.line });
+    K.mono(s, 12, 184, 'Pixtral', { size: 12, color: C.ink });
+    K.label(s, 12, 200, A_.vision.dim + 'd', { size: 8.4 });
+    K.label(s, 12, 214, A_.vision.layers + ' layers', { size: 8.4 });
+    K.mono(s, 0, 252, '~' + A_.vision.approxM + 'M', { size: 13, color: C.ink2 });
+    K.label(s, 0, 268, 'frozen', { size: 8.4 });
 
-    K.arrow(s, 108, 204, 146, 204, { color: C.line });
-    K.arrow(s, 240, 120, 240, 190, { color: C.line });
+    K.arrow(s, 96, 196, 128, 196, { color: C.line });
+    K.arrow(s, 217, 118, 217, 152, { color: C.line });
 
-    /* --- the language model --- */
-    K.panel(s, 150, 176, 300, 132, { fill: T.purple, stroke: P });
-    K.mono(s, 166, 202, 'Ministral-3-3B', { size: 15, color: C.ink, weight: 700 });
-    K.label(s, 166, 220, A_.lm.dim + 'd  ' + A_.lm.layers + ' layers  ' + A_.lm.heads + 'h/' + A_.lm.kvHeads + 'kv', { color: P });
-    for (var i = 0; i < 9; i++) {
-      s.appendChild(K.n('rect', { x: 166 + i * 31, y: 238, width: 25, height: 40, rx: 3,
-        fill: 'rgba(107,63,168,' + (0.16 + i * 0.045) + ')' }));
+    K.panel(s, 134, 160, 268, 74, { fill: T.purple, stroke: P });
+    K.mono(s, 150, 184, 'Ministral-3-3B', { size: 13.5, color: C.ink, weight: 700 });
+    K.label(s, 150, 202, A_.lm.dim + 'd  ' + A_.lm.layers + ' layers  '
+      + A_.lm.heads + 'h/' + A_.lm.kvHeads + 'kv', { color: P, size: 8.6 });
+    for (var i = 0; i < 8; i++) {
+      s.appendChild(K.n('rect', { x: 150 + i * 31, y: 212, width: 25, height: 12, rx: 2,
+        fill: 'rgba(107,63,168,' + (0.2 + i * 0.05) + ')' }));
     }
-    K.label(s, 166, 296, 'lora adapters here, and only here', { color: P, size: 9 });
+    K.mono(s, 134, 252, '~' + A_.lm.approxB + 'B', { size: 13, color: P });
+    K.label(s, 134, 268, 'lora adapters, here only', { size: 8.4, color: P });
 
-    /* --- the head --- */
-    K.arrow(s, 452, 240, 486, 240, { color: C.line });
-    K.panel(s, 494, 176, 146, 132, { stroke: C.line });
-    K.label(s, 508, 200, 'output head', { color: C.ink3 });
-    K.mono(s, 508, 226, 'z_yes', { size: 12.5, color: C.red });
-    K.bar(s, 560, 216, 66, 11, 0.82, { color: C.red });
-    K.mono(s, 508, 254, 'z_no', { size: 12.5, color: C.teal });
-    K.bar(s, 560, 244, 66, 11, 0.26, { color: C.teal });
-    K.label(s, 508, 288, 'softmax, two tokens', { size: 8.6 });
+    K.arrow(s, 406, 196, 438, 196, { color: C.line });
+    K.panel(s, 444, 160, 196, 74, { stroke: C.line });
+    K.label(s, 458, 182, 'output head', { size: 8.6 });
+    K.mono(s, 458, 204, 'z_yes', { size: 11.5, color: C.red });
+    K.bar(s, 508, 195, 116, 10, 0.82, { color: C.red });
+    K.mono(s, 458, 224, 'z_no', { size: 11.5, color: C.teal });
+    K.bar(s, 508, 215, 116, 10, 0.26, { color: C.teal });
+    K.mono(s, 444, 252, '~' + A_.totalApproxB + 'B', { size: 13, color: C.ink, weight: 700 });
+    K.label(s, 444, 268, 'total, what you download', { size: 8.4 });
 
-    /* --- what ships --- */
-    K.label(s, 0, 348, 'and the checkpoint that ships is a merge, not a run');
+    /* row three: what ships */
+    K.label(s, 0, 320, 'and the checkpoint that ships is a merge, not a training run');
     var mix = [['PG', 0.6, P], ['P', 0.3, C.ink3], ['Instruct', 0.1, C.amber]], cx = 0;
     mix.forEach(function (m) {
-      var w = m[1] * Wd;
-      s.appendChild(K.n('rect', { x: cx, y: 360, width: w - 3, height: 32, rx: 5, fill: m[2] }));
-      K.mono(s, cx + 12, 381, m[0] + ' ' + m[1], { size: 12.5, color: '#fff', weight: 700 });
+      var w = m[1] * 640;
+      s.appendChild(K.n('rect', { x: cx, y: 332, width: w - 3, height: 30, rx: 5, fill: m[2] }));
+      K.mono(s, cx + 12, 352, m[0] + ' ' + m[1], { size: 12, color: '#fff', weight: 700 });
       cx += w;
     });
-    K.callout(s, 0, 406, Wd,
-      'The 3B counts the language model, about ' + A_.lm.approxB + 'B from params.json. The vision '
-      + 'encoder adds roughly ' + A_.vision.approxM + 'M more, so the checkpoint is about '
-      + A_.totalApproxB + 'B.',
-      { color: P, tint: T.purple, cols: 70 });
-    K.foot(s, 'Layer and dimension counts are read from params.json in the Hugging Face repo. Parameter totals are computed from those shapes, so they are approximate. Section 6.1 says LoRA is applied to the language model parameters, 6.2 gives the merge.');
+    K.callout(s, 0, 380, 640,
+      'The third component is Ministral-3B-Instruct, the base instruct checkpoint, so what ships '
+      + 'is not any single run.', { color: P, tint: T.purple, cols: 70 });
+    K.foot(s, 'Dimensions and layer counts come from params.json in the Hugging Face repo. Parameter totals are computed from those shapes and are approximate.');
   };
 
   /* 23 LoRA against full SFT */
