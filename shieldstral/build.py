@@ -55,8 +55,8 @@ HERO = """
   harm categories. You hand it the moderation criterion as plain text at inference time and it
   answers one yes/no question about one document.</p>
   <p class="sub" style="margin-top:14px">I worked on Shieldstral, and this is my attempt to lay the
-  paper out visually, so you can scroll through the method and see how each piece actually behaves
-  rather than take the PDF's word for it.</p>
+  paper out visually. Every figure is live, so you can scroll through the method and try each piece
+  as you get to it.</p>
 
   <div class="metastrip">
     <span class="chip"><a href="https://arxiv.org/abs/2607.25857">arXiv <b>2607.25857</b></a></span>
