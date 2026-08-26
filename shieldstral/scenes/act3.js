@@ -30,9 +30,10 @@ window.SCENES = window.SCENES || {};
     /* row two: encoder and language model, side by side, one clear flow */
     K.arrow(s, 46, 118, 46, 152, { color: C.line });
     K.panel(s, 0, 160, 92, 74, { stroke: C.line });
-    K.mono(s, 12, 184, 'Pixtral', { size: 12, color: C.ink });
-    K.label(s, 12, 200, A_.vision.dim + 'd', { size: 8.4 });
-    K.label(s, 12, 214, A_.vision.layers + ' layers', { size: 8.4 });
+    K.mono(s, 12, 184, 'vision', { size: 12, color: C.ink });
+    K.mono(s, 12, 198, 'encoder', { size: 12, color: C.ink });
+    K.label(s, 12, 214, A_.vision.dim + 'd', { size: 8.4 });
+    K.label(s, 12, 226, A_.vision.layers + ' layers', { size: 8.4 });
     K.mono(s, 0, 252, '~' + A_.vision.approxM + 'M', { size: 13, color: C.ink2 });
     K.label(s, 0, 268, 'frozen', { size: 8.4 });
 

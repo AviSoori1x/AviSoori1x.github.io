@@ -533,7 +533,7 @@ h3{
     <span class="num">22<span class="sec">§5</span></span>
     <h3>What the checkpoint actually is</h3>
     <p>Section 5 names <b>Ministral-3-3B-Base-2512</b> as the starting point, a 3B causal language
-    model with native multimodal support through a <b>Pixtral vision encoder</b>.</p>
+    model with native multimodal support through a <b>vision encoder</b>.</p>
     <p>The 3B in the title is the language model. The vision encoder sits on top of it, so the
     checkpoint you download is larger than 3B.</p>
     <p>Two more things the architecture section does not say out loud. LoRA is applied to the
@@ -2002,9 +2002,10 @@ window.SCENES = window.SCENES || {};
     /* row two: encoder and language model, side by side, one clear flow */
     K.arrow(s, 46, 118, 46, 152, { color: C.line });
     K.panel(s, 0, 160, 92, 74, { stroke: C.line });
-    K.mono(s, 12, 184, 'Pixtral', { size: 12, color: C.ink });
-    K.label(s, 12, 200, A_.vision.dim + 'd', { size: 8.4 });
-    K.label(s, 12, 214, A_.vision.layers + ' layers', { size: 8.4 });
+    K.mono(s, 12, 184, 'vision', { size: 12, color: C.ink });
+    K.mono(s, 12, 198, 'encoder', { size: 12, color: C.ink });
+    K.label(s, 12, 214, A_.vision.dim + 'd', { size: 8.4 });
+    K.label(s, 12, 226, A_.vision.layers + ' layers', { size: 8.4 });
     K.mono(s, 0, 252, '~' + A_.vision.approxM + 'M', { size: 13, color: C.ink2 });
     K.label(s, 0, 268, 'frozen', { size: 8.4 });
 
