@@ -127,29 +127,82 @@ window.SCENES = window.SCENES || {};
       { size: 14, color: C.ink2 });
   };
 
-  /* 31 adaptability, where it comes second */
+  /* 31 adaptability: the headline, then the whole table underneath */
   window.SCENES.S_ADAPT = function (root, api) {
-    var s = K.board(root, { alt: 'Second place on the adaptability benchmark.' });
-    K.head(s, 'Second, and the report says why', 'adaptability benchmark, reasoning trace against one token');
-    var h = api.SS.headline;
-    K.label(s, 0, 14, 'adaptability benchmark');
-    [['GPT-OSS-Safeguard-20B', h.adaptabilityBest, C.ink, '20B', 'writes a reasoning trace first'],
-     ['Shieldstral', h.adaptabilityF1, G, '3B', 'emits a single token']
-    ].forEach(function (r, i) {
-      var y = 46 + i * 132;
-      K.mono(s, 0, y + 16, r[0], { size: 15, color: r[2], weight: 700 });
-      K.chip(s, 0, y + 30, r[3], { size: 11, color: r[2], stroke: r[2] });
-      K.bar(s, 76, y + 34, 440, 22, r[1] / 100, { color: i ? G : 'rgba(31,37,48,.28)' });
-      K.big(s, 640, y + 52, r[1].toFixed(1), { size: 34, color: r[2], anchor: 'end' });
-      K.text(s, 0, y + 86, r[4], { size: 13.5, color: C.ink3 });
+    var s = K.board(root, { alt: 'Per category F1 across the adaptability benchmark.' });
+    K.head(s, 'Second, and the report says why',
+           'every leaf category, every model, one grid');
+    var h = api.SS.headline, SSd = api.SS;
+    var models = SSd.taxonomyModels || [];
+    var OURS = models.indexOf('Shieldstral-3B');
+    var BEST = models.indexOf('GPT-OSS-Safeguard-20B');
+
+    /* headline pair */
+    [[models[BEST] || 'GPT-OSS-Safeguard-20B', h.adaptabilityBest, C.ink, '20B'],
+     ['Shieldstral', h.adaptabilityF1, G, '3B']].forEach(function (r, i) {
+      var y = 16 + i * 40;
+      K.mono(s, 0, y + 12, r[0], { size: 13, color: r[2], weight: 700 });
+      K.bar(s, 240, y + 2, 300, 14, r[1] / 100, { color: i ? G : 'rgba(31,37,48,.3)' });
+      K.mono(s, 640, y + 14, r[1].toFixed(1), { size: 17, color: r[2], anchor: 'end' });
     });
-    var gap = (h.adaptabilityBest - h.adaptabilityF1).toFixed(1);
-    K.text(s, 0, 330, 'Shieldstral is ' + gap + ' F1 behind, at roughly a seventh of the parameters.',
-      { size: 15, color: C.ink2 });
-    K.text(s, 0, 354, 'The report reports no latency or cost measurement for this comparison,',
-      { size: 14, color: C.ink3 });
-    K.text(s, 0, 374, 'so treat the tradeoff as directional rather than quantified.',
-      { size: 14, color: C.ink3 });
+
+    /* the whole table, 52 leaves against every model */
+    var leaves = [];
+    (SSd.evalTaxonomy || []).forEach(function (sc) {
+      (sc.subs || []).forEach(function (sub) {
+        (sub.leaves || []).forEach(function (lf) {
+          if (lf.f1) leaves.push({ name: lf.name, f1: lf.f1, sc: sc.id });
+        });
+      });
+    });
+
+    var CW = 40, CH = 8.4, X0 = 172, Y0 = 132;
+    K.label(s, 0, Y0 - 88, leaves.length + ' leaf categories, ' + models.length + ' models');
+    // full names collide at 40px column pitch even when rotated, so tag them
+    var SHORT = {
+      'PolyGuard-Qwen-7B': 'PolyG', 'LlamaGuard-4-12B': 'Llama',
+      'WildGuard-7B': 'Wild', 'OmniGuard-7B': 'Omni',
+      'Qwen3Guard-8B': 'Qwen3', 'Nemotron-Safety-8B': 'Nemo',
+      'Nemotron-3.5-Safety-4B': 'Nemo3.5', 'ShieldGemma-9B': 'Gemma',
+      'GPT-OSS-Safeguard-20B': 'GPT-OSS', 'Shieldstral-3B': 'SHIELDSTRAL'
+    };
+    models.forEach(function (m, mi) {
+      var cx = X0 + mi * CW + CW / 2 - 4;
+      var lab = K.mono(s, cx, Y0 - 10, SHORT[m] || m.slice(0, 9),
+        { size: 8.2, color: mi === OURS ? G : C.ink3, anchor: 'start',
+          weight: mi === OURS ? 700 : 400 });
+      lab.setAttribute('transform', 'rotate(-62 ' + cx + ' ' + (Y0 - 10) + ')');
+    });
+
+    leaves.forEach(function (lf, li) {
+      var y = Y0 + li * CH;
+      if (li % 2 === 0) {
+        K.mono(s, X0 - 8, y + 6.8, lf.name.slice(0, 22), { size: 7.6, color: C.ink3, anchor: 'end' });
+      }
+      lf.f1.forEach(function (v, mi) {
+        var frac = v == null ? null : Math.max(0, Math.min(1, (v - 30) / 68));
+        s.appendChild(K.n('rect', {
+          x: X0 + mi * CW, y: y, width: CW - 1.6, height: CH - 1.2, rx: 1,
+          fill: v == null ? 'rgba(31,37,48,.05)'
+              : (mi === OURS ? 'rgba(15,110,86,' + (0.13 + frac * 0.82) + ')'
+                             : 'rgba(31,37,48,' + (0.06 + frac * 0.5) + ')')
+        }));
+      });
+    });
+
+    var gy = Y0 + leaves.length * CH + 22;
+    var ours = 0, tot = 0;
+    leaves.forEach(function (lf) {
+      if (lf.f1[OURS] != null && lf.f1[BEST] != null) {
+        tot++;
+        if (lf.f1[OURS] > lf.f1[BEST]) ours++;
+      }
+    });
+    K.callout(s, 0, gy, 640,
+      'Shieldstral leads on ' + ours + ' of ' + tot + ' leaf categories against the 20B model, '
+      + 'and trails on the rest. The column is darker where a model scores higher.',
+      { color: G, tint: T.teal, cols: 74 });
+    K.foot(s, 'Adaptability benchmark, per category. This is the test set, not the taxonomy validation set used for the ablations.');
   };
 
   /* 32 the language holes */
