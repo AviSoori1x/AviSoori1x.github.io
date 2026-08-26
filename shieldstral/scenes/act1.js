@@ -7,6 +7,7 @@ window.SCENES = window.SCENES || {};
   /* ---- 01 frozen list versus an open slot ---- */
   window.SCENES.S_FROZEN = function (root, api) {
     var s = K.board(root, { alt: 'A fixed taxonomy guardrail beside a policy adaptive one.' });
+    K.head(s, 'Most guardrails already decided', 'one of these two can hear you, the other cannot');
     var SSd = api.SS;
     var cats = ['violence', 'hate', 'sexual', 'self-harm', 'weapons', 'crime',
                 'privacy', 'drugs', 'jailbreak', 'csam'];
@@ -64,6 +65,7 @@ window.SCENES = window.SCENES || {};
   /* ---- 02 four label shapes into one row ---- */
   window.SCENES.S_QA = function (root, api) {
     var s = K.board(root, { alt: 'Four incompatible datasets folded into one row shape.' });
+    K.head(s, 'Four label schemes, one row', 'the reformulation that lets them merge at all');
     var inv = (api.SS.benchInventory || []).slice(0, 4);
     K.label(s, 0, 14, 'four sources, four label schemes');
 
@@ -92,6 +94,7 @@ window.SCENES = window.SCENES || {};
   /* ---- 03 the three fields ---- */
   window.SCENES.S_REQUEST = function (root, api) {
     var s = K.board(root, { alt: 'Anatomy of one request.' });
+    K.head(s, 'Three fields, three jobs', 'change the strictness and watch which words move');
     var SSd = api.SS;
     var tiers = SSd.strictness || [];
     var fmts = SSd.formats || [];
@@ -140,6 +143,7 @@ window.SCENES = window.SCENES || {};
   /* ---- 04 two logits ---- */
   window.SCENES.S_HEAD = function (root, api) {
     var s = K.board(root, { alt: 'Two logits softmaxed into one score.' });
+    K.head(s, 'Two logits, one score', 'the entire output head of the model');
     var st = { yes: 3.4, no: -2.1 };
 
     K.label(s, 0, 14, 'unembed to two token ids only');
@@ -210,6 +214,7 @@ window.SCENES = window.SCENES || {};
   /* ---- 05 same text, different question ---- */
   window.SCENES.S_ISOCONTENT = function (root, api) {
     var s = K.board(root, { alt: 'One document, two questions, the verdict flips.' });
+    K.head(s, 'Same text. Different question.', 'iso-content: hold the document, vary the query');
     var f3 = api.SS.fig3 || {};
     var qs = [f3.positive || {}, f3.negative || {}];
 
@@ -239,6 +244,7 @@ window.SCENES = window.SCENES || {};
   /* ---- 06 same question, different text ---- */
   window.SCENES.S_ISOQUERY = function (root, api) {
     var s = K.board(root, { alt: 'One question, two documents, the verdict flips.' });
+    K.head(s, 'Same question. Different text.', 'iso-query: hold the query, vary the document');
     var f4 = api.SS.fig4 || {};
     var docs = [f4.positive || {}, f4.negative || {}];
 
@@ -272,6 +278,7 @@ window.SCENES = window.SCENES || {};
   /* ---- 07 heterogeneous taxonomies ---- */
   window.SCENES.S_UNIFY = function (root, api) {
     var s = K.board(root, { alt: 'Incompatible label schemes converging on one question.' });
+    K.head(s, 'Datasets that disagree', 'binary flags, taxonomies and severity scales, side by side');
     K.label(s, 0, 14, 'three incompatible label schemes');
 
     /* binary flag */

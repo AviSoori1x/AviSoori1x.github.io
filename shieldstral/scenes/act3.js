@@ -13,6 +13,7 @@ window.SCENES = window.SCENES || {};
   /* 22 the base model */
   window.SCENES.S_BASE = function (root, api) {
     var s = K.board(root, { alt: 'One checkpoint accepting three input shapes.' });
+    K.head(s, 'One checkpoint, three input shapes', 'the vision encoder is native, not bolted on');
     K.label(s, 0, 14, 'ministral-3-3b-base-2512, pixtral vision encoder');
     var inputs = [['text only', 'a user prompt'], ['image only', 'one picture'],
                   ['image plus text', 'a picture and a caption']];
@@ -38,6 +39,7 @@ window.SCENES = window.SCENES || {};
   /* 23 LoRA against full SFT */
   window.SCENES.S_LORA = function (root, api) {
     var s = K.board(root, { alt: 'LoRA against full SFT on two validation sets.' });
+    K.head(s, 'LoRA, or full SFT', 'close enough that efficiency decided it');
     var L = api.SS.loraVsSft || {}, cols = L.cols || [];
     var sets = [['Aegis v2 validation', L.aegis || []],
                 ['fine-grained taxonomy validation', L.taxonomy || []]];
@@ -67,6 +69,7 @@ window.SCENES = window.SCENES || {};
   /* 24 two checkpoints pulling apart */
   window.SCENES.S_TWOCKPT = function (root, api) {
     var s = K.board(root, { alt: 'P and PG are strong on opposite validation sets.' });
+    K.head(s, 'Two checkpoints, pulling apart', 'each one strong exactly where the other is weak');
     var rows = (api.SS.merge || {}).rows || [];
     var pairs = [
       ['Aegis v2 validation', f1of(rows, 'P', 'aegis'), f1of(rows, 'PG', 'aegis')],
@@ -102,6 +105,7 @@ window.SCENES = window.SCENES || {};
   /* 25 the five measured recipes */
   window.SCENES.S_MERGE = function (root, api) {
     var s = K.board(root, { alt: 'Five measured merge recipes on two validation axes.' });
+    K.head(s, 'Five recipes, and only five', 'spherical interpolation between the two checkpoints');
     var M = api.SS.merge || {}, rows = M.rows || [], cols = M.cols || [];
     var FINAL = '0.6PG+0.3P+0.1I';
     var xs = rows.map(function (r) { return r.aegis[3]; });
@@ -162,6 +166,7 @@ window.SCENES = window.SCENES || {};
   /* 26 what each stage buys */
   window.SCENES.S_STAGES = function (root, api) {
     var s = K.board(root, { alt: 'What each training stage adds.' });
+    K.head(s, 'What each stage actually buys', 'fine-grained taxonomy validation set');
     var A = api.SS.stageAblation || {}, cols = A.cols || [], rws = A.rows || [];
     var mrow = ((api.SS.merge || {}).rows || []).filter(function (r) {
       return r.name === '0.6PG+0.3P+0.1I'; })[0];

@@ -951,11 +951,68 @@ window.SS = {"evalTaxonomy":[{"id":"SC1","name":"Physical Harm","subs":[{"name":
     return { g: g, btns: btns, pick: function (i) { btns[i].dispatchEvent(new Event('click')); } };
   }
 
+
+  /* ---------- figure furniture, the thing that was missing ----------
+     The reference gives every art panel its own headline, a mono subtitle and a
+     tinted payoff box. Ours were bare diagrams with a small label, which is why
+     they read as sparse. These draw ABOVE y=0 so existing layouts do not shift. */
+
+  function head(p, title, sub) {
+    var t1 = n('text', {
+      x: 0, y: -46, 'font-family': "'Sora',system-ui,sans-serif",
+      'font-size': 27, 'font-weight': 700, 'letter-spacing': '-.022em', fill: C.ink
+    });
+    t1.textContent = title;
+    p.appendChild(t1);
+    if (sub) {
+      var t2 = n('text', {
+        x: 0, y: -22, 'font-family': "'JetBrains Mono',monospace",
+        'font-size': 13, fill: C.ink3
+      });
+      t2.textContent = sub;
+      p.appendChild(t2);
+    }
+  }
+
+  /** the tinted box that carries a figure's punchline */
+  function callout(p, x, y, w, s, o) {
+    o = o || {};
+    var col = o.color || C.amber, tint = o.tint || TINT.amber;
+    var lines = wrap(s, o.cols || 62), lh = 19;
+    var h = lines.length * lh + 22;
+    p.appendChild(n('rect', { x: x, y: y, width: w, height: h, rx: 9,
+      fill: tint, stroke: col, 'stroke-opacity': .45 }));
+    lines.forEach(function (ln, i) {
+      var tn = n('text', {
+        x: x + 16, y: y + 22 + i * lh, 'font-family': "'JetBrains Mono',monospace",
+        'font-size': o.size || 13.5, fill: col, 'font-weight': 500
+      });
+      tn.textContent = ln;
+      p.appendChild(tn);
+    });
+    return h;
+  }
+
+  /** one sans sentence of narration under the headline */
+  function lede(p, y, s, cols) {
+    var lines = wrap(s, cols || 74), lh = 21;
+    lines.forEach(function (ln, i) {
+      var tn = n('text', {
+        x: 0, y: y + i * lh, 'font-family': "'IBM Plex Sans',system-ui,sans-serif",
+        'font-size': 14.5, fill: C.ink2
+      });
+      tn.textContent = ln;
+      p.appendChild(tn);
+    });
+    return lines.length * lh;
+  }
+
   window.KIT = {
     W: W, H: H, C: C, TINT: TINT, n: n,
     board: board, panel: panel, label: label, mono: mono, text: text, big: big,
     chip: chip, bar: bar, arrow: arrow, code: code, verdict: verdict,
-    wrap: wrap, para: para, foot: foot, switcher: switcher
+    wrap: wrap, para: para, foot: foot, switcher: switcher,
+    head: head, callout: callout, lede: lede
   };
 })();
 
@@ -970,6 +1027,7 @@ window.SCENES = window.SCENES || {};
   /* ---- 01 frozen list versus an open slot ---- */
   window.SCENES.S_FROZEN = function (root, api) {
     var s = K.board(root, { alt: 'A fixed taxonomy guardrail beside a policy adaptive one.' });
+    K.head(s, 'Most guardrails already decided', 'one of these two can hear you, the other cannot');
     var SSd = api.SS;
     var cats = ['violence', 'hate', 'sexual', 'self-harm', 'weapons', 'crime',
                 'privacy', 'drugs', 'jailbreak', 'csam'];
@@ -1027,6 +1085,7 @@ window.SCENES = window.SCENES || {};
   /* ---- 02 four label shapes into one row ---- */
   window.SCENES.S_QA = function (root, api) {
     var s = K.board(root, { alt: 'Four incompatible datasets folded into one row shape.' });
+    K.head(s, 'Four label schemes, one row', 'the reformulation that lets them merge at all');
     var inv = (api.SS.benchInventory || []).slice(0, 4);
     K.label(s, 0, 14, 'four sources, four label schemes');
 
@@ -1055,6 +1114,7 @@ window.SCENES = window.SCENES || {};
   /* ---- 03 the three fields ---- */
   window.SCENES.S_REQUEST = function (root, api) {
     var s = K.board(root, { alt: 'Anatomy of one request.' });
+    K.head(s, 'Three fields, three jobs', 'change the strictness and watch which words move');
     var SSd = api.SS;
     var tiers = SSd.strictness || [];
     var fmts = SSd.formats || [];
@@ -1103,6 +1163,7 @@ window.SCENES = window.SCENES || {};
   /* ---- 04 two logits ---- */
   window.SCENES.S_HEAD = function (root, api) {
     var s = K.board(root, { alt: 'Two logits softmaxed into one score.' });
+    K.head(s, 'Two logits, one score', 'the entire output head of the model');
     var st = { yes: 3.4, no: -2.1 };
 
     K.label(s, 0, 14, 'unembed to two token ids only');
@@ -1173,6 +1234,7 @@ window.SCENES = window.SCENES || {};
   /* ---- 05 same text, different question ---- */
   window.SCENES.S_ISOCONTENT = function (root, api) {
     var s = K.board(root, { alt: 'One document, two questions, the verdict flips.' });
+    K.head(s, 'Same text. Different question.', 'iso-content: hold the document, vary the query');
     var f3 = api.SS.fig3 || {};
     var qs = [f3.positive || {}, f3.negative || {}];
 
@@ -1202,6 +1264,7 @@ window.SCENES = window.SCENES || {};
   /* ---- 06 same question, different text ---- */
   window.SCENES.S_ISOQUERY = function (root, api) {
     var s = K.board(root, { alt: 'One question, two documents, the verdict flips.' });
+    K.head(s, 'Same question. Different text.', 'iso-query: hold the query, vary the document');
     var f4 = api.SS.fig4 || {};
     var docs = [f4.positive || {}, f4.negative || {}];
 
@@ -1235,6 +1298,7 @@ window.SCENES = window.SCENES || {};
   /* ---- 07 heterogeneous taxonomies ---- */
   window.SCENES.S_UNIFY = function (root, api) {
     var s = K.board(root, { alt: 'Incompatible label schemes converging on one question.' });
+    K.head(s, 'Datasets that disagree', 'binary flags, taxonomies and severity scales, side by side');
     K.label(s, 0, 14, 'three incompatible label schemes');
 
     /* binary flag */
@@ -1285,6 +1349,7 @@ window.SCENES = window.SCENES || {};
   /* 08 the training mix */
   window.SCENES.S_MOUNTAIN = function (root, api) {
     var s = K.board(root, { alt: 'The training mix at true proportion.' });
+    K.head(s, 'Fifty-four million rows', 'one mark per hundred thousand training samples');
     var h = api.SS.headline, PER = 0.1;
     var parts = [
       { n: h.openSourceText, lab: 'public datasets, text', col: A },
@@ -1317,6 +1382,7 @@ window.SCENES = window.SCENES || {};
   /* 09 one processor per dataset */
   window.SCENES.S_PROCESSOR = function (root, api) {
     var s = K.board(root, { alt: 'Each dataset gets its own hand written processor.' });
+    K.head(s, 'One processor per dataset', 'hand written, from that dataset own documentation');
     var inv = (api.SS.benchInventory || []).slice(0, 5);
     K.label(s, 0, 14, 'each source, its own processor');
     inv.forEach(function (r, i) {
@@ -1343,6 +1409,7 @@ window.SCENES = window.SCENES || {};
   /* 10 strictness tiers */
   window.SCENES.S_STRICT = function (root, api) {
     var s = K.board(root, { alt: 'Three strictness tiers move the decision boundary.' });
+    K.head(s, 'Strictness moves the line', 'the same content, three intended decision boundaries');
     var tiers = api.SS.strictness || [];
     K.label(s, 0, 14, 'strictness tier, assigned per dataset');
     var body = K.n('g', {}); s.appendChild(body);
@@ -1373,6 +1440,7 @@ window.SCENES = window.SCENES || {};
   /* 11 three query shapes */
   window.SCENES.S_QTYPES = function (root, api) {
     var s = K.board(root, { alt: 'Three kinds of question about the same document.' });
+    K.head(s, 'Three shapes of question', 'category specific, binary, and refusal detection');
     var qs = api.SS.queryTypes || [];
     var doc = ((api.SS.fig2 || [])[0] || {}).document || '';
     K.label(s, 0, 14, 'one document');
@@ -1394,6 +1462,7 @@ window.SCENES = window.SCENES || {};
   /* 12 seven document formats */
   window.SCENES.S_FORMATS = function (root, api) {
     var s = K.board(root, { alt: 'The same exchange in seven delimiter conventions.' });
+    K.head(s, 'Seven ways to write a conversation', 'every one of them a convention some real system uses');
     var f = api.SS.formats || [];
     var ex = (api.SS.fig2 || [])[0] || {};
     var m = String(ex.document || '').match(/\[User\]\s*([\s\S]*?)\s*\[Assistant\]\s*([\s\S]*)$/);
@@ -1417,6 +1486,7 @@ window.SCENES = window.SCENES || {};
   /* 13 the pools multiply */
   window.SCENES.S_COMBO = function (root, api) {
     var s = K.board(root, { alt: 'The pools a single row can be drawn from.' });
+    K.head(s, 'One row, many views', 'the model never sees the same wording twice');
     var SSd = api.SS;
     var nS = (SSd.strictness || []).length, nF = (SSd.formats || []).length,
         nQ = (SSd.queryTypes || []).length;
@@ -1439,6 +1509,7 @@ window.SCENES = window.SCENES || {};
   /* 14 positives at three granularities */
   window.SCENES.S_POS = function (root, api) {
     var s = K.board(root, { alt: 'One harmful document answers yes to three questions.' });
+    K.head(s, 'Ask it three ways, get three yeses', 'one violation, at three levels of specificity');
     var f3 = api.SS.fig3 || {};
     K.label(s, 0, 14, 'one harmful document');
     K.panel(s, 0, 24, 640, 72, { fill: T.ink });
@@ -1462,6 +1533,7 @@ window.SCENES = window.SCENES || {};
   /* 15 three negative strategies */
   window.SCENES.S_NEG = function (root, api) {
     var s = K.board(root, { alt: 'Three ways to build a negative.' });
+    K.head(s, 'Unsafe, and the answer is still no', 'the discrimination a general harm detector fails');
     var f3 = api.SS.fig3 || {};
     var STRAT = [
       ['category based', f3.document, f3.negative ? f3.negative.query : '',
@@ -1493,6 +1565,7 @@ window.SCENES = window.SCENES || {};
   /* 16 rebalance and filter */
   window.SCENES.S_FILTER = function (root, api) {
     var s = K.board(root, { alt: 'Positives duplicated, disagreeing labels dropped.' });
+    K.head(s, 'Rebalance, then throw away the wrong labels', 'public safety datasets contain incorrect labels');
     K.label(s, 0, 14, 'contrastive construction skews negative');
     var y = 36;
     for (var i = 0; i < 12; i++) {
@@ -1530,6 +1603,7 @@ window.SCENES = window.SCENES || {};
   /* 17 one call, two rows */
   window.SCENES.S_REWRITE = function (root, api) {
     var s = K.board(root, { alt: 'One LLM call produces two contradictory training rows.' });
+    K.head(s, 'One call in, two rows out', 'and they disagree on purpose');
     var f3 = api.SS.fig3 || {};
     K.label(s, 0, 14, 'into one llm call');
     ['safe source text', 'target category', 'sibling category'].forEach(function (t, i) {
@@ -1557,6 +1631,7 @@ window.SCENES = window.SCENES || {};
   /* 18 free positives up the tree */
   window.SCENES.S_ANCESTOR = function (root, api) {
     var s = K.board(root, { alt: 'A leaf violation counts at every level above it.' });
+    K.head(s, 'Free positives, all the way up', 'a leaf violation is a violation at every level above it');
     var h = api.SS.headline;
     var sc = (api.SS.evalTaxonomy || [])[0] || {};
     var sub = (sc.subs || [])[0] || {};
@@ -1588,6 +1663,7 @@ window.SCENES = window.SCENES || {};
   /* 19 images cannot be rewritten */
   window.SCENES.S_IMGSCARCE = function (root, api) {
     var s = K.board(root, { alt: 'The text trick does not transfer to images.' });
+    K.head(s, 'You cannot rewrite an image', 'so the negatives get borrowed instead');
     K.label(s, 0, 14, 'text');
     K.panel(s, 0, 26, 280, 58, { fill: T.ink });
     K.mono(s, 16, 60, 'safe sentence', { size: 13, color: C.ink });
@@ -1619,6 +1695,7 @@ window.SCENES = window.SCENES || {};
   /* 20 mutate the query */
   window.SCENES.S_IMGQUERY = function (root, api) {
     var s = K.board(root, { alt: 'Query mutation, including inverse phrasings.' });
+    K.head(s, 'Move the question, not the picture', 'including the inverse phrasing of every category');
     var h = api.SS.headline;
     K.big(s, 0, 60, h.imageQueryPhrasings, { size: 62, color: A });
     K.text(s, 0, 88, 'query phrasings, from a fixed ' + h.imageSubcats + ' subcategory visual taxonomy',
@@ -1647,6 +1724,7 @@ window.SCENES = window.SCENES || {};
   /* 21 asymmetric cut */
   window.SCENES.S_RERANK = function (root, api) {
     var s = K.board(root, { alt: 'Two different reranker thresholds for two pools.' });
+    K.head(s, 'Two pools, two different bars', 'drag the cuts, or snap them together and watch the cost');
     var body = K.n('g', {}); s.appendChild(body);
     var VIOL = [], NEG = [], i;
     for (i = 0; i < 26; i++) VIOL.push(0.18 + (i * 0.37) % 0.72);
@@ -1698,6 +1776,7 @@ window.SCENES = window.SCENES || {};
   /* 22 the base model */
   window.SCENES.S_BASE = function (root, api) {
     var s = K.board(root, { alt: 'One checkpoint accepting three input shapes.' });
+    K.head(s, 'One checkpoint, three input shapes', 'the vision encoder is native, not bolted on');
     K.label(s, 0, 14, 'ministral-3-3b-base-2512, pixtral vision encoder');
     var inputs = [['text only', 'a user prompt'], ['image only', 'one picture'],
                   ['image plus text', 'a picture and a caption']];
@@ -1723,6 +1802,7 @@ window.SCENES = window.SCENES || {};
   /* 23 LoRA against full SFT */
   window.SCENES.S_LORA = function (root, api) {
     var s = K.board(root, { alt: 'LoRA against full SFT on two validation sets.' });
+    K.head(s, 'LoRA, or full SFT', 'close enough that efficiency decided it');
     var L = api.SS.loraVsSft || {}, cols = L.cols || [];
     var sets = [['Aegis v2 validation', L.aegis || []],
                 ['fine-grained taxonomy validation', L.taxonomy || []]];
@@ -1752,6 +1832,7 @@ window.SCENES = window.SCENES || {};
   /* 24 two checkpoints pulling apart */
   window.SCENES.S_TWOCKPT = function (root, api) {
     var s = K.board(root, { alt: 'P and PG are strong on opposite validation sets.' });
+    K.head(s, 'Two checkpoints, pulling apart', 'each one strong exactly where the other is weak');
     var rows = (api.SS.merge || {}).rows || [];
     var pairs = [
       ['Aegis v2 validation', f1of(rows, 'P', 'aegis'), f1of(rows, 'PG', 'aegis')],
@@ -1787,6 +1868,7 @@ window.SCENES = window.SCENES || {};
   /* 25 the five measured recipes */
   window.SCENES.S_MERGE = function (root, api) {
     var s = K.board(root, { alt: 'Five measured merge recipes on two validation axes.' });
+    K.head(s, 'Five recipes, and only five', 'spherical interpolation between the two checkpoints');
     var M = api.SS.merge || {}, rows = M.rows || [], cols = M.cols || [];
     var FINAL = '0.6PG+0.3P+0.1I';
     var xs = rows.map(function (r) { return r.aegis[3]; });
@@ -1847,6 +1929,7 @@ window.SCENES = window.SCENES || {};
   /* 26 what each stage buys */
   window.SCENES.S_STAGES = function (root, api) {
     var s = K.board(root, { alt: 'What each training stage adds.' });
+    K.head(s, 'What each stage actually buys', 'fine-grained taxonomy validation set');
     var A = api.SS.stageAblation || {}, cols = A.cols || [], rws = A.rows || [];
     var mrow = ((api.SS.merge || {}).rows || []).filter(function (r) {
       return r.name === '0.6PG+0.3P+0.1I'; })[0];
@@ -1923,6 +2006,7 @@ window.SCENES = window.SCENES || {};
   /* 27 two taxonomies built to differ */
   window.SCENES.S_EVALTAX = function (root, api) {
     var s = K.board(root, { alt: 'Training and evaluation taxonomies differ by design.' });
+    K.head(s, 'An evaluation built not to match', 'different names, different granularity, different groupings');
     var div = api.SS.divergence || [], h = api.SS.headline;
     K.label(s, 0, 14, 'two trees, built not to match');
     [['training', h.trainSupers + ' super classes, ' + h.trainLeaves + ' leaves', 'variable subcategory sizes', C.ink3],
@@ -1954,6 +2038,7 @@ window.SCENES = window.SCENES || {};
   /* 28 how one eval sample is made */
   window.SCENES.S_EVALGEN = function (root, api) {
     var s = K.board(root, { alt: 'Iso-query evaluation pairs, then cross verification.' });
+    K.head(s, 'Both unsafe. One answer.', 'how a single evaluation sample gets made');
     var f4 = api.SS.fig4 || {}, h = api.SS.headline;
     K.label(s, 0, 14, 'one fixed question per category, ' + h.evalQueries + ' in total');
     K.panel(s, 0, 26, 640, 54, { fill: T.teal, stroke: G });
@@ -1978,6 +2063,7 @@ window.SCENES = window.SCENES || {};
   /* 29 text benchmarks */
   window.SCENES.S_TEXT = function (root, api) {
     var s = K.board(root, { alt: 'Text safety benchmarks against the baselines.' });
+    K.head(s, 'Level with a model seven times its size', 'text safety benchmarks, and the rows it loses');
     var B = api.SS.benchmarks || {}, h = api.SS.headline;
     var tabs = [['prompt', B.promptClassification], ['response', B.responseClassification]];
     K.big(s, 0, 54, h.textF1 + '', { size: 58, color: G });
@@ -1997,6 +2083,7 @@ window.SCENES = window.SCENES || {};
   /* 30 multimodal */
   window.SCENES.S_MM = function (root, api) {
     var s = K.board(root, { alt: 'Multimodal benchmarks, including the one it loses.' });
+    K.head(s, 'The strongest result is on images', 'three multimodal benchmarks, one of them a loss');
     var h = api.SS.headline, t = (api.SS.benchmarks || {}).multimodal;
     K.big(s, 0, 54, h.multimodalF1 + '', { size: 58, color: G });
     K.text(s, 108, 46, 'mean F1 across the three image benchmarks,', { size: 14.5, color: C.ink2 });
@@ -2012,6 +2099,7 @@ window.SCENES = window.SCENES || {};
   /* 31 adaptability, where it comes second */
   window.SCENES.S_ADAPT = function (root, api) {
     var s = K.board(root, { alt: 'Second place on the adaptability benchmark.' });
+    K.head(s, 'Second, and the report says why', 'adaptability benchmark, reasoning trace against one token');
     var h = api.SS.headline;
     K.label(s, 0, 14, 'adaptability benchmark');
     [['GPT-OSS-Safeguard-20B', h.adaptabilityBest, C.ink, '20B', 'writes a reasoning trace first'],
@@ -2036,6 +2124,7 @@ window.SCENES = window.SCENES || {};
   /* 32 the language holes */
   window.SCENES.S_LANG = function (root, api) {
     var s = K.board(root, { alt: 'Shieldstral prompt and response scores by language.' });
+    K.head(s, 'The holes are in the low-resource languages', 'prompt classification against response classification');
     var M = api.SS.multilingual || {}, models = M.models || [], sc = M.scores || {};
     var ours = models.indexOf('Shieldstral-3B');
     var codes = Object.keys(sc.prompt || {});
@@ -2069,6 +2158,7 @@ window.SCENES = window.SCENES || {};
   /* 33 running it */
   window.SCENES.S_RUN = function (root, api) {
     var s = K.board(root, { alt: 'The scoring helper and the serve command.' });
+    K.head(s, 'Twelve lines to a verdict', 'the endpoint hands back logprobs, not a score');
     var sp = api.SS.systemPrompt || '';
     K.label(s, 0, 14, 'serve it');
     K.code(s, 0, 24, 640, [
@@ -2100,6 +2190,7 @@ window.SCENES = window.SCENES || {};
   /* 34 limits */
   window.SCENES.S_LIMITS = function (root, api) {
     var s = K.board(root, { alt: 'What the model will not do for you.' });
+    K.head(s, 'What it will not do for you', 'straight from the model card, unsoftened');
     var lim = (api.SS.limitations || []).slice();
     lim.push({ t: 'No rationale to inspect',
       d: 'A single token verdict arrives with nothing attached, so understanding a flag means going back to the content and the policy yourself.' });

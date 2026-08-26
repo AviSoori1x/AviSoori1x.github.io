@@ -7,6 +7,7 @@ window.SCENES = window.SCENES || {};
   /* 08 the training mix */
   window.SCENES.S_MOUNTAIN = function (root, api) {
     var s = K.board(root, { alt: 'The training mix at true proportion.' });
+    K.head(s, 'Fifty-four million rows', 'one mark per hundred thousand training samples');
     var h = api.SS.headline, PER = 0.1;
     var parts = [
       { n: h.openSourceText, lab: 'public datasets, text', col: A },
@@ -39,6 +40,7 @@ window.SCENES = window.SCENES || {};
   /* 09 one processor per dataset */
   window.SCENES.S_PROCESSOR = function (root, api) {
     var s = K.board(root, { alt: 'Each dataset gets its own hand written processor.' });
+    K.head(s, 'One processor per dataset', 'hand written, from that dataset own documentation');
     var inv = (api.SS.benchInventory || []).slice(0, 5);
     K.label(s, 0, 14, 'each source, its own processor');
     inv.forEach(function (r, i) {
@@ -65,6 +67,7 @@ window.SCENES = window.SCENES || {};
   /* 10 strictness tiers */
   window.SCENES.S_STRICT = function (root, api) {
     var s = K.board(root, { alt: 'Three strictness tiers move the decision boundary.' });
+    K.head(s, 'Strictness moves the line', 'the same content, three intended decision boundaries');
     var tiers = api.SS.strictness || [];
     K.label(s, 0, 14, 'strictness tier, assigned per dataset');
     var body = K.n('g', {}); s.appendChild(body);
@@ -95,6 +98,7 @@ window.SCENES = window.SCENES || {};
   /* 11 three query shapes */
   window.SCENES.S_QTYPES = function (root, api) {
     var s = K.board(root, { alt: 'Three kinds of question about the same document.' });
+    K.head(s, 'Three shapes of question', 'category specific, binary, and refusal detection');
     var qs = api.SS.queryTypes || [];
     var doc = ((api.SS.fig2 || [])[0] || {}).document || '';
     K.label(s, 0, 14, 'one document');
@@ -116,6 +120,7 @@ window.SCENES = window.SCENES || {};
   /* 12 seven document formats */
   window.SCENES.S_FORMATS = function (root, api) {
     var s = K.board(root, { alt: 'The same exchange in seven delimiter conventions.' });
+    K.head(s, 'Seven ways to write a conversation', 'every one of them a convention some real system uses');
     var f = api.SS.formats || [];
     var ex = (api.SS.fig2 || [])[0] || {};
     var m = String(ex.document || '').match(/\[User\]\s*([\s\S]*?)\s*\[Assistant\]\s*([\s\S]*)$/);
@@ -139,6 +144,7 @@ window.SCENES = window.SCENES || {};
   /* 13 the pools multiply */
   window.SCENES.S_COMBO = function (root, api) {
     var s = K.board(root, { alt: 'The pools a single row can be drawn from.' });
+    K.head(s, 'One row, many views', 'the model never sees the same wording twice');
     var SSd = api.SS;
     var nS = (SSd.strictness || []).length, nF = (SSd.formats || []).length,
         nQ = (SSd.queryTypes || []).length;
@@ -161,6 +167,7 @@ window.SCENES = window.SCENES || {};
   /* 14 positives at three granularities */
   window.SCENES.S_POS = function (root, api) {
     var s = K.board(root, { alt: 'One harmful document answers yes to three questions.' });
+    K.head(s, 'Ask it three ways, get three yeses', 'one violation, at three levels of specificity');
     var f3 = api.SS.fig3 || {};
     K.label(s, 0, 14, 'one harmful document');
     K.panel(s, 0, 24, 640, 72, { fill: T.ink });
@@ -184,6 +191,7 @@ window.SCENES = window.SCENES || {};
   /* 15 three negative strategies */
   window.SCENES.S_NEG = function (root, api) {
     var s = K.board(root, { alt: 'Three ways to build a negative.' });
+    K.head(s, 'Unsafe, and the answer is still no', 'the discrimination a general harm detector fails');
     var f3 = api.SS.fig3 || {};
     var STRAT = [
       ['category based', f3.document, f3.negative ? f3.negative.query : '',
@@ -215,6 +223,7 @@ window.SCENES = window.SCENES || {};
   /* 16 rebalance and filter */
   window.SCENES.S_FILTER = function (root, api) {
     var s = K.board(root, { alt: 'Positives duplicated, disagreeing labels dropped.' });
+    K.head(s, 'Rebalance, then throw away the wrong labels', 'public safety datasets contain incorrect labels');
     K.label(s, 0, 14, 'contrastive construction skews negative');
     var y = 36;
     for (var i = 0; i < 12; i++) {
@@ -252,6 +261,7 @@ window.SCENES = window.SCENES || {};
   /* 17 one call, two rows */
   window.SCENES.S_REWRITE = function (root, api) {
     var s = K.board(root, { alt: 'One LLM call produces two contradictory training rows.' });
+    K.head(s, 'One call in, two rows out', 'and they disagree on purpose');
     var f3 = api.SS.fig3 || {};
     K.label(s, 0, 14, 'into one llm call');
     ['safe source text', 'target category', 'sibling category'].forEach(function (t, i) {
@@ -279,6 +289,7 @@ window.SCENES = window.SCENES || {};
   /* 18 free positives up the tree */
   window.SCENES.S_ANCESTOR = function (root, api) {
     var s = K.board(root, { alt: 'A leaf violation counts at every level above it.' });
+    K.head(s, 'Free positives, all the way up', 'a leaf violation is a violation at every level above it');
     var h = api.SS.headline;
     var sc = (api.SS.evalTaxonomy || [])[0] || {};
     var sub = (sc.subs || [])[0] || {};
@@ -310,6 +321,7 @@ window.SCENES = window.SCENES || {};
   /* 19 images cannot be rewritten */
   window.SCENES.S_IMGSCARCE = function (root, api) {
     var s = K.board(root, { alt: 'The text trick does not transfer to images.' });
+    K.head(s, 'You cannot rewrite an image', 'so the negatives get borrowed instead');
     K.label(s, 0, 14, 'text');
     K.panel(s, 0, 26, 280, 58, { fill: T.ink });
     K.mono(s, 16, 60, 'safe sentence', { size: 13, color: C.ink });
@@ -341,6 +353,7 @@ window.SCENES = window.SCENES || {};
   /* 20 mutate the query */
   window.SCENES.S_IMGQUERY = function (root, api) {
     var s = K.board(root, { alt: 'Query mutation, including inverse phrasings.' });
+    K.head(s, 'Move the question, not the picture', 'including the inverse phrasing of every category');
     var h = api.SS.headline;
     K.big(s, 0, 60, h.imageQueryPhrasings, { size: 62, color: A });
     K.text(s, 0, 88, 'query phrasings, from a fixed ' + h.imageSubcats + ' subcategory visual taxonomy',
@@ -369,6 +382,7 @@ window.SCENES = window.SCENES || {};
   /* 21 asymmetric cut */
   window.SCENES.S_RERANK = function (root, api) {
     var s = K.board(root, { alt: 'Two different reranker thresholds for two pools.' });
+    K.head(s, 'Two pools, two different bars', 'drag the cuts, or snap them together and watch the cost');
     var body = K.n('g', {}); s.appendChild(body);
     var VIOL = [], NEG = [], i;
     for (i = 0; i < 26; i++) VIOL.push(0.18 + (i * 0.37) % 0.72);

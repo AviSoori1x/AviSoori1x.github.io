@@ -37,6 +37,7 @@ window.SCENES = window.SCENES || {};
   /* 27 two taxonomies built to differ */
   window.SCENES.S_EVALTAX = function (root, api) {
     var s = K.board(root, { alt: 'Training and evaluation taxonomies differ by design.' });
+    K.head(s, 'An evaluation built not to match', 'different names, different granularity, different groupings');
     var div = api.SS.divergence || [], h = api.SS.headline;
     K.label(s, 0, 14, 'two trees, built not to match');
     [['training', h.trainSupers + ' super classes, ' + h.trainLeaves + ' leaves', 'variable subcategory sizes', C.ink3],
@@ -68,6 +69,7 @@ window.SCENES = window.SCENES || {};
   /* 28 how one eval sample is made */
   window.SCENES.S_EVALGEN = function (root, api) {
     var s = K.board(root, { alt: 'Iso-query evaluation pairs, then cross verification.' });
+    K.head(s, 'Both unsafe. One answer.', 'how a single evaluation sample gets made');
     var f4 = api.SS.fig4 || {}, h = api.SS.headline;
     K.label(s, 0, 14, 'one fixed question per category, ' + h.evalQueries + ' in total');
     K.panel(s, 0, 26, 640, 54, { fill: T.teal, stroke: G });
@@ -92,6 +94,7 @@ window.SCENES = window.SCENES || {};
   /* 29 text benchmarks */
   window.SCENES.S_TEXT = function (root, api) {
     var s = K.board(root, { alt: 'Text safety benchmarks against the baselines.' });
+    K.head(s, 'Level with a model seven times its size', 'text safety benchmarks, and the rows it loses');
     var B = api.SS.benchmarks || {}, h = api.SS.headline;
     var tabs = [['prompt', B.promptClassification], ['response', B.responseClassification]];
     K.big(s, 0, 54, h.textF1 + '', { size: 58, color: G });
@@ -111,6 +114,7 @@ window.SCENES = window.SCENES || {};
   /* 30 multimodal */
   window.SCENES.S_MM = function (root, api) {
     var s = K.board(root, { alt: 'Multimodal benchmarks, including the one it loses.' });
+    K.head(s, 'The strongest result is on images', 'three multimodal benchmarks, one of them a loss');
     var h = api.SS.headline, t = (api.SS.benchmarks || {}).multimodal;
     K.big(s, 0, 54, h.multimodalF1 + '', { size: 58, color: G });
     K.text(s, 108, 46, 'mean F1 across the three image benchmarks,', { size: 14.5, color: C.ink2 });
@@ -126,6 +130,7 @@ window.SCENES = window.SCENES || {};
   /* 31 adaptability, where it comes second */
   window.SCENES.S_ADAPT = function (root, api) {
     var s = K.board(root, { alt: 'Second place on the adaptability benchmark.' });
+    K.head(s, 'Second, and the report says why', 'adaptability benchmark, reasoning trace against one token');
     var h = api.SS.headline;
     K.label(s, 0, 14, 'adaptability benchmark');
     [['GPT-OSS-Safeguard-20B', h.adaptabilityBest, C.ink, '20B', 'writes a reasoning trace first'],
@@ -150,6 +155,7 @@ window.SCENES = window.SCENES || {};
   /* 32 the language holes */
   window.SCENES.S_LANG = function (root, api) {
     var s = K.board(root, { alt: 'Shieldstral prompt and response scores by language.' });
+    K.head(s, 'The holes are in the low-resource languages', 'prompt classification against response classification');
     var M = api.SS.multilingual || {}, models = M.models || [], sc = M.scores || {};
     var ours = models.indexOf('Shieldstral-3B');
     var codes = Object.keys(sc.prompt || {});
@@ -183,6 +189,7 @@ window.SCENES = window.SCENES || {};
   /* 33 running it */
   window.SCENES.S_RUN = function (root, api) {
     var s = K.board(root, { alt: 'The scoring helper and the serve command.' });
+    K.head(s, 'Twelve lines to a verdict', 'the endpoint hands back logprobs, not a score');
     var sp = api.SS.systemPrompt || '';
     K.label(s, 0, 14, 'serve it');
     K.code(s, 0, 24, 640, [
@@ -214,6 +221,7 @@ window.SCENES = window.SCENES || {};
   /* 34 limits */
   window.SCENES.S_LIMITS = function (root, api) {
     var s = K.board(root, { alt: 'What the model will not do for you.' });
+    K.head(s, 'What it will not do for you', 'straight from the model card, unsoftened');
     var lim = (api.SS.limitations || []).slice();
     lim.push({ t: 'No rationale to inspect',
       d: 'A single token verdict arrives with nothing attached, so understanding a flag means going back to the content and the policy yourself.' });

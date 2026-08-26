@@ -283,10 +283,67 @@
     return { g: g, btns: btns, pick: function (i) { btns[i].dispatchEvent(new Event('click')); } };
   }
 
+
+  /* ---------- figure furniture, the thing that was missing ----------
+     The reference gives every art panel its own headline, a mono subtitle and a
+     tinted payoff box. Ours were bare diagrams with a small label, which is why
+     they read as sparse. These draw ABOVE y=0 so existing layouts do not shift. */
+
+  function head(p, title, sub) {
+    var t1 = n('text', {
+      x: 0, y: -46, 'font-family': "'Sora',system-ui,sans-serif",
+      'font-size': 27, 'font-weight': 700, 'letter-spacing': '-.022em', fill: C.ink
+    });
+    t1.textContent = title;
+    p.appendChild(t1);
+    if (sub) {
+      var t2 = n('text', {
+        x: 0, y: -22, 'font-family': "'JetBrains Mono',monospace",
+        'font-size': 13, fill: C.ink3
+      });
+      t2.textContent = sub;
+      p.appendChild(t2);
+    }
+  }
+
+  /** the tinted box that carries a figure's punchline */
+  function callout(p, x, y, w, s, o) {
+    o = o || {};
+    var col = o.color || C.amber, tint = o.tint || TINT.amber;
+    var lines = wrap(s, o.cols || 62), lh = 19;
+    var h = lines.length * lh + 22;
+    p.appendChild(n('rect', { x: x, y: y, width: w, height: h, rx: 9,
+      fill: tint, stroke: col, 'stroke-opacity': .45 }));
+    lines.forEach(function (ln, i) {
+      var tn = n('text', {
+        x: x + 16, y: y + 22 + i * lh, 'font-family': "'JetBrains Mono',monospace",
+        'font-size': o.size || 13.5, fill: col, 'font-weight': 500
+      });
+      tn.textContent = ln;
+      p.appendChild(tn);
+    });
+    return h;
+  }
+
+  /** one sans sentence of narration under the headline */
+  function lede(p, y, s, cols) {
+    var lines = wrap(s, cols || 74), lh = 21;
+    lines.forEach(function (ln, i) {
+      var tn = n('text', {
+        x: 0, y: y + i * lh, 'font-family': "'IBM Plex Sans',system-ui,sans-serif",
+        'font-size': 14.5, fill: C.ink2
+      });
+      tn.textContent = ln;
+      p.appendChild(tn);
+    });
+    return lines.length * lh;
+  }
+
   window.KIT = {
     W: W, H: H, C: C, TINT: TINT, n: n,
     board: board, panel: panel, label: label, mono: mono, text: text, big: big,
     chip: chip, bar: bar, arrow: arrow, code: code, verdict: verdict,
-    wrap: wrap, para: para, foot: foot, switcher: switcher
+    wrap: wrap, para: para, foot: foot, switcher: switcher,
+    head: head, callout: callout, lede: lede
   };
 })();
