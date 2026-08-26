@@ -36,6 +36,13 @@
       'aria-label': opts.alt || 'figure'
     });
     svg.style.display = 'block';
+    var ids = defs(svg);
+    // engineering grid behind everything, then a grain wash over the top
+    var bg = n('rect', { x: -40, y: -120, width: W + 200, height: H + 320,
+      fill: 'url(#' + ids.gd + ')', 'pointer-events': 'none' });
+    bg.setAttribute('mask', '');
+    svg.appendChild(bg);
+    svg._grainAfter = true;
     root.appendChild(svg);
     // Trim the board to whatever the scene actually drew. A fixed height left a
     // dead half-screen under the shorter figures.
@@ -60,9 +67,55 @@
         var x1 = Math.max(W, bb.x + bb.width + pad);
         var y1 = bb.y + bb.height + pad;
         svg.setAttribute('viewBox', x0 + ' ' + y0 + ' ' + (x1 - x0) + ' ' + (y1 - y0));
+        if (svg._grainAfter) {
+          svg._grainAfter = false;
+          var gn = n('rect', { x: x0, y: y0, width: x1 - x0, height: y1 - y0,
+            filter: 'url(#' + svg._ids.gr + ')', opacity: .05,
+            'mix-blend-mode': 'multiply', 'pointer-events': 'none' });
+          svg.appendChild(gn);
+        }
       } catch (e) {}
     });
     return svg;
+  }
+
+
+  /* ---------- one defs block per board: depth, texture, sheen ----------
+     The palette and type are fixed by the reference, so all the craft has to
+     come from surface: a real cast shadow instead of a hairline, a paper grain
+     over the whole board, a faint engineering grid behind it, and a slight
+     sheen down every filled bar. */
+  var UID = 0;
+  function defs(svg) {
+    var id = 'k' + (++UID);
+    var d = n('defs', {});
+
+    var f = n('filter', { id: id + 'sh', x: '-20%', y: '-20%', width: '150%', height: '160%' });
+    f.appendChild(n('feDropShadow', {
+      dx: 0, dy: 6, stdDeviation: 9, 'flood-color': '#141922', 'flood-opacity': .10 }));
+    f.appendChild(n('feDropShadow', {
+      dx: 0, dy: 1, stdDeviation: 1.5, 'flood-color': '#141922', 'flood-opacity': .07 }));
+    d.appendChild(f);
+
+    var grain = n('filter', { id: id + 'gr', x: '0%', y: '0%', width: '100%', height: '100%' });
+    grain.appendChild(n('feTurbulence', {
+      type: 'fractalNoise', baseFrequency: '.9', numOctaves: 3, stitchTiles: 'stitch' }));
+    grain.appendChild(n('feColorMatrix', { type: 'saturate', values: '0' }));
+    d.appendChild(grain);
+
+    var grid = n('pattern', { id: id + 'gd', width: 28, height: 28,
+      patternUnits: 'userSpaceOnUse' });
+    grid.appendChild(n('circle', { cx: 1, cy: 1, r: 1, fill: 'rgba(31,37,48,.13)' }));
+    d.appendChild(grid);
+
+    var sheen = n('linearGradient', { id: id + 'sn', x1: 0, y1: 0, x2: 0, y2: 1 });
+    sheen.appendChild(n('stop', { offset: 0, 'stop-color': '#fff', 'stop-opacity': .26 }));
+    sheen.appendChild(n('stop', { offset: 1, 'stop-color': '#fff', 'stop-opacity': 0 }));
+    d.appendChild(sheen);
+
+    svg.appendChild(d);
+    svg._ids = { sh: id + 'sh', gr: id + 'gr', gd: id + 'gd', sn: id + 'sn' };
+    return svg._ids;
   }
 
   /* ---------- primitives ---------- */
@@ -71,10 +124,23 @@
   function panel(p, x, y, w, h, o) {
     o = o || {};
     var g = n('g', {});
-    g.appendChild(n('rect', {
-      x: x, y: y, width: w, height: h, rx: o.r == null ? 10 : o.r,
+    var r = o.r == null ? 10 : o.r;
+    var svg = p.ownerSVGElement || p;
+    var ids = (svg && svg._ids) || {};
+    var base = n('rect', {
+      x: x, y: y, width: w, height: h, rx: r,
       fill: o.fill || C.panel, stroke: o.stroke || C.line, 'stroke-width': 1
-    }));
+    });
+    if (o.flat !== true && ids.sh) base.setAttribute('filter', 'url(#' + ids.sh + ')');
+    g.appendChild(base);
+    // a one pixel lit edge along the top, which is what stops a flat rect
+    // reading as a flat rect
+    if (o.flat !== true) {
+      g.appendChild(n('path', {
+        d: 'M' + (x + r) + ' ' + (y + .75) + ' H' + (x + w - r),
+        stroke: 'rgba(255,255,255,.85)', 'stroke-width': 1.2, fill: 'none'
+      }));
+    }
     p.appendChild(g);
     return g;
   }
@@ -170,12 +236,21 @@
   function bar(p, x, y, w, h, frac, o) {
     o = o || {};
     var g = n('g', {});
+    var svg2 = p.ownerSVGElement || p;
+    var ids2 = (svg2 && svg2._ids) || {};
     g.appendChild(n('rect', { x: x, y: y, width: w, height: h, rx: h / 2,
       fill: o.track || TINT.ink }));
+    g.appendChild(n('path', {
+      d: 'M' + (x + h / 2) + ' ' + (y + .6) + ' H' + (x + w - h / 2),
+      stroke: 'rgba(31,37,48,.10)', 'stroke-width': 1.1, fill: 'none' }));
     var fw = Math.max(0, Math.min(1, frac)) * w;
     var f = n('rect', { x: x, y: y, width: fw, height: h, rx: h / 2,
       fill: o.color || C.blue });
     g.appendChild(f);
+    if (h >= 9 && ids2.sn) {
+      g.appendChild(n('rect', { x: x, y: y, width: fw, height: h / 2, rx: h / 2,
+        fill: 'url(#' + ids2.sn + ')', 'pointer-events': 'none' }));
+    }
     p.appendChild(g);
     g._fill = f;
     return g;
@@ -314,6 +389,7 @@
      they read as sparse. These draw ABOVE y=0 so existing layouts do not shift. */
 
   function head(p, title, sub) {
+    p.appendChild(n('rect', { x: 0, y: -78, width: 34, height: 3, rx: 1.5, fill: C.amber }));
     var t1 = n('text', {
       x: 0, y: -46, 'font-family': "'Sora',system-ui,sans-serif",
       'font-size': 27, 'font-weight': 700, 'letter-spacing': '-.022em', fill: C.ink
