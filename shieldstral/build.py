@@ -51,12 +51,11 @@ HERO = """
 <div class="hero">
   <div class="eyebrow">a visual guide &nbsp;&middot;&nbsp; paper results, with labelled schematics</div>
   <h1>Shieldstral,<br>taken <em>apart</em></h1>
-  <p class="sub">Shieldstral is an open-weight <b>moderation model</b> that carries no fixed list of
-  harm categories in its weights. You pass the moderation criterion as plain text at inference time
-  and it answers one yes/no question about one document.</p>
-  <p class="sub" style="margin-top:14px">I worked on the model, so this walks the method the way I
-  would explain it to a colleague: the reformulation, the data pipeline, the training and the merge,
-  and the results, including the ones that are less flattering.</p>
+  <p class="sub">Shieldstral is an open-weight <b>moderation model</b>. It carries no fixed list of
+  harm categories. You hand it the moderation criterion as plain text at inference time and it
+  answers one yes/no question about one document.</p>
+  <p class="sub" style="margin-top:14px">This is my attempt to break down the paper visually, so you
+  can scroll through it instead of reading the PDF. I worked on the model.</p>
 
   <div class="metastrip">
     <span class="chip"><a href="https://arxiv.org/abs/2607.25857">arXiv <b>2607.25857</b></a></span>
@@ -100,7 +99,6 @@ html = f"""<!DOCTYPE html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="robots" content="noindex,nofollow">
 <title>{TITLE}</title>
 <meta name="description" content="{DESC}">
 <link rel="canonical" href="{URL}">

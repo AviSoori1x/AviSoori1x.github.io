@@ -331,7 +331,7 @@ window.SCENES = window.SCENES || {};
 
     K.label(s, 0, 122, 'images');
     K.panel(s, 0, 134, 280, 58, { fill: T.ink });
-    ['landscape', 'interior', 'objects'].forEach(function (w, i) {
+    ['blocks', 'ball', 'car'].forEach(function (w, i) {
       K.photo(s, 16 + i * 62, 142, 54, 42, w, { r: 4 });
     });
     K.arrow(s, 288, 163, 344, 163, { color: C.red, dash: '4 4' });
@@ -342,7 +342,7 @@ window.SCENES = window.SCENES || {};
     K.panel(s, 0, 244, 640, 96);
     K.text(s, 18, 274, 'General-purpose classification and object-detection datasets supply', { size: 13.5, color: C.ink2 });
     K.text(s, 18, 294, 'a large pool of naturally safe images to serve as negatives.', { size: 13.5, color: C.ink2 });
-    var TW = ['landscape', 'interior', 'objects'];
+    var TW = ['blocks', 'ball', 'car'];
     for (i = 0; i < 16; i++) {
       K.photo(s, 18 + i * 38, 306, 32, 26, TW[i % 3], { r: 3 });
     }
@@ -364,7 +364,7 @@ window.SCENES = window.SCENES || {};
 
     /* the picture, once, large, on the left */
     K.label(s, 0, 18, 'the document');
-    K.photo(s, 0, 30, 246, 184, 'landscape');
+    K.photo(s, 0, 30, 246, 184, 'blocks');
     K.label(s, 0, 232, 'a rendered stand-in, nothing real is shown', { size: 8.6 });
 
     var body = K.n('g', {});

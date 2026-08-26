@@ -18,7 +18,7 @@ window.SCENES = window.SCENES || {};
 
     /* row one: the two inputs */
     K.label(s, 0, 16, 'in');
-    K.photo(s, 0, 26, 92, 68, 'objects', { r: 6 });
+    K.photo(s, 0, 26, 92, 68, 'car', { r: 6 });
     K.label(s, 0, 108, 'image, optional', { size: 8.6 });
 
     K.panel(s, 112, 26, 210, 68);

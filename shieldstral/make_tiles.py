@@ -49,25 +49,62 @@ def hit_sphere(o, d, c, r):
     return t if t > 1e-3 else MAXD
 
 
+def hit_box(o, d, lo, hi):
+    """Slab test. Returns (t, normal) or (MAXD, None)."""
+    tmin, tmax, nrm = -MAXD, MAXD, (0, 0, 0)
+    for i in range(3):
+        if abs(d[i]) < 1e-9:
+            if o[i] < lo[i] or o[i] > hi[i]:
+                return MAXD, None
+            continue
+        inv = 1.0 / d[i]
+        t1, t2 = (lo[i] - o[i]) * inv, (hi[i] - o[i]) * inv
+        sgn = -1.0
+        if t1 > t2:
+            t1, t2 = t2, t1
+            sgn = 1.0
+        if t1 > tmin:
+            tmin = t1
+            n = [0.0, 0.0, 0.0]
+            n[i] = sgn
+            nrm = tuple(n)
+        tmax = min(tmax, t2)
+        if tmin > tmax:
+            return MAXD, None
+    return (tmin, nrm) if tmin > 1e-3 else (MAXD, None)
+
+
 def scene_for(kind):
-    if kind == 'landscape':
-        return ([((-0.95, 0.55, 3.5), 0.55, (0.80, 0.38, 0.22), 0.28),
-                 ((0.30, 0.42, 2.7), 0.42, (0.28, 0.44, 0.40), 0.46),
-                 ((1.30, 0.30, 3.9), 0.30, (0.54, 0.50, 0.68), 0.32)],
-                (0.64, 0.61, 0.55), (0.40, 0.57, 0.80), (0.92, 0.87, 0.76))
-    if kind == 'interior':
-        return ([((-0.55, 0.62, 3.0), 0.62, (0.74, 0.70, 0.62), 0.16),
-                 ((0.90, 0.36, 2.6), 0.36, (0.68, 0.32, 0.20), 0.38)],
-                (0.56, 0.49, 0.42), (0.34, 0.33, 0.36), (0.84, 0.78, 0.66))
-    return ([((-0.78, 0.40, 2.7), 0.40, (0.72, 0.34, 0.22), 0.36),
-             ((0.18, 0.55, 3.3), 0.55, (0.30, 0.47, 0.42), 0.26),
-             ((1.05, 0.28, 2.4), 0.28, (0.44, 0.38, 0.62), 0.52)],
-            (0.67, 0.64, 0.57), (0.48, 0.59, 0.72), (0.90, 0.85, 0.78))
+    """Return (spheres, boxes, ground, sky_top, sky_bot).
+
+    sphere = (centre, radius, colour, gloss, stripe)
+    box    = (lo, hi, colour, gloss)
+    """
+    if kind == 'blocks':
+        # a stack of toy building blocks
+        return ([],
+                [((-0.62, 0.00, 2.55), (0.10, 0.62, 3.27), (0.82, 0.30, 0.20), 0.20),
+                 ((-0.52, 0.62, 2.66), (0.00, 1.18, 3.16), (0.24, 0.48, 0.62), 0.20),
+                 ((-0.42, 1.18, 2.76), (-0.10, 1.62, 3.06), (0.92, 0.72, 0.24), 0.20),
+                 ((0.28, 0.00, 2.30), (0.94, 0.50, 2.96), (0.34, 0.56, 0.38), 0.20)],
+                (0.66, 0.63, 0.57), (0.44, 0.60, 0.80), (0.92, 0.88, 0.78))
+    if kind == 'ball':
+        # a striped beach ball beside a smaller one
+        return ([((-0.30, 0.66, 2.75), 0.66, (0.90, 0.88, 0.84), 0.42, 1),
+                 ((0.95, 0.28, 2.20), 0.28, (0.86, 0.44, 0.18), 0.35, 0)],
+                [],
+                (0.68, 0.65, 0.60), (0.46, 0.62, 0.82), (0.94, 0.90, 0.80))
+    # a little toy car: body, cabin, two wheels
+    return ([((-0.42, 0.20, 2.32), 0.20, (0.16, 0.16, 0.18), 0.30, 0),
+             ((0.46, 0.20, 2.32), 0.20, (0.16, 0.16, 0.18), 0.30, 0)],
+            [((-0.72, 0.20, 2.06), (0.76, 0.56, 2.58), (0.84, 0.26, 0.20), 0.34),
+             ((-0.34, 0.56, 2.12), (0.38, 0.86, 2.52), (0.40, 0.62, 0.74), 0.40)],
+            (0.66, 0.63, 0.58), (0.44, 0.60, 0.80), (0.92, 0.88, 0.78))
 
 
 def trace(kind, seed):
     rnd = random.Random(seed)
-    spheres, ground, sky_top, sky_bot = scene_for(kind)
+    spheres, boxes, ground, sky_top, sky_bot = scene_for(kind)
     eye = (0.0, 0.85, 0.0)
     light = (-2.2, 3.4, 1.2)
     lr = 0.6
@@ -79,11 +116,15 @@ def trace(kind, seed):
             v = -((y + 0.5) / H * 2 - 1) * 0.75
             d = norm((u, v, 1.0))
 
-            best, what, sp = MAXD, None, None
+            best, what, sp, bn = MAXD, None, None, None
             for s in spheres:
                 t = hit_sphere(eye, d, s[0], s[1])
                 if t < best:
                     best, what, sp = t, 'sphere', s
+            for bx in boxes:
+                t, nb = hit_box(eye, d, bx[0], bx[1])
+                if t < best:
+                    best, what, sp, bn = t, 'box', bx, nb
             if d[1] < -1e-4:
                 tg = -eye[1] / d[1]
                 if 1e-3 < tg < best:
@@ -96,6 +137,16 @@ def trace(kind, seed):
                 p = add(eye, mul(d, best))
                 if what == 'sphere':
                     n = norm(sub(p, sp[0]))
+                    base, gloss = sp[2], sp[3]
+                    if len(sp) > 4 and sp[4]:
+                        # beach ball panels, from the angle around the vertical axis
+                        ang = math.atan2(n[0], n[2])
+                        seg = int((ang + math.pi) / (2 * math.pi) * 6) % 6
+                        base = ((0.86, 0.30, 0.24), (0.94, 0.92, 0.88), (0.22, 0.46, 0.68),
+                                (0.94, 0.92, 0.88), (0.96, 0.74, 0.22),
+                                (0.94, 0.92, 0.88))[seg]
+                elif what == 'box':
+                    n = bn
                     base, gloss = sp[2], sp[3]
                 else:
                     n = (0.0, 1.0, 0.0)
@@ -116,6 +167,11 @@ def trace(kind, seed):
                         if hit_sphere(p, ld, s2[0], s2[1]) < MAXD:
                             blocked = True
                             break
+                    if not blocked:
+                        for b2 in boxes:
+                            if hit_box(p, ld, b2[0], b2[1])[0] < MAXD:
+                                blocked = True
+                                break
                     if not blocked:
                         lit += 1
                 shade = lit / SHADOW_SAMPLES
@@ -158,7 +214,7 @@ def png(rows):
 
 if __name__ == '__main__':
     tiles = {}
-    for name, seed in (('landscape', 11), ('interior', 23), ('objects', 37)):
+    for name, seed in (('blocks', 11), ('ball', 23), ('car', 37)):
         data = png(trace(name, seed))
         tiles[name] = 'data:image/png;base64,' + base64.b64encode(data).decode()
         print(f"  {name:10s} {len(data)/1024:5.1f} KB")

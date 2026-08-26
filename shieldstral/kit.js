@@ -472,7 +472,7 @@
   /** a placeholder photograph, rendered rather than drawn as outline clip art */
   function photo(p, x, y, w, h, which, o) {
     o = o || {};
-    var src = (window.SS_TILES || {})[which || 'landscape'];
+    var src = (window.SS_TILES || {})[which || 'blocks'];
     var g = n('g', {});
     var cid = 'ph' + (++UID);
     var d = n('defs', {});
