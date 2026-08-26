@@ -378,7 +378,10 @@
   .sc-s_adapt .ftr,.sc-s_adapt .fop{display:none}
   .sc-s_adapt .sr,.sc-s_adapt .schdr{grid-template-columns:minmax(0,1fr) 40px 40px 44px;gap:7px}
   .sc-s_adapt .sid,.sc-s_adapt .sbar,.sc-s_adapt .schdr .sbar{display:none}
-  .sc-s_adapt .out{min-height:112px}
+  .sc-s_adapt .out{min-height:96px}
+  .sc-s_adapt .fig{font-size:clamp(38px,12vw,52px)}
+  .sc-s_adapt .cell{padding:8px 11px 9px}
+  .sc-s_adapt .cols{gap:7px}
 }
 @media(max-width:34rem){
   .sc-s_adapt .hd{gap:7px}

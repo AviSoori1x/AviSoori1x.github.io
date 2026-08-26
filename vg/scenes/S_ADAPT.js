@@ -415,7 +415,7 @@ window.SCENES['S_ADAPT'] = function (root, api) {
       + ', ahead on <b>' + scAhead + '</b>.</span></div>'
       + '<div class="schdr" aria-hidden="true">'
       +   '<span class="sid"></span><span class="snm">super class</span>'
-      +   '<span class="sv rival">' + esc(WIN.base.split('-')[0]) + '</span>'
+      +   '<span class="sv rival">' + esc(WIN.base.split('-').slice(0, 2).join('-')) + '</span>'
       +   '<span class="sv mine">ours</span>'
       +   '<span class="sbar"><i class="zero"></i></span>'
       +   '<span class="sd">gap</span>'

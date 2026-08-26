@@ -60,21 +60,21 @@ body::before{
   position:relative;z-index:2;min-height:100svh;display:flex;flex-direction:column;
   justify-content:center;padding:7svh clamp(22px,6vw,92px);max-width:1240px;margin:0 auto;
 }
-.eyebrow{
+.hero .eyebrow{
   font-family:var(--fm);font-size:11px;letter-spacing:.24em;text-transform:uppercase;
   color:var(--cyan);margin:0 0 26px;display:flex;align-items:center;gap:12px;
 }
-.eyebrow::before{content:'';width:30px;height:1px;background:var(--cyan)}
+.hero .eyebrow::before{content:'';width:30px;height:1px;background:var(--cyan)}
 .hero h1{
   font-family:var(--fd);font-weight:700;letter-spacing:-.035em;line-height:.95;
   font-size:clamp(2.9rem,8vw,6.2rem);margin:0 0 26px;max-width:15ch;
 }
 .hero h1 em{font-style:normal;color:var(--cyan)}
-.sub{
+.hero .sub{
   font-size:clamp(1.02rem,1.55vw,1.24rem);line-height:1.55;color:var(--ink2);
   max-width:62ch;margin:0 0 34px;
 }
-.sub b{color:var(--ink);font-weight:600}
+.hero .sub b{color:var(--ink);font-weight:600}
 .metastrip{display:flex;flex-wrap:wrap;gap:9px;margin:0 0 42px}
 .chip{
   font-family:var(--fm);font-size:12px;color:var(--ink2);
@@ -137,7 +137,9 @@ body::before{
 .scene>*{max-width:100%;max-height:100%}
 
 /* ============ beats ============ */
-#beats{position:relative;z-index:2}
+/* #beats sits above the fixed stage, so it must be transparent to the mouse.
+   Only the text cards themselves take pointer events back. */
+#beats{position:relative;z-index:2;pointer-events:none}
 .beat{min-height:112svh;display:flex;align-items:center;pointer-events:none}
 .stack{width:var(--txtW);margin-left:clamp(22px,6vw,92px);pointer-events:auto}
 .card{
@@ -638,7 +640,10 @@ body::before{
   .sc-s_adapt .ftr,.sc-s_adapt .fop{display:none}
   .sc-s_adapt .sr,.sc-s_adapt .schdr{grid-template-columns:minmax(0,1fr) 40px 40px 44px;gap:7px}
   .sc-s_adapt .sid,.sc-s_adapt .sbar,.sc-s_adapt .schdr .sbar{display:none}
-  .sc-s_adapt .out{min-height:112px}
+  .sc-s_adapt .out{min-height:96px}
+  .sc-s_adapt .fig{font-size:clamp(38px,12vw,52px)}
+  .sc-s_adapt .cell{padding:8px 11px 9px}
+  .sc-s_adapt .cols{gap:7px}
 }
 @media(max-width:34rem){
   .sc-s_adapt .hd{gap:7px}
@@ -9087,7 +9092,7 @@ window.SCENES['S_ADAPT'] = function (root, api) {
       + ', ahead on <b>' + scAhead + '</b>.</span></div>'
       + '<div class="schdr" aria-hidden="true">'
       +   '<span class="sid"></span><span class="snm">super class</span>'
-      +   '<span class="sv rival">' + esc(WIN.base.split('-')[0]) + '</span>'
+      +   '<span class="sv rival">' + esc(WIN.base.split('-').slice(0, 2).join('-')) + '</span>'
       +   '<span class="sv mine">ours</span>'
       +   '<span class="sbar"><i class="zero"></i></span>'
       +   '<span class="sd">gap</span>'
@@ -13363,7 +13368,7 @@ window.SCENES['S_LANG'] = function (root, api) {
     +   '<div class="lg-hl">'
     +     '<span class="lg-eyebrow">appendix a &nbsp;&middot;&nbsp; f1 by language</span>'
     +     '<span class="lg-hnote">' + codes.length + ' language buckets, ' + models.length
-    +     ' guardrails, and the score printed in every cell</span>'
+    +     ' guardrails, every score printed</span>'
     +   '</div>'
     +   '<div class="lg-ctl">'
     +     segHtml('v', 'Which classification task to show',

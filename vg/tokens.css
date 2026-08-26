@@ -41,21 +41,21 @@ body::before{
   position:relative;z-index:2;min-height:100svh;display:flex;flex-direction:column;
   justify-content:center;padding:7svh clamp(22px,6vw,92px);max-width:1240px;margin:0 auto;
 }
-.eyebrow{
+.hero .eyebrow{
   font-family:var(--fm);font-size:11px;letter-spacing:.24em;text-transform:uppercase;
   color:var(--cyan);margin:0 0 26px;display:flex;align-items:center;gap:12px;
 }
-.eyebrow::before{content:'';width:30px;height:1px;background:var(--cyan)}
+.hero .eyebrow::before{content:'';width:30px;height:1px;background:var(--cyan)}
 .hero h1{
   font-family:var(--fd);font-weight:700;letter-spacing:-.035em;line-height:.95;
   font-size:clamp(2.9rem,8vw,6.2rem);margin:0 0 26px;max-width:15ch;
 }
 .hero h1 em{font-style:normal;color:var(--cyan)}
-.sub{
+.hero .sub{
   font-size:clamp(1.02rem,1.55vw,1.24rem);line-height:1.55;color:var(--ink2);
   max-width:62ch;margin:0 0 34px;
 }
-.sub b{color:var(--ink);font-weight:600}
+.hero .sub b{color:var(--ink);font-weight:600}
 .metastrip{display:flex;flex-wrap:wrap;gap:9px;margin:0 0 42px}
 .chip{
   font-family:var(--fm);font-size:12px;color:var(--ink2);
@@ -118,7 +118,9 @@ body::before{
 .scene>*{max-width:100%;max-height:100%}
 
 /* ============ beats ============ */
-#beats{position:relative;z-index:2}
+/* #beats sits above the fixed stage, so it must be transparent to the mouse.
+   Only the text cards themselves take pointer events back. */
+#beats{position:relative;z-index:2;pointer-events:none}
 .beat{min-height:112svh;display:flex;align-items:center;pointer-events:none}
 .stack{width:var(--txtW);margin-left:clamp(22px,6vw,92px);pointer-events:auto}
 .card{

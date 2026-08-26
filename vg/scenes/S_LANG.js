@@ -219,7 +219,7 @@ window.SCENES['S_LANG'] = function (root, api) {
     +   '<div class="lg-hl">'
     +     '<span class="lg-eyebrow">appendix a &nbsp;&middot;&nbsp; f1 by language</span>'
     +     '<span class="lg-hnote">' + codes.length + ' language buckets, ' + models.length
-    +     ' guardrails, and the score printed in every cell</span>'
+    +     ' guardrails, every score printed</span>'
     +   '</div>'
     +   '<div class="lg-ctl">'
     +     segHtml('v', 'Which classification task to show',
