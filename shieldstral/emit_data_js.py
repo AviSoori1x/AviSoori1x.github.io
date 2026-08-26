@@ -266,7 +266,33 @@ for b in baselines:
     if b["model"] == "ShieldGemma 2":
         b["model"] = "ShieldGemma-2"
 
+arch = {
+    "source": "params.json in mistralai/Shieldstral-1.0-3B",
+    "lm": {
+        "dim": 3072,
+        "layers": 26,
+        "heads": 32,
+        "kvHeads": 8,
+        "hidden": 9216,
+        "vocab": 131072,
+        "tied": True,
+        "approxB": 3.43
+    },
+    "vision": {
+        "dim": 1024,
+        "layers": 24,
+        "heads": 16,
+        "hidden": 4096,
+        "projector": "patch_merge",
+        "spatialMerge": 2,
+        "approxM": 403
+    },
+    "totalApproxB": 3.83,
+    "maxPos": 262144
+}
+
 d.update({
+    "arch": arch,
     "systemPrompt": SYSTEM_PROMPT, "strictness": strictness, "formats": formats,
     "fig2": fig2, "fig3": fig3, "fig4": fig4, "divergence": divergence, "queryTypes": queryTypes,
     "taxCompare": taxCompare, "baselines": baselines, "benchInventory": benchInventory,

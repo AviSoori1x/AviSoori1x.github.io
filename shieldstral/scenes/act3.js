@@ -13,6 +13,7 @@ window.SCENES = window.SCENES || {};
   /* 22 the actual architecture, end to end */
   window.SCENES.S_BASE = function (root, api) {
     var s = K.board(root, { alt: 'Architecture from input through to the two output logits.' });
+    var A_ = api.SS.arch || { lm: {}, vision: {} };
     K.head(s, 'What the checkpoint actually is',
            'the 3B is the language model, not the artifact');
     var Wd = 640;
@@ -37,6 +38,7 @@ window.SCENES = window.SCENES || {};
     K.panel(s, 0, 176, 108, 56, { stroke: C.line });
     K.mono(s, 14, 200, 'Pixtral', { size: 12, color: C.ink });
     K.label(s, 14, 218, 'vision encoder', { size: 8.6 });
+    K.label(s, 14, 232, A_.vision.dim + 'd  ' + A_.vision.layers + ' layers', { size: 8.2 });
     K.label(s, 0, 248, 'frozen', { color: C.ink3, size: 9 });
 
     K.arrow(s, 108, 204, 146, 204, { color: C.line });
@@ -45,7 +47,7 @@ window.SCENES = window.SCENES || {};
     /* --- the language model --- */
     K.panel(s, 150, 176, 300, 132, { fill: T.purple, stroke: P });
     K.mono(s, 166, 202, 'Ministral-3-3B', { size: 15, color: C.ink, weight: 700 });
-    K.label(s, 166, 220, '3B causal language model', { color: P });
+    K.label(s, 166, 220, A_.lm.dim + 'd  ' + A_.lm.layers + ' layers  ' + A_.lm.heads + 'h/' + A_.lm.kvHeads + 'kv', { color: P });
     for (var i = 0; i < 9; i++) {
       s.appendChild(K.n('rect', { x: 166 + i * 31, y: 238, width: 25, height: 40, rx: 3,
         fill: 'rgba(107,63,168,' + (0.16 + i * 0.045) + ')' }));
@@ -72,10 +74,11 @@ window.SCENES = window.SCENES || {};
       cx += w;
     });
     K.callout(s, 0, 406, Wd,
-      'The 3B counts the language model. The vision encoder is additional, so the download is '
-      + 'larger, and the third merge component is the base instruct checkpoint.',
+      'The 3B counts the language model, about ' + A_.lm.approxB + 'B from params.json. The vision '
+      + 'encoder adds roughly ' + A_.vision.approxM + 'M more, so the checkpoint is about '
+      + A_.totalApproxB + 'B.',
       { color: P, tint: T.purple, cols: 70 });
-    K.foot(s, 'Section 5 gives the base and the encoder, 6.1 says LoRA is applied to the language model parameters, 6.2 gives the merge.');
+    K.foot(s, 'Layer and dimension counts are read from params.json in the Hugging Face repo. Parameter totals are computed from those shapes, so they are approximate. Section 6.1 says LoRA is applied to the language model parameters, 6.2 gives the merge.');
   };
 
   /* 23 LoRA against full SFT */
