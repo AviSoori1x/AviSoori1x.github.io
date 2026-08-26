@@ -15,14 +15,14 @@ window.SCENES = window.SCENES || {};
       { n: h.multimodalSamples, lab: 'multimodal, image plus text', col: C.blue }
     ];
     K.big(s, 0, 62, h.totalSamples + 'M', { size: 72, color: C.ink });
-    K.text(s, 0, 100, 'samples, at one mark per ' + (PER * 1000) + ',000 rows', { size: 14, color: C.ink3 });
+    K.text(s, 0, 100, 'samples in the training mix', { size: 14, color: C.ink3 });
 
     var x = 0, y = 130, col = 0;
     parts.forEach(function (p) {
       var marks = Math.round(p.n / PER);
       for (var i = 0; i < marks; i++) {
         s.appendChild(K.n('rect', { x: x + col % 44 * 14.5, y: y + Math.floor(col / 44) * 13,
-          width: 9, height: 9, rx: 1.5, fill: p.col, opacity: .85 }));
+          width: 9, height: 9, rx: 1.5, fill: p.col }));
         col++;
       }
     });
@@ -40,7 +40,7 @@ window.SCENES = window.SCENES || {};
   /* 09 one processor per dataset */
   window.SCENES.S_PROCESSOR = function (root, api) {
     var s = K.board(root, { alt: 'Each dataset gets its own hand written processor.' });
-    K.head(s, 'One processor per dataset', 'hand written, from that dataset own documentation');
+    K.head(s, 'One processor per dataset', 'hand written, from that dataset\'s own documentation');
     var inv = (api.SS.benchInventory || []).slice(0, 5);
     K.label(s, 0, 14, 'each source, its own processor');
     inv.forEach(function (r, i) {
@@ -50,7 +50,7 @@ window.SCENES = window.SCENES || {};
       K.arrow(s, 218, y + 18, 268, y + 18, { color: C.line });
       K.panel(s, 272, y, 92, 36, { fill: T.amber, stroke: A });
       K.mono(s, 288, y + 23, 'processor', { size: 11, color: A });
-      K.arrow(s, 372, y + 18, 424, 150, { curve: true, color: C.line });
+      K.arrow(s, 372, y + 18, 430, 146, { curve: true, color: C.line });
     });
     K.panel(s, 430, 100, 210, 100, { stroke: A, fill: T.amber });
     K.label(s, 446, 124, 'one shared row', { color: A });
@@ -61,7 +61,7 @@ window.SCENES = window.SCENES || {};
     ['labelling logic', 'category mappings', 'instruction templates'].forEach(function (t, i) {
       K.chip(s, i * 172, 302, t, { size: 11.5, color: C.ink2 });
     });
-    K.foot(s, 'Written by hand from each dataset own documentation. The report does not say how many processors there are.');
+    K.foot(s, 'Written by hand from each dataset\'s own documentation. The report does not say how many processors there are.');
   };
 
   /* 10 strictness tiers */
@@ -85,12 +85,12 @@ window.SCENES = window.SCENES || {};
       s.appendChild(body);
       body.appendChild(K.n('rect', { x: 0, y: 228, width: 640, height: 10, rx: 5, fill: T.ink }));
       for (var d = 0; d < 42; d++) {
-        var px = 10 + d * 15, flag = px / 640 > CUT[i];
+        var px = 12 + d * 14.6, flag = px / 640 > CUT[i];
         body.appendChild(K.n('circle', { cx: px, cy: 262, r: 4.5,
           fill: flag ? C.red : C.teal, opacity: .8 }));
       }
-      body.appendChild(K.n('rect', { x: CUT[i] * 640, y: 218, width: 2, height: 60, fill: A }));
-      K.label(body, CUT[i] * 640 + 8, 292, 'flag from here', { color: A });
+      body.appendChild(K.n('rect', { x: CUT[i] * 640 + 5, y: 214, width: 2, height: 68, fill: A }));
+      K.label(body, CUT[i] * 640 + 13, 296, 'flag from here', { color: A });
     }, { tint: 'amber' });
     K.foot(s, 'The boundary position and the sample cloud are drawn for this figure. The report gives the tiers and their domains, not a numeric threshold.');
   };
@@ -185,7 +185,7 @@ window.SCENES = window.SCENES || {};
       K.para(s, 16, y + 40, q[1], 58, { size: 12.5, color: C.ink, lh: 16 });
       K.big(s, 566, y + 42, 'yes', { size: 28, color: C.red });
     });
-    K.foot(s, 'The coarse and target-group questions are phrased for this figure. The category question is the report own.');
+    K.foot(s, 'The coarse and target-group questions are phrased for this figure. The category question is the report\'s own.');
   };
 
   /* 15 three negative strategies */
@@ -283,7 +283,7 @@ window.SCENES = window.SCENES || {};
     });
     K.big(s, 0, 400, 'two rows', { size: 36, color: C.ink });
     K.text(s, 168, 396, 'from a single call, disagreeing on purpose', { size: 15, color: C.ink2 });
-    K.foot(s, 'The queries and the rewritten document are the report own, from its worked example.');
+    K.foot(s, 'The queries and the rewritten document are the report\'s own, from its worked example.');
   };
 
   /* 18 free positives up the tree */
@@ -410,7 +410,7 @@ window.SCENES = window.SCENES || {};
       h.imageQueryPhrasings + ' query phrasings from a fixed ' + h.imageSubcats
       + '-subcategory visual taxonomy. Images cannot be rewritten, so the diversity is put '
       + 'entirely into the question.', { color: A, tint: T.amber, cols: 70 });
-    K.foot(s, 'The two example questions are phrased for this figure. The phrasing count, the taxonomy size and the inverse share are the report own.');
+    K.foot(s, 'The two example questions are phrased for this figure. The phrasing count, the taxonomy size and the inverse share are the report\'s own.');
   };
 
   /* 21 asymmetric cut */

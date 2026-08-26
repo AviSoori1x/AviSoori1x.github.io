@@ -81,8 +81,10 @@
         var FLOOR = 660, ch = y1 - y0;
         if (ch < FLOOR) {
           var slack = FLOOR - ch;
-          y0 -= slack * 0.44;
-          y1 += slack * 0.56;
+          // reviewers measured bottom padding at 1.6 to 1.85x the top, so the
+          // drawing read as sitting high. Give the top the larger share.
+          y0 -= slack * 0.56;
+          y1 += slack * 0.44;
         }
         if (svg._deco) {
           svg._deco.removeAttribute('display');

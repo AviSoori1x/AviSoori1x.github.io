@@ -110,10 +110,10 @@ window.SCENES = window.SCENES || {};
 
     var body = K.n('g', {});   // exists before the switcher fires its first pick
     K.label(s, 0, 96, 'strictness');
-    K.switcher(s, 74, 84, tiers.map(function (t) { return t.level; }),
+    K.switcher(s, 150, 84, tiers.map(function (t) { return t.level; }),
       function (i) { st.tier = i; draw(); }, { tint: 'blue' });
     K.label(s, 0, 130, 'document format');
-    K.switcher(s, 128, 118, fmts.map(function (f) { return f.family.split(' ')[0]; }),
+    K.switcher(s, 150, 118, fmts.map(function (f) { return f.family.split(' ')[0]; }),
       function (i) { st.fmt = i; draw(); }, { tint: 'amber' });
 
     s.appendChild(body);
@@ -129,7 +129,7 @@ window.SCENES = window.SCENES || {};
       K.label(body, 0, y, 'query', { color: C.blue });
       K.mono(body, 0, y + 20, (SSd.queryTypes || [{}])[0].examples[0], { size: 12.5, color: C.ink });
       y += 44;
-      K.label(body, 0, y, 'document', { color: C.amber });
+      K.label(body, 0, y, 'document', { color: C.blue });
       var doc = String(f.tpl || '').replace('{prompt}', PROMPT).replace('{response}', RESP);
       doc.split('\n').forEach(function (ln, i) {
         K.mono(body, 0, y + 22 + i * 19, ln, { size: 12.5, color: C.ink });
@@ -137,7 +137,7 @@ window.SCENES = window.SCENES || {};
     }
     draw();
     K.foot(s, 'The instruction sentence is assembled from the report strictness table rather '
-      + 'than quoted. The document formats and the exchange are the report own.');
+      + 'than quoted. The document formats and the exchange are the report\'s own.');
   };
 
   /* ---- 04 two logits ---- */
@@ -147,15 +147,15 @@ window.SCENES = window.SCENES || {};
     var st = { yes: 3.4, no: -2.1 };
 
     K.label(s, 0, 14, 'unembed to two token ids only');
-    var scoreT = K.big(s, 0, 92, '0.000', { size: 74 });
-    var vlab = K.label(s, 250, 92, '', { size: 11 });
+    var scoreT = K.big(s, 0, 86, '0.000', { size: 70 });
+    var vlab = K.label(s, 0, 122, '', { size: 11 });
 
-    var track = K.bar(s, 0, 146, 640, 12, 0, { color: C.red });
+    var track = K.bar(s, 0, 146, 640, 12, 0, { color: C.teal });
     var tau = K.n('rect', { x: 318, y: 140, width: 2, height: 24, fill: C.ink3 });
     s.appendChild(tau);
-    K.label(s, 0, 180, 'no  0.0');
+    K.label(s, 0, 180, 'no  0.00');
     K.label(s, 320, 180, 'tau 0.50', { anchor: 'middle' });
-    K.label(s, 640, 180, '1.0  yes', { anchor: 'end' });
+    K.label(s, 640, 180, '1.00  yes', { anchor: 'end' });
 
     function slider(y, key, name, min, max) {
       K.label(s, 0, y - 6, name);
@@ -254,8 +254,8 @@ window.SCENES = window.SCENES || {};
 
     K.label(s, 0, 108, 'one innocuous source sentence');
     K.para(s, 0, 128, f4.source || '', 74, { size: 12.5, color: C.ink3 });
-    K.arrow(s, 150, 142, 60, 182, { curve: true });
-    K.arrow(s, 330, 142, 420, 182, { curve: true });
+    K.arrow(s, 150, 142, 70, 180, { curve: true });
+    K.arrow(s, 320, 142, 360, 180, { curve: true });
 
     var dg = K.n('g', {}); s.appendChild(dg);
     var vg = K.n('g', {}); s.appendChild(vg);
@@ -308,7 +308,7 @@ window.SCENES = window.SCENES || {};
     [95, 319, 543].forEach(function (x) { K.arrow(s, x, 158, 320, 220, { curve: true }); });
 
     K.panel(s, 130, 232, 380, 100, { stroke: C.blue, fill: T.blue });
-    K.label(s, 148, 256, 'one question, in that dataset own terms', { color: C.blue });
+    K.label(s, 148, 256, 'one question, in that dataset\'s own terms', { color: C.blue });
     K.mono(s, 148, 284, '<Query>: does this content promote violence?', { size: 12.5, color: C.ink });
     K.mono(s, 148, 308, 'answer:  yes | no', { size: 12.5, color: C.blue });
 

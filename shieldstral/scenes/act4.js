@@ -121,7 +121,7 @@ window.SCENES = window.SCENES || {};
     K.text(s, 176, 66, 'against ' + h.multimodalNextBest + ' for the next highest', { size: 14.5, color: C.ink2 });
     K.label(s, 0, 110, 'shieldstral 3b in teal');
     benchBlock(s, t, 126);
-    K.text(s, 0, 330, 'It loses LlavaGuard to LlavaGuard-7B. Some of that benchmark test images were',
+    K.text(s, 0, 330, 'It loses LlavaGuard to LlavaGuard-7B. Some of that benchmark\'s test images were',
       { size: 14, color: C.ink2 });
     K.text(s, 0, 352, 'unavailable, so every model there is scored on the available subset.',
       { size: 14, color: C.ink2 });

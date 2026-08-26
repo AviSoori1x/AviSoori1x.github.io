@@ -55,14 +55,14 @@ HERO = """
   answers one yes/no question about one document, and emits a single token. This walks
   the whole method, the reformulation, the 54.1M-sample data pipeline, the two checkpoints and the
   merge, and the places it loses, in <b>34 scenes</b>.</p>
+  <p class="byline"><b>Avinash Sooriyarachchi</b>, one of the core contributors on Shieldstral.<br>
+  Where the report is vague I have said so rather than filled the gap.</p>
   <div class="metastrip">
-    <span class="chip hl">I was a <b>core contributor</b></span>
     <span class="chip"><a href="https://arxiv.org/abs/2607.25857">arXiv <b>2607.25857</b></a></span>
     <span class="chip"><a href="https://huggingface.co/mistralai/Shieldstral-1.0-3B">weights <b>Apache 2.0</b></a></span>
-    <span class="chip">3B LM <b>plus vision encoder</b></span>
+    <span class="chip">34 <b>scenes</b></span>
     <span class="chip">text F1 <b>84.9</b></span>
     <span class="chip">multimodal F1 <b>83.8</b></span>
-    <span class="chip">34 scenes &middot; every figure live</span>
   </div>
   <div class="toc">
     <div class="a1"><h4>Act I &nbsp;&middot;&nbsp; the idea</h4>
