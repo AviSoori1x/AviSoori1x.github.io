@@ -17,45 +17,17 @@ SCENES = HERE / "scenes"
 tokens = (HERE / "tokens.css").read_text(encoding="utf-8")
 beats = (HERE / "beats.html").read_text(encoding="utf-8")
 engine = (HERE / "engine.js").read_text(encoding="utf-8")
+kit = (HERE / "kit.js").read_text(encoding="utf-8")
 data = (HERE / "data.js").read_text(encoding="utf-8")
 
 # one file pair per scene, so a single broken scene cannot take the rest down
-
-def bump(css: str) -> str:
-    """Lift small type across every scene stylesheet.
-
-    Thirty-four agents each picked their own sizes and the result ran from 7.4px
-    to 11px, which is unreadable. This is a monotonic map, so relative hierarchy
-    inside a scene is preserved, with a hard floor. Anything already 20px or more
-    is display type and is left alone.
-    """
-    def one(m):
-        old = float(m.group(1))
-        if old >= 20:
-            return m.group(0)
-        new = round(max(old, 12.6 + (old - 7.4) * 0.58), 1)
-        return m.group(0).replace(m.group(1), str(new))
-
-    # bare px sizes, and the px floor inside clamp(Npx, ...)
-    css = re.sub(r'font-size:\s*([0-9.]+)px', one, css)
-    css = re.sub(r'font-size:\s*clamp\(\s*([0-9.]+)px', one, css)
-    # small rem sizes too
-    def onerem(m):
-        old = float(m.group(1))
-        if old >= 1.25:
-            return m.group(0)
-        new = round(max(old, 0.79 + (old - 0.46) * 0.58), 3)
-        return m.group(0).replace(m.group(1), str(new))
-    css = re.sub(r'font-size:\s*([0-9.]*\.?[0-9]+)rem', onerem, css)
-    return css
-
 
 scene_css, scene_js, acts = [], [], []
 for j in sorted(SCENES.glob("*.js")):
     n = j.stem
     c = j.with_suffix(".css")
     if c.exists():
-        scene_css.append(f"/* ---- {n} ---- */\n" + bump(c.read_text(encoding="utf-8")).strip())
+        scene_css.append(f"/* ---- {n} ---- */\n" + c.read_text(encoding="utf-8").strip())
     scene_js.append(f"/* ---- {n} ---- */\n" + j.read_text(encoding="utf-8").strip())
     acts.append(n)
 
@@ -136,9 +108,9 @@ html = f"""<!DOCTYPE html>
 <body>
 {HERO}
 
-<div id="stageWrap"><div id="stage"><div id="stageInner"></div></div></div>
-<div id="railwrap"></div>
-<div id="status"></div>
+<div id="stage"><div id="art"></div></div>
+<div class="railwrap"><div id="rail"></div></div>
+<div id="actlab"></div>
 
 <div id="beats">
 {beats}
@@ -148,6 +120,7 @@ html = f"""<!DOCTYPE html>
 {data}
 </script>
 <script>
+{kit}
 window.SCENES = window.SCENES || {{}};
 {chr(10).join(scene_js)}
 </script>

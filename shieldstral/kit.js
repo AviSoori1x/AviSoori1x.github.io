@@ -1,0 +1,292 @@
+/* One drawing vocabulary for all 34 figures.
+
+   The previous attempt let every figure invent its own layout and the page read
+   as thirty-four unrelated dashboards. Everything here draws into a fixed
+   640 x 520 SVG board using the same handful of primitives, so the figures share
+   a visual language by construction. */
+(function () {
+  var W = 640, H = 520;
+  var NS = 'http://www.w3.org/2000/svg';
+
+  var C = {
+    ink: '#141922', ink2: '#39404f', ink3: '#5d6474',
+    line: 'rgba(31,37,48,.14)', line2: 'rgba(31,37,48,.08)',
+    panel: '#ffffff', bg: '#f4f1ea',
+    blue: '#1c6e8c', teal: '#0f6e56', amber: '#b4551a',
+    purple: '#6b3fa8', red: '#a32d2d'
+  };
+  var TINT = {
+    blue: 'rgba(28,110,140,.08)', teal: 'rgba(15,110,86,.08)',
+    amber: 'rgba(180,85,26,.09)', purple: 'rgba(107,63,168,.08)',
+    red: 'rgba(163,45,45,.07)', ink: 'rgba(31,37,48,.05)'
+  };
+
+  function n(tag, a) {
+    var e = document.createElementNS(NS, tag);
+    for (var k in a) if (a.hasOwnProperty(k) && a[k] != null) e.setAttribute(k, a[k]);
+    return e;
+  }
+
+  /* ---------- board ---------- */
+  function board(root, opts) {
+    opts = opts || {};
+    var svg = n('svg', {
+      viewBox: '0 0 ' + W + ' ' + H,
+      width: '100%', role: 'img',
+      'aria-label': opts.alt || 'figure'
+    });
+    svg.style.display = 'block';
+    root.appendChild(svg);
+    // Trim the board to whatever the scene actually drew. A fixed height left a
+    // dead half-screen under the shorter figures.
+    requestAnimationFrame(function () {
+      try {
+        // place the honesty line under whatever was drawn, then fit the board
+        if (svg._foot) {
+          var fb = svg.getBBox();
+          wrap(svg._foot, 92).forEach(function (ln, i) {
+            var tn = n('text', {
+              x: 0, y: fb.y + fb.height + 26 + i * 14,
+              'font-family': "'IBM Plex Sans',system-ui,sans-serif",
+              'font-size': 11.5, fill: C.ink3
+            });
+            tn.textContent = ln;
+            svg.appendChild(tn);
+          });
+          svg._foot = null;
+        }
+        var bb = svg.getBBox(), pad = 10;
+        var x0 = Math.min(0, bb.x - pad), y0 = Math.min(0, bb.y - pad);
+        var x1 = Math.max(W, bb.x + bb.width + pad);
+        var y1 = bb.y + bb.height + pad;
+        svg.setAttribute('viewBox', x0 + ' ' + y0 + ' ' + (x1 - x0) + ' ' + (y1 - y0));
+      } catch (e) {}
+    });
+    return svg;
+  }
+
+  /* ---------- primitives ---------- */
+
+  /** white card with a hairline border */
+  function panel(p, x, y, w, h, o) {
+    o = o || {};
+    var g = n('g', {});
+    g.appendChild(n('rect', {
+      x: x, y: y, width: w, height: h, rx: o.r == null ? 10 : o.r,
+      fill: o.fill || C.panel, stroke: o.stroke || C.line, 'stroke-width': 1
+    }));
+    p.appendChild(g);
+    return g;
+  }
+
+  /** small uppercase mono label, the caption voice of the whole guide */
+  function label(p, x, y, s, o) {
+    o = o || {};
+    var t = n('text', {
+      x: x, y: y, 'font-family': "'JetBrains Mono',monospace",
+      'font-size': o.size || 10.5, 'letter-spacing': '.14em',
+      fill: o.color || C.ink3, 'text-anchor': o.anchor || 'start'
+    });
+    t.textContent = String(s).toUpperCase();
+    p.appendChild(t);
+    return t;
+  }
+
+  /** mono body line, for prompts, tokens and data */
+  function mono(p, x, y, s, o) {
+    o = o || {};
+    var t = n('text', {
+      x: x, y: y, 'font-family': "'JetBrains Mono',monospace",
+      'font-size': o.size || 13, fill: o.color || C.ink2,
+      'text-anchor': o.anchor || 'start', 'font-weight': o.weight || 400
+    });
+    t.textContent = s;
+    p.appendChild(t);
+    return t;
+  }
+
+  /** sans line, used sparingly, the cards carry the prose */
+  function text(p, x, y, s, o) {
+    o = o || {};
+    var t = n('text', {
+      x: x, y: y, 'font-family': "'IBM Plex Sans',system-ui,sans-serif",
+      'font-size': o.size || 14, fill: o.color || C.ink2,
+      'text-anchor': o.anchor || 'start', 'font-weight': o.weight || 400
+    });
+    t.textContent = s;
+    p.appendChild(t);
+    return t;
+  }
+
+  /** the big display numeral, one per figure at most */
+  function big(p, x, y, s, o) {
+    o = o || {};
+    var t = n('text', {
+      x: x, y: y, 'font-family': "'Sora',system-ui,sans-serif",
+      'font-size': o.size || 62, 'font-weight': 700, 'letter-spacing': '-.03em',
+      fill: o.color || C.ink, 'text-anchor': o.anchor || 'start'
+    });
+    t.textContent = s;
+    p.appendChild(t);
+    return t;
+  }
+
+  /** pill, for a category or a state */
+  function chip(p, x, y, s, o) {
+    o = o || {};
+    var pad = 9, size = o.size || 11.5;
+    var w = o.w || (String(s).length * size * 0.62 + pad * 2);
+    var g = n('g', {});
+    g.appendChild(n('rect', {
+      x: x, y: y, width: w, height: o.h || 23, rx: 11.5,
+      fill: o.fill || 'none', stroke: o.stroke || C.line, 'stroke-width': 1
+    }));
+    var t = n('text', {
+      x: x + w / 2, y: y + (o.h || 23) / 2 + size * 0.36,
+      'font-family': "'JetBrains Mono',monospace", 'font-size': size,
+      fill: o.color || C.ink3, 'text-anchor': 'middle'
+    });
+    t.textContent = s;
+    g.appendChild(t);
+    p.appendChild(g);
+    g._w = w;
+    return g;
+  }
+
+  /** horizontal proportional bar on a track */
+  function bar(p, x, y, w, h, frac, o) {
+    o = o || {};
+    var g = n('g', {});
+    g.appendChild(n('rect', { x: x, y: y, width: w, height: h, rx: h / 2,
+      fill: o.track || TINT.ink }));
+    var fw = Math.max(0, Math.min(1, frac)) * w;
+    var f = n('rect', { x: x, y: y, width: fw, height: h, rx: h / 2,
+      fill: o.color || C.blue });
+    g.appendChild(f);
+    p.appendChild(g);
+    g._fill = f;
+    return g;
+  }
+
+  /** connector with an arrow head */
+  function arrow(p, x1, y1, x2, y2, o) {
+    o = o || {};
+    var col = o.color || C.line;
+    var g = n('g', {});
+    var d;
+    if (o.curve) {
+      var mx = (x1 + x2) / 2;
+      d = 'M' + x1 + ' ' + y1 + ' C' + mx + ' ' + y1 + ' ' + mx + ' ' + y2 + ' ' + x2 + ' ' + y2;
+    } else {
+      d = 'M' + x1 + ' ' + y1 + ' L' + x2 + ' ' + y2;
+    }
+    g.appendChild(n('path', { d: d, fill: 'none', stroke: col,
+      'stroke-width': o.w || 1.2, 'stroke-dasharray': o.dash || null }));
+    if (o.head !== false) {
+      var a = Math.atan2(y2 - y1, x2 - (o.curve ? (x1 + x2) / 2 : x1));
+      var s = o.headSize || 6;
+      g.appendChild(n('path', {
+        d: 'M' + x2 + ' ' + y2 +
+           ' L' + (x2 - s * Math.cos(a - 0.42)) + ' ' + (y2 - s * Math.sin(a - 0.42)) +
+           ' L' + (x2 - s * Math.cos(a + 0.42)) + ' ' + (y2 - s * Math.sin(a + 0.42)) + ' Z',
+        fill: col
+      }));
+    }
+    p.appendChild(g);
+    return g;
+  }
+
+  /** dark code slab, matching the reference's .codecard */
+  function code(p, x, y, w, lines, o) {
+    o = o || {};
+    var lh = o.lh || 17, padY = 14, padX = 14;
+    var h = lines.length * lh + padY * 2;
+    var g = n('g', {});
+    g.appendChild(n('rect', { x: x, y: y, width: w, height: h, rx: 10, fill: '#151a23' }));
+    lines.forEach(function (ln, i) {
+      var t = n('text', {
+        x: x + padX, y: y + padY + lh * (i + 0.72),
+        'font-family': "'JetBrains Mono',monospace", 'font-size': o.size || 12.5,
+        fill: ln.c || '#c8cfdb'
+      });
+      t.textContent = ln.t == null ? ln : ln.t;
+      g.appendChild(t);
+    });
+    p.appendChild(g);
+    g._h = h;
+    return g;
+  }
+
+  /** the yes / no verdict, the recurring motif of the whole guide */
+  function verdict(p, x, y, yes, o) {
+    o = o || {};
+    var g = n('g', {});
+    var col = yes ? C.red : C.teal;
+    big(g, x, y, yes ? 'yes' : 'no', { size: o.size || 58, color: col });
+    label(g, x, y + 28, yes ? 'flagged' : 'not flagged', { color: col, size: 10.5 });
+    p.appendChild(g);
+    return g;
+  }
+
+  /** wrap a string to a width in characters, returning lines */
+  function wrap(s, cols) {
+    var words = String(s).split(/\s+/), out = [], cur = '';
+    words.forEach(function (w) {
+      if ((cur + ' ' + w).trim().length > cols) { out.push(cur.trim()); cur = w; }
+      else cur += ' ' + w;
+    });
+    if (cur.trim()) out.push(cur.trim());
+    return out;
+  }
+
+  /** a block of mono text, wrapped */
+  function para(p, x, y, s, cols, o) {
+    o = o || {};
+    var lines = wrap(s, cols), lh = o.lh || 18;
+    lines.forEach(function (ln, i) {
+      mono(p, x, y + i * lh, ln, { size: o.size || 13, color: o.color });
+    });
+    return { h: lines.length * lh, lines: lines.length };
+  }
+
+  /** the honesty line every schematic figure carries, placed after layout */
+  function foot(svg, s) { svg._foot = s; }
+
+  /** interactive switch row, returns the group and wires selection */
+  function switcher(p, x, y, items, onPick, o) {
+    o = o || {};
+    var g = n('g', {}), cx = x, btns = [];
+    items.forEach(function (it, i) {
+      var b = chip(g, cx, y, it, { size: o.size || 11.5, h: 25 });
+      b.style.cursor = 'pointer';
+      b.setAttribute('tabindex', '0');
+      b.setAttribute('role', 'button');
+      b.setAttribute('aria-label', it);
+      var pick = function () {
+        btns.forEach(function (o2, j) {
+          var on = j === i;
+          o2.firstChild.setAttribute('fill', on ? TINT[o.tint || 'blue'] : 'none');
+          o2.firstChild.setAttribute('stroke', on ? C[o.tint || 'blue'] : C.line);
+          o2.lastChild.setAttribute('fill', on ? C[o.tint || 'blue'] : C.ink3);
+        });
+        onPick(i);
+      };
+      b.addEventListener('click', pick);
+      b.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); }
+      });
+      btns.push(b);
+      cx += b._w + 7;
+    });
+    p.appendChild(g);
+    if (btns.length) btns[0].dispatchEvent(new Event('click'));
+    return { g: g, btns: btns, pick: function (i) { btns[i].dispatchEvent(new Event('click')); } };
+  }
+
+  window.KIT = {
+    W: W, H: H, C: C, TINT: TINT, n: n,
+    board: board, panel: panel, label: label, mono: mono, text: text, big: big,
+    chip: chip, bar: bar, arrow: arrow, code: code, verdict: verdict,
+    wrap: wrap, para: para, foot: foot, switcher: switcher
+  };
+})();
