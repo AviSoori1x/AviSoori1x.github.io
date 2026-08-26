@@ -36,7 +36,7 @@ window.SCENES['S_IMGSCARCE'] = function (root, api) {
      Measured here by matching the multimodal benchmark names against the inventory. */
   var mmNames = {};
   mmRows.forEach(function (r) { if (r && r.name) mmNames[String(r.name).toLowerCase()] = 1; });
-  var splitsAll = inv.length;
+  var splitsAll = inv.length;   // benchmarks in the eval inventory, not splits
   var sampAll = 0, splitsImg = 0, sampImg = 0;
   inv.forEach(function (r) {
     var n = Number(r[3]) || 0;
@@ -150,7 +150,7 @@ window.SCENES['S_IMGSCARCE'] = function (root, api) {
   }).join('');
 
   var invLine = (splitsImg && splitsAll)
-    ? ('paper eval inventory: ' + splitsImg + ' of ' + splitsAll + ' splits are image, '
+    ? ('paper evaluation inventory, not a count of training sources: ' + splitsImg + ' of ' + splitsAll + ' benchmarks are image, '
        + fmt(sampImg) + ' of ' + fmt(sampAll) + ' samples')
     : null;
 

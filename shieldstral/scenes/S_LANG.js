@@ -291,9 +291,13 @@ window.SCENES['S_LANG'] = function (root, api) {
   $('slo').textContent = api.num(lo, 1);
   $('shi').textContent = api.num(hi, 1);
   if (offcEl) {
-    offcEl.textContent = offList.map(function (c) { return langMap[c]; }).join(' and ')
-      + ', the ' + offList.length + ' buckets outside the ' + official.length
-      + ' supported languages';
+    // "Others" is an aggregate whose members the table never names, so it cannot be
+    // called unsupported wholesale. Only name the buckets we can actually check.
+    var named = offList.filter(function (c) { return String(langMap[c]) !== 'Others'; });
+    offcEl.textContent = named.map(function (c) { return langMap[c]; }).join(' and ')
+      + (named.length === 1 ? ' is not in the ' : ' are not in the ')
+      + official.length + '-language support list. Others is an aggregate bucket and '
+      + 'this table does not name its constituent languages.';
   }
 
   /* ---------------- cell fill ---------------- */

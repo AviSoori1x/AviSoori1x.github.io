@@ -35,9 +35,10 @@ window.SCENES['S_PROCESSOR'] = function (root, api) {
     '<div class="hd">' +
       '<div class="hdl">' +
         '<div class="big"></div>' +
-        '<div class="lede"><b>hand-written processors</b>' +
-        '<span>one per source dataset. No shared parser, no label autodetect, ' +
-        'no way around it.</span></div>' +
+        '<div class="lede"><b>one processor per training dataset</b>' +
+        '<span>hand written from that dataset&#39;s documentation. The paper does not ' +
+        'report how many there are. The sources below are the evaluation inventory, ' +
+        'shown to illustrate the variety.</span></div>' +
       '</div>' +
       '<div class="hdr">' +
         '<div class="st"><i>datasets</i><b class="vds"></b></div>' +
@@ -45,7 +46,10 @@ window.SCENES['S_PROCESSOR'] = function (root, api) {
         '<div class="st fin"><i>output formats</i><b>1</b></div>' +
       '</div>' +
     '</div>').firstChild;
-  hd.querySelector('.big').textContent = inv.length;
+  // The paper says every training dataset has its own processor but never says
+  // how many there are. inv.length is the count of EVALUATION benchmarks, so it
+  // must not be presented as a processor census.
+  hd.querySelector('.big').textContent = '1:1';
   hd.querySelector('.vds').textContent = inv.length;
   hd.querySelector('.vex').textContent = fmt(total);
   wrap.appendChild(hd);

@@ -8190,10 +8190,10 @@ body::before{
 <body>
 
 <div class="hero">
-  <div class="eyebrow">a visual guide &nbsp;&middot;&nbsp; every number from the paper</div>
+  <div class="eyebrow">a visual guide &nbsp;&middot;&nbsp; paper results, with labelled schematics</div>
   <h1>Shieldstral,<br>taken <em>apart</em></h1>
-  <p class="sub">A 3B guardrail whose safety policy is <b>not in its weights</b>. It reads the rule
-  at inference time as plain text, answers one yes/no question, and emits a single token. This walks
+  <p class="sub">A 3B guardrail that takes its moderation criterion as plain text <b>at inference time</b>,
+  answers one yes/no question about one document, and emits a single token. This walks
   the whole method, the reformulation, the 54.1M-sample data pipeline, the two checkpoints and the
   merge, and the places it loses, in <b>34 scenes</b>.</p>
   <div class="metastrip">
@@ -8213,7 +8213,7 @@ body::before{
       rewrite loop, free positives up the tree, and the image problem.</p></div>
     <div class="a3"><h4>Act III &nbsp;&middot;&nbsp; the training</h4>
       <p>Ministral-3B with a vision encoder, LoRA against full SFT, two checkpoints wrong in
-      opposite directions, and the SLERP merge that fixes it.</p></div>
+      opposite directions, and the SLERP merge that balances them.</p></div>
     <div class="a4"><h4>Act IV &nbsp;&middot;&nbsp; does it hold up</h4>
       <p>An evaluation built not to match, the benchmark numbers, the adaptability loss to a 20B
       model, the language holes, and how to run it.</p></div>
@@ -8262,7 +8262,7 @@ body::before{
 <div class="beat a1" data-s="S_REQUEST" data-act="1" data-sec="§2" data-title="The three fields">
   <div class="stack"><div class="card">
     <span class="num">03<span class="sec">§2</span></span>
-    <h3>Three fields, and only one of them moves</h3>
+    <h3>Three fields with different jobs</h3>
     <p>A fixed system message sets the meta task and restricts the answer to yes or no. Then three
     tagged fields do the work.</p>
     <p><span class="k">&lt;Instruct&gt;</span> is the framing: what surface is this, how strict.
@@ -8290,8 +8290,7 @@ body::before{
   <div class="stack"><div class="card">
     <span class="num">05<span class="sec">§3.3</span></span>
     <h3>Same text. Different question.</h3>
-    <p>This is the moment the whole design turns on. One document, frozen. Two questions, both
-    about harm. The verdict flips.</p>
+    <p>One document, held fixed. Two questions, both about harm. The verdict flips between them.</p>
     <p>The report calls this the <b>iso-content</b> setting, and it generates training data this
     way on purpose.</p>
     <div class="try">Swap the question. Not one character of the document moves.</div>
@@ -8315,8 +8314,9 @@ body::before{
     <h3>Datasets that disagree, folded into one objective</h3>
     <p>Binary flags, multi-label taxonomies, severity scales. Force them into a shared category
     set and you need a lossy mapping for every one.</p>
-    <p>Turn each dataset's own labels into questions phrased in <b>that dataset's own terms</b> and
-    the single yes/no objective absorbs all of them. Nothing has to agree with anything else.</p>
+    <p>Each processor converts its source labels into questions phrased in <b>that dataset's own
+    terms</b>, against one yes/no target. The source taxonomies never need a shared category
+    vocabulary.</p>
   </div></div>
 </div>
 
@@ -8345,8 +8345,8 @@ body::before{
     <p>Every source dataset gets a processor, designed by hand from that dataset's documentation.
     It encodes the labelling logic, the category mappings and the instruction templates for that
     source.</p>
-    <p>This is the unglamorous half of the contribution and there is no way around it. Somebody
-    read each dataset and wrote down what its labels mean.</p>
+    <p>The paper does not report how many processors there are, only that each dataset has one,
+    designed by hand from that dataset's documentation.</p>
   </div></div>
 </div>
 
@@ -8517,7 +8517,7 @@ body::before{
 <div class="beat a3" data-s="S_LORA" data-act="3" data-sec="§6.1" data-title="LoRA vs SFT">
   <div class="stack"><div class="card">
     <span class="num">23<span class="sec">§6.1</span></span>
-    <h3>LoRA, because it made no difference</h3>
+    <h3>LoRA, no significant difference</h3>
     <p>Fine-tuning runs LoRA on the language model parameters with cross-entropy on the single
     output token. Both LoRA and full SFT were tried.</p>
     <div class="meas">Full SFT is 0.7 F1 ahead on Aegis v2 validation. LoRA is 0.5 ahead on the
@@ -8610,7 +8610,7 @@ body::before{
 <div class="beat a4" data-s="S_MM" data-act="4" data-sec="§7.3" data-title="Multimodal results">
   <div class="stack"><div class="card">
     <span class="num">30<span class="sec">§7.3</span></span>
-    <h3>The clearest win is on images</h3>
+    <h3>The highest mean on the image benchmarks</h3>
     <p><b>83.8</b> average F1 across the three multimodal benchmarks against 77.6 for OmniGuard-7B,
     the next highest, at under half the parameters.</p>
     <p>It loses LlavaGuard to LlavaGuard, 72.0 against 81.4. Some of that benchmark's test images
@@ -8621,12 +8621,12 @@ body::before{
 <div class="beat a4" data-s="S_ADAPT" data-act="4" data-sec="§7.2" data-title="Adaptability">
   <div class="stack"><div class="card">
     <span class="num">31<span class="sec">§7.2</span></span>
-    <h3>Second place, on purpose</h3>
+    <h3>Second on adaptability</h3>
     <p>On the adaptability benchmark GPT-OSS-Safeguard-20B wins with <b>94.1</b> to Shieldstral's
     <b>91.3</b>. The report is upfront about why: per-category policy prompts, reasoning that
     decomposes an unfamiliar policy, and roughly seven times the parameters.</p>
-    <p>Shieldstral gives up those points and returns one token instead of a reasoning trace. Whether
-    that trade is right depends on whether you pay for the guardrail on every request.</p>
+    <p>Shieldstral returns one token instead of a reasoning trace. The paper reports no latency or
+    cost measurement for this comparison, so treat the tradeoff as directional.</p>
   </div></div>
 </div>
 
@@ -8636,8 +8636,8 @@ body::before{
     <h3>The holes are in the low-resource languages</h3>
     <p>Twelve languages are officially supported and the benchmarks reach 17 and 28. Performance is
     not uniform, and the report says so.</p>
-    <div class="meas">Indonesian prompt classification is 55.5 F1. The same language on response
-    classification is 94.1. That is the widest gap in the table.</div>
+    <div class="meas">For Shieldstral, Indonesian has the widest prompt to response gap: 55.5 F1 on
+    prompt classification against 94.1 on response.</div>
     <div class="try">Sort by Shieldstral's score to bring the weak cells to the top.</div>
   </div></div>
 </div>
@@ -8645,7 +8645,7 @@ body::before{
 <div class="beat a4" data-s="S_RUN" data-act="4" data-sec="card" data-title="Running it">
   <div class="stack"><div class="card">
     <span class="num">33<span class="sec">model card</span></span>
-    <h3>Twelve lines to a verdict</h3>
+    <h3>One endpoint call to a verdict</h3>
     <p>Apache 2.0, fits in 16GB of VRAM in BF16, serves through vLLM, llama.cpp, SGLang or
     Transformers.</p>
     <p>The one non-obvious part: the endpoint hands back token logprobs, not a score. You pull the
@@ -9359,9 +9359,9 @@ window.SCENES['S_ANCESTOR'] = function (root, api) {
     +     '<path d="M2 10 H27 M21 4.4 L27.4 10 L21 15.6"></path></svg>'
     +   '<span class="cell two"><span class="big lim" id="' + ID + '-n">0</span>'
     +     '<span class="lab">positive rows<i id="' + ID + '-free">stacking</i></span></span>'
-    +   '<p class="scale">Every leaf sits ' + DEPTH + ' levels deep, so the same trick across '
-    +     'the whole tree turns ' + nLeaves + ' rewrites into <b>' + totalRows
-    +     '</b> labelled rows.</p>'
+    +   '<p class="scale">Every leaf sits ' + DEPTH + ' levels deep, so one rewrite yields '
+    +     'one row per level. The paper reports 11 training super classes and 73 training '
+    +     'leaves but does not publish the training tree, so no total is computed here.</p>'
     + '</div>'
 
     + '<div class="foot">'
@@ -10139,7 +10139,8 @@ window.SCENES['S_COMBO'] = function (root, api) {
   var tot = el('div', 'tot');
   tot.appendChild(el('span', 'expr', nS + ' × ' + nF + ' × ' + nQ + ' ='));
   tot.appendChild(el('span', 'big', String(TOTAL)));
-  tot.appendChild(el('span', 'tlab', 'combinations in this data file'));
+  tot.appendChild(el('span', 'tlab',
+    'combinations of the pools in this data file, not a figure the paper reports'));
   var seenTx = el('span', 'seen', '');
   tot.appendChild(seenTx);
   prod.appendChild(tot);
@@ -11152,7 +11153,10 @@ window.SCENES['S_FILTER'] = function (root, api) {
   /* ---------------- numbers, all read from the data file ---------------- */
 
   var leaves = head.trainLeaves;                                  /* 73 leaf categories */
-  var negPer = (leaves != null) ? (leaves - 1) : null;            /* no rows per document */
+  // Pairing one document against every other leaf would be an invented ratio. The
+  // paper says any absent category CAN serve as a negative and that positives are
+  // duplicated k times, but reports no negatives-per-positive figure.
+  var negPer = null;
   var afterPer = (negPer != null) ? (negPer / 2) : null;          /* after one duplication */
 
   function ratio(n) {
@@ -12399,7 +12403,7 @@ window.SCENES['S_IMGSCARCE'] = function (root, api) {
      Measured here by matching the multimodal benchmark names against the inventory. */
   var mmNames = {};
   mmRows.forEach(function (r) { if (r && r.name) mmNames[String(r.name).toLowerCase()] = 1; });
-  var splitsAll = inv.length;
+  var splitsAll = inv.length;   // benchmarks in the eval inventory, not splits
   var sampAll = 0, splitsImg = 0, sampImg = 0;
   inv.forEach(function (r) {
     var n = Number(r[3]) || 0;
@@ -12513,7 +12517,7 @@ window.SCENES['S_IMGSCARCE'] = function (root, api) {
   }).join('');
 
   var invLine = (splitsImg && splitsAll)
-    ? ('paper eval inventory: ' + splitsImg + ' of ' + splitsAll + ' splits are image, '
+    ? ('paper evaluation inventory, not a count of training sources: ' + splitsImg + ' of ' + splitsAll + ' benchmarks are image, '
        + fmt(sampImg) + ' of ' + fmt(sampAll) + ' samples')
     : null;
 
@@ -13440,9 +13444,13 @@ window.SCENES['S_LANG'] = function (root, api) {
   $('slo').textContent = api.num(lo, 1);
   $('shi').textContent = api.num(hi, 1);
   if (offcEl) {
-    offcEl.textContent = offList.map(function (c) { return langMap[c]; }).join(' and ')
-      + ', the ' + offList.length + ' buckets outside the ' + official.length
-      + ' supported languages';
+    // "Others" is an aggregate whose members the table never names, so it cannot be
+    // called unsupported wholesale. Only name the buckets we can actually check.
+    var named = offList.filter(function (c) { return String(langMap[c]) !== 'Others'; });
+    offcEl.textContent = named.map(function (c) { return langMap[c]; }).join(' and ')
+      + (named.length === 1 ? ' is not in the ' : ' are not in the ')
+      + official.length + '-language support list. Others is an aggregate bucket and '
+      + 'this table does not name its constituent languages.';
   }
 
   /* ---------------- cell fill ---------------- */
@@ -16037,9 +16045,10 @@ window.SCENES['S_PROCESSOR'] = function (root, api) {
     '<div class="hd">' +
       '<div class="hdl">' +
         '<div class="big"></div>' +
-        '<div class="lede"><b>hand-written processors</b>' +
-        '<span>one per source dataset. No shared parser, no label autodetect, ' +
-        'no way around it.</span></div>' +
+        '<div class="lede"><b>one processor per training dataset</b>' +
+        '<span>hand written from that dataset&#39;s documentation. The paper does not ' +
+        'report how many there are. The sources below are the evaluation inventory, ' +
+        'shown to illustrate the variety.</span></div>' +
       '</div>' +
       '<div class="hdr">' +
         '<div class="st"><i>datasets</i><b class="vds"></b></div>' +
@@ -16047,7 +16056,10 @@ window.SCENES['S_PROCESSOR'] = function (root, api) {
         '<div class="st fin"><i>output formats</i><b>1</b></div>' +
       '</div>' +
     '</div>').firstChild;
-  hd.querySelector('.big').textContent = inv.length;
+  // The paper says every training dataset has its own processor but never says
+  // how many there are. inv.length is the count of EVALUATION benchmarks, so it
+  // must not be presented as a processor census.
+  hd.querySelector('.big').textContent = '1:1';
   hd.querySelector('.vds').textContent = inv.length;
   hd.querySelector('.vex').textContent = fmt(total);
   wrap.appendChild(hd);
@@ -17891,10 +17903,10 @@ window.SCENES['S_REWRITE'] = function (root, api) {
     + '</div>';
 
   var volNote = (SYN != null)
-    ? ('Repeated over the corpora this stage yields ' + SYN + 'M synthetic text samples, '
-       + 'every one of them a near miss pair rather than an easy contrast.')
+    ? ('Repeated over the corpora this stage yields about ' + SYN + 'M synthetic text samples, '
+       + 'covering these target and sibling pairs plus the ancestor positives in the next scene.')
     : 'Repeated over the corpora this stage yields the synthetic slice of the training mix, '
-      + 'every sample a near miss pair rather than an easy contrast.';
+      + 'covering target and sibling pairs plus ancestor positives.';
 
   root.className = 'sc-s_rewrite';
   root.appendChild(api.frag(

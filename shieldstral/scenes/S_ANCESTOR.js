@@ -184,9 +184,9 @@ window.SCENES['S_ANCESTOR'] = function (root, api) {
     +     '<path d="M2 10 H27 M21 4.4 L27.4 10 L21 15.6"></path></svg>'
     +   '<span class="cell two"><span class="big lim" id="' + ID + '-n">0</span>'
     +     '<span class="lab">positive rows<i id="' + ID + '-free">stacking</i></span></span>'
-    +   '<p class="scale">Every leaf sits ' + DEPTH + ' levels deep, so the same trick across '
-    +     'the whole tree turns ' + nLeaves + ' rewrites into <b>' + totalRows
-    +     '</b> labelled rows.</p>'
+    +   '<p class="scale">Every leaf sits ' + DEPTH + ' levels deep, so one rewrite yields '
+    +     'one row per level. The paper reports 11 training super classes and 73 training '
+    +     'leaves but does not publish the training tree, so no total is computed here.</p>'
     + '</div>'
 
     + '<div class="foot">'

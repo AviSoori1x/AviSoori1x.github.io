@@ -214,10 +214,10 @@ window.SCENES['S_REWRITE'] = function (root, api) {
     + '</div>';
 
   var volNote = (SYN != null)
-    ? ('Repeated over the corpora this stage yields ' + SYN + 'M synthetic text samples, '
-       + 'every one of them a near miss pair rather than an easy contrast.')
+    ? ('Repeated over the corpora this stage yields about ' + SYN + 'M synthetic text samples, '
+       + 'covering these target and sibling pairs plus the ancestor positives in the next scene.')
     : 'Repeated over the corpora this stage yields the synthetic slice of the training mix, '
-      + 'every sample a near miss pair rather than an easy contrast.';
+      + 'covering target and sibling pairs plus ancestor positives.';
 
   root.className = 'sc-s_rewrite';
   root.appendChild(api.frag(

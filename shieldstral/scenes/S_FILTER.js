@@ -24,7 +24,10 @@ window.SCENES['S_FILTER'] = function (root, api) {
   /* ---------------- numbers, all read from the data file ---------------- */
 
   var leaves = head.trainLeaves;                                  /* 73 leaf categories */
-  var negPer = (leaves != null) ? (leaves - 1) : null;            /* no rows per document */
+  // Pairing one document against every other leaf would be an invented ratio. The
+  // paper says any absent category CAN serve as a negative and that positives are
+  // duplicated k times, but reports no negatives-per-positive figure.
+  var negPer = null;
   var afterPer = (negPer != null) ? (negPer / 2) : null;          /* after one duplication */
 
   function ratio(n) {

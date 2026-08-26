@@ -76,10 +76,10 @@ URL = "https://avisoori1x.github.io/shieldstral/"
 
 HERO = """
 <div class="hero">
-  <div class="eyebrow">a visual guide &nbsp;&middot;&nbsp; every number from the paper</div>
+  <div class="eyebrow">a visual guide &nbsp;&middot;&nbsp; paper results, with labelled schematics</div>
   <h1>Shieldstral,<br>taken <em>apart</em></h1>
-  <p class="sub">A 3B guardrail whose safety policy is <b>not in its weights</b>. It reads the rule
-  at inference time as plain text, answers one yes/no question, and emits a single token. This walks
+  <p class="sub">A 3B guardrail that takes its moderation criterion as plain text <b>at inference time</b>,
+  answers one yes/no question about one document, and emits a single token. This walks
   the whole method, the reformulation, the 54.1M-sample data pipeline, the two checkpoints and the
   merge, and the places it loses, in <b>34 scenes</b>.</p>
   <div class="metastrip">
@@ -99,7 +99,7 @@ HERO = """
       rewrite loop, free positives up the tree, and the image problem.</p></div>
     <div class="a3"><h4>Act III &nbsp;&middot;&nbsp; the training</h4>
       <p>Ministral-3B with a vision encoder, LoRA against full SFT, two checkpoints wrong in
-      opposite directions, and the SLERP merge that fixes it.</p></div>
+      opposite directions, and the SLERP merge that balances them.</p></div>
     <div class="a4"><h4>Act IV &nbsp;&middot;&nbsp; does it hold up</h4>
       <p>An evaluation built not to match, the benchmark numbers, the adaptability loss to a 20B
       model, the language holes, and how to run it.</p></div>

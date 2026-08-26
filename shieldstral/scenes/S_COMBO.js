@@ -111,7 +111,8 @@ window.SCENES['S_COMBO'] = function (root, api) {
   var tot = el('div', 'tot');
   tot.appendChild(el('span', 'expr', nS + ' × ' + nF + ' × ' + nQ + ' ='));
   tot.appendChild(el('span', 'big', String(TOTAL)));
-  tot.appendChild(el('span', 'tlab', 'combinations in this data file'));
+  tot.appendChild(el('span', 'tlab',
+    'combinations of the pools in this data file, not a figure the paper reports'));
   var seenTx = el('span', 'seen', '');
   tot.appendChild(seenTx);
   prod.appendChild(tot);
