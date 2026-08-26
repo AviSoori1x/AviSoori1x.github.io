@@ -1,4 +1,4 @@
-/* Act I. Every figure is one artifact drawn from the shared kit. */
+/* The idea. Every figure is one artifact drawn from the shared kit. */
 window.SCENES = window.SCENES || {};
 
 (function () {

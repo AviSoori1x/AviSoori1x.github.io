@@ -219,17 +219,17 @@ h3{
     <span class="chip">multimodal F1 <b>83.8</b></span>
   </div>
   <div class="toc">
-    <div class="a1"><h4>Act I &nbsp;&middot;&nbsp; the idea</h4>
+    <div class="a1"><h4>The idea</h4>
       <p>Why a fixed list of harms breaks, moderation as one yes/no question, the three fields, two
       logits, and one document answered yes and no depending on the question.</p></div>
-    <div class="a2"><h4>Act II &nbsp;&middot;&nbsp; the data</h4>
+    <div class="a2"><h4>The data</h4>
       <p>Per-dataset processors, strictness tiers, seven document formats, hard negatives, the LLM
       rewrite loop, free positives up the tree, and why the image data had to be built
       differently.</p></div>
-    <div class="a3"><h4>Act III &nbsp;&middot;&nbsp; the training</h4>
+    <div class="a3"><h4>The training</h4>
       <p>What the checkpoint actually is, LoRA against full SFT, two checkpoints wrong in
       opposite directions, and the SLERP merge that ships instead of either.</p></div>
-    <div class="a4"><h4>Act IV &nbsp;&middot;&nbsp; does it hold up</h4>
+    <div class="a4"><h4>Does it hold up</h4>
       <p>An evaluation taxonomy built not to match the training one, the benchmark numbers, the
       adaptability loss to a 20B model, the language holes, and how to run it.</p></div>
   </div>
@@ -244,7 +244,6 @@ h3{
 <div id="beats">
 <!-- ==================== ACT I ==================== -->
 <div class="actdiv a1"><div class="stack">
-  <p class="n">Act I</p>
   <h2>The idea</h2>
   <p>A moderation model whose rules are not in its weights. What that costs, and what it buys.</p>
 </div></div>
@@ -337,7 +336,7 @@ h3{
 
 <!-- ==================== ACT II ==================== -->
 <div class="actdiv a2"><div class="stack">
-  <p class="n">Act II</p>
+  <p class="n">the data section</p>
   <h2>The data</h2>
   <p>Fifty-four million rows. The architecture is a paragraph, the pipeline is the paper.</p>
 </div></div>
@@ -512,7 +511,7 @@ h3{
 
 <!-- ==================== ACT III ==================== -->
 <div class="actdiv a3"><div class="stack">
-  <p class="n">Act III</p>
+  <p class="n">the data sectionI</p>
   <h2>The training</h2>
   <p>Two checkpoints that are wrong in opposite directions, and the merge that fixes it.</p>
 </div></div>
@@ -548,7 +547,7 @@ h3{
     <span class="num">24<span class="sec">§6.2</span></span>
     <h3>What P and PG each get wrong</h3>
     <p><b>P</b> trains on public safety data only. <b>PG</b> adds the generated taxonomy data from
-    Act II.</p>
+    the data section.</p>
     <p>P is calibrated to Aegis v2 and weak on unseen fine-grained policies. PG is strong on
     fine-grained policies and drifts on Aegis v2. Neither one is what you want to ship.</p>
   </div></div>
@@ -582,7 +581,6 @@ h3{
 
 <!-- ==================== ACT IV ==================== -->
 <div class="actdiv a4"><div class="stack">
-  <p class="n">Act IV</p>
   <h2>Does it hold up</h2>
   <p>An evaluation built not to match the training taxonomy, the numbers, and the places it loses.</p>
 </div></div>
@@ -1207,7 +1205,7 @@ window.SS_TILES = {"landscape": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA
 
 window.SCENES = window.SCENES || {};
 /* ---- act1 ---- */
-/* Act I. Every figure is one artifact drawn from the shared kit. */
+/* The idea. Every figure is one artifact drawn from the shared kit. */
 window.SCENES = window.SCENES || {};
 
 (function () {
@@ -1529,7 +1527,7 @@ window.SCENES = window.SCENES || {};
   };
 })();
 /* ---- act2 ---- */
-/* Act II, the data pipeline. Amber. One artifact per figure. */
+/* The data pipeline. Amber. One artifact per figure. */
 window.SCENES = window.SCENES || {};
 
 (function () {
@@ -1960,7 +1958,7 @@ window.SCENES = window.SCENES || {};
   };
 })();
 /* ---- act3 ---- */
-/* Act III, training and merging. Purple. */
+/* The training and the merge. Purple. */
 window.SCENES = window.SCENES || {};
 
 (function () {
@@ -2205,7 +2203,7 @@ window.SCENES = window.SCENES || {};
   };
 })();
 /* ---- act4 ---- */
-/* Act IV, does it hold up. Teal, with red for every loss. */
+/* Does it hold up. Teal, with red for every loss. */
 window.SCENES = window.SCENES || {};
 
 (function () {
@@ -2515,7 +2513,7 @@ window.SCENES = window.SCENES || {};
   var beats = [].slice.call(document.querySelectorAll('.beat'));
   var rail = document.getElementById('rail');
   var actlab = document.getElementById('actlab');
-  var ROMAN = ['', 'I', 'II', 'III', 'IV'];
+  var SECTION = ['', 'The idea', 'The data', 'The training', 'Does it hold up'];
   var built = {}, current = null, ticking = null;
 
   function make(id) {
@@ -2558,7 +2556,7 @@ window.SCENES = window.SCENES || {};
     if (ticking && ticking.start && !reduce) { try { ticking.start(); } catch (e) {} }
 
     var i = beats.indexOf(beat) + 1;
-    actlab.textContent = 'Act ' + ROMAN[+(beat.getAttribute('data-act') || 1)] +
+    actlab.textContent = SECTION[+(beat.getAttribute('data-act') || 1)] +
       ' · ' + (beat.getAttribute('data-sec') || '') + ' · ' + i + '/' + beats.length;
     current = beat;
   }

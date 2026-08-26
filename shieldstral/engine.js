@@ -10,7 +10,7 @@
   var beats = [].slice.call(document.querySelectorAll('.beat'));
   var rail = document.getElementById('rail');
   var actlab = document.getElementById('actlab');
-  var ROMAN = ['', 'I', 'II', 'III', 'IV'];
+  var SECTION = ['', 'The idea', 'The data', 'The training', 'Does it hold up'];
   var built = {}, current = null, ticking = null;
 
   function make(id) {
@@ -53,7 +53,7 @@
     if (ticking && ticking.start && !reduce) { try { ticking.start(); } catch (e) {} }
 
     var i = beats.indexOf(beat) + 1;
-    actlab.textContent = 'Act ' + ROMAN[+(beat.getAttribute('data-act') || 1)] +
+    actlab.textContent = SECTION[+(beat.getAttribute('data-act') || 1)] +
       ' · ' + (beat.getAttribute('data-sec') || '') + ' · ' + i + '/' + beats.length;
     current = beat;
   }

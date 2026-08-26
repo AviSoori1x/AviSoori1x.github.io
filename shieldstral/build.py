@@ -65,17 +65,17 @@ HERO = """
     <span class="chip">multimodal F1 <b>83.8</b></span>
   </div>
   <div class="toc">
-    <div class="a1"><h4>Act I &nbsp;&middot;&nbsp; the idea</h4>
+    <div class="a1"><h4>The idea</h4>
       <p>Why a fixed list of harms breaks, moderation as one yes/no question, the three fields, two
       logits, and one document answered yes and no depending on the question.</p></div>
-    <div class="a2"><h4>Act II &nbsp;&middot;&nbsp; the data</h4>
+    <div class="a2"><h4>The data</h4>
       <p>Per-dataset processors, strictness tiers, seven document formats, hard negatives, the LLM
       rewrite loop, free positives up the tree, and why the image data had to be built
       differently.</p></div>
-    <div class="a3"><h4>Act III &nbsp;&middot;&nbsp; the training</h4>
+    <div class="a3"><h4>The training</h4>
       <p>What the checkpoint actually is, LoRA against full SFT, two checkpoints wrong in
       opposite directions, and the SLERP merge that ships instead of either.</p></div>
-    <div class="a4"><h4>Act IV &nbsp;&middot;&nbsp; does it hold up</h4>
+    <div class="a4"><h4>Does it hold up</h4>
       <p>An evaluation taxonomy built not to match the training one, the benchmark numbers, the
       adaptability loss to a 20B model, the language holes, and how to run it.</p></div>
   </div>

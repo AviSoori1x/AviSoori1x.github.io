@@ -1,4 +1,4 @@
-/* Act II, the data pipeline. Amber. One artifact per figure. */
+/* The data pipeline. Amber. One artifact per figure. */
 window.SCENES = window.SCENES || {};
 
 (function () {

@@ -1,4 +1,4 @@
-/* Act IV, does it hold up. Teal, with red for every loss. */
+/* Does it hold up. Teal, with red for every loss. */
 window.SCENES = window.SCENES || {};
 
 (function () {

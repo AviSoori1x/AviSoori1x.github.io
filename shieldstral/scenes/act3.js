@@ -1,4 +1,4 @@
-/* Act III, training and merging. Purple. */
+/* The training and the merge. Purple. */
 window.SCENES = window.SCENES || {};
 
 (function () {
