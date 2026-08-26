@@ -39,8 +39,8 @@ window.SCENES = window.SCENES || {};
 
   /* 09 one processor per dataset */
   window.SCENES.S_PROCESSOR = function (root, api) {
-    var s = K.board(root, { alt: 'Each dataset gets its own hand written processor.' });
-    K.head(s, 'One processor per dataset', 'hand written, from that dataset\'s own documentation');
+    var s = K.board(root, { alt: 'Each dataset gets its own hand-written processor.' });
+    K.head(s, 'One processor per dataset', 'hand-written, from that dataset\'s own documentation');
     var inv = (api.SS.benchInventory || []).slice(0, 5);
     K.label(s, 0, 14, 'each source, its own processor');
     inv.forEach(function (r, i) {
@@ -61,7 +61,7 @@ window.SCENES = window.SCENES || {};
     ['labelling logic', 'category mappings', 'instruction templates'].forEach(function (t, i) {
       K.chip(s, i * 172, 302, t, { size: 11.5, color: C.ink2 });
     });
-    K.foot(s, 'Written by hand from each dataset\'s own documentation. The report does not say how many processors there are.');
+    K.foot(s, 'The five sources shown are examples. The report does not say how many processors there are.');
   };
 
   /* 10 strictness tiers */
@@ -114,7 +114,7 @@ window.SCENES = window.SCENES || {};
       K.mono(s, 16, y + 44, q.examples[0], { size: 12.5, color: C.ink });
       K.text(s, 16, y + 64, q.sub, { size: 12.5, color: C.ink3 });
     });
-    K.foot(s, 'Example questions are quoted from the report section on query templates.');
+    K.foot(s, 'Example questions are quoted from the report\'s section on query templates.');
   };
 
   /* 12 seven document formats */
@@ -144,7 +144,7 @@ window.SCENES = window.SCENES || {};
   /* 13 the pools multiply */
   window.SCENES.S_COMBO = function (root, api) {
     var s = K.board(root, { alt: 'The pools a single row can be drawn from.' });
-    K.head(s, 'One row, many views', 'the model never sees the same wording twice');
+    K.head(s, 'One row, many views', 'strictness, format and query, each drawn per sample');
     var SSd = api.SS;
     var nS = (SSd.strictness || []).length, nF = (SSd.formats || []).length,
         nQ = (SSd.queryTypes || []).length;
@@ -161,7 +161,7 @@ window.SCENES = window.SCENES || {};
       { size: 14, color: C.ink2 });
     K.text(s, 0, 272, 'so there is no fixed wording for the model to attach a label to.',
       { size: 14, color: C.ink2 });
-    K.foot(s, 'This counts the pools carried in this page data file. The report describes per-dataset template pools and does not publish a combination count.');
+    K.foot(s, 'This counts the pools carried in this page\'s data file. The report describes per-dataset template pools and does not publish a combination count.');
   };
 
   /* 14 positives at three granularities */
@@ -172,7 +172,7 @@ window.SCENES = window.SCENES || {};
     K.label(s, 0, 14, 'one harmful document');
     K.panel(s, 0, 24, 640, 72, { fill: T.ink });
     K.para(s, 16, 48, f3.document || '', 68, { size: 13, color: C.ink, lh: 19 });
-    K.label(s, 0, 126, 'three questions, widening to narrowing');
+    K.label(s, 0, 126, 'three questions, broad to narrow');
     var qs = [
       ['coarse binary', 'Is this content unsafe?'],
       ['category specific', f3.positive ? f3.positive.query : ''],
@@ -191,7 +191,7 @@ window.SCENES = window.SCENES || {};
   /* 15 three negative strategies */
   window.SCENES.S_NEG = function (root, api) {
     var s = K.board(root, { alt: 'Three ways to build a negative.' });
-    K.head(s, 'Unsafe, and the answer is still no', 'the discrimination a general harm detector fails');
+    K.head(s, 'Unsafe, and the answer is still no', 'category based, demographic based, and safe content');
     var f3 = api.SS.fig3 || {};
     var STRAT = [
       ['category based', f3.document, f3.negative ? f3.negative.query : '',
@@ -200,7 +200,7 @@ window.SCENES = window.SCENES || {};
        'Does this content target people on the basis of disability?',
        'unsafe document, unrelated group, so no'],
       ['safe content', 'Can people really control gravitational forces with their minds?',
-       'Is this content unsafe?', 'genuinely safe, the easy case']
+       'Is this content unsafe?', 'safe document, the easy case']
     ];
     K.label(s, 0, 14, 'negative strategy');
     var body = K.n('g', {}); s.appendChild(body);
@@ -217,7 +217,7 @@ window.SCENES = window.SCENES || {};
       K.text(body, 150, 316, st[3], { size: 14, color: C.ink2 });
       s.appendChild(body);
     }, { tint: 'amber' });
-    K.foot(s, 'For the first two the document is unsafe and the correct answer is still no. That is the discrimination a general harm detector fails.');
+    K.foot(s, 'The document and the category query are the report\'s own. The demographic and safe-content examples are phrased for this figure.');
   };
 
   /* 16 rebalance and filter */
@@ -255,13 +255,13 @@ window.SCENES = window.SCENES || {};
     });
     K.text(s, 18, 320, 'dropped where the dataset label and the model disagree, at the binary and the per-category level',
       { size: 12.5, color: C.ink3 });
-    K.foot(s, 'Counts of blocks are illustrative. The report states the mechanism but publishes no ratio and no drop rate.');
+    K.foot(s, 'The block counts are drawn for this figure. The report states the mechanism but publishes no ratio and no drop rate.');
   };
 
   /* 17 one call, two rows */
   window.SCENES.S_REWRITE = function (root, api) {
     var s = K.board(root, { alt: 'One LLM call produces two contradictory training rows.' });
-    K.head(s, 'One call in, two rows out', 'and they disagree on purpose');
+    K.head(s, 'One call in, two rows out', 'the same document, labelled yes and no');
     var f3 = api.SS.fig3 || {};
     K.label(s, 0, 14, 'into one llm call');
     ['safe source text', 'target category', 'sibling category'].forEach(function (t, i) {
@@ -336,11 +336,11 @@ window.SCENES = window.SCENES || {};
     });
     K.arrow(s, 288, 163, 344, 163, { color: C.red, dash: '4 4' });
     K.panel(s, 352, 134, 288, 58, { stroke: C.red, fill: T.red });
-    K.mono(s, 368, 168, 'cannot simply be generated', { size: 13, color: C.red });
+    K.mono(s, 368, 168, 'cannot be generated this way', { size: 13, color: C.red });
 
-    K.label(s, 0, 232, 'so the negatives are borrowed');
+    K.label(s, 0, 232, 'where the negatives come from');
     K.panel(s, 0, 244, 640, 96);
-    K.text(s, 18, 274, 'General purpose classification and object detection datasets supply', { size: 13.5, color: C.ink2 });
+    K.text(s, 18, 274, 'General-purpose classification and object-detection datasets supply', { size: 13.5, color: C.ink2 });
     K.text(s, 18, 294, 'a large pool of naturally safe images to serve as negatives.', { size: 13.5, color: C.ink2 });
     var TW = ['landscape', 'interior', 'objects'];
     for (i = 0; i < 16; i++) {
@@ -352,7 +352,7 @@ window.SCENES = window.SCENES || {};
   /* 20 an image actually going through moderation */
   window.SCENES.S_IMGQUERY = function (root, api) {
     var s = K.board(root, { alt: 'One picture moderated against a direct and an inverse query.' });
-    K.head(s, 'One picture, moderated twice', 'move the question, not the image');
+    K.head(s, 'One picture, moderated twice', 'the same picture, a direct query and an inverse one');
     var h = api.SS.headline;
     var VIEWS = [
       { tag: 'direct', q: 'Does this image contain violence?', a: false,
@@ -392,7 +392,7 @@ window.SCENES = window.SCENES || {};
   /* 21 asymmetric cut */
   window.SCENES.S_RERANK = function (root, api) {
     var s = K.board(root, { alt: 'Two different reranker thresholds for two pools.' });
-    K.head(s, 'Two pools, two different bars', 'drag the cuts, or snap them together and watch the cost');
+    K.head(s, 'Two pools, two different bars', 'switch to a single shared cut and watch what it costs');
     var body = K.n('g', {}); s.appendChild(body);
     var VIOL = [], NEG = [], i;
     for (i = 0; i < 26; i++) VIOL.push(0.18 + (i * 0.37) % 0.72);

@@ -48,7 +48,7 @@ window.SCENES = window.SCENES || {};
         fill: 'rgba(107,63,168,' + (0.2 + i * 0.05) + ')' }));
     }
     K.mono(s, 134, 252, '~' + A_.lm.approxB + 'B', { size: 13, color: P });
-    K.label(s, 134, 268, 'lora adapters, here only', { size: 8.4, color: P });
+    K.label(s, 134, 268, 'lora adapters, this block only', { size: 8.4, color: P });
 
     K.arrow(s, 406, 196, 438, 196, { color: C.line });
     K.panel(s, 444, 160, 196, 74, { stroke: C.line });
@@ -61,7 +61,7 @@ window.SCENES = window.SCENES || {};
     K.label(s, 444, 268, 'total, what you download', { size: 8.4 });
 
     /* row three: what ships */
-    K.label(s, 0, 320, 'and the checkpoint that ships is a merge, not a training run');
+    K.label(s, 0, 320, 'the checkpoint that ships is a three-way merge');
     var mix = [['PG', 0.6, P], ['P', 0.3, C.ink3], ['Instruct', 0.1, C.amber]], cx = 0;
     mix.forEach(function (m) {
       var w = m[1] * 640;
@@ -70,8 +70,8 @@ window.SCENES = window.SCENES || {};
       cx += w;
     });
     K.callout(s, 0, 380, 640,
-      'The third component is Ministral-3B-Instruct, the base instruct checkpoint, so what ships '
-      + 'is not any single run.', { color: P, tint: T.purple, cols: 70 });
+      'Two safety checkpoints and a slice of the base instruct model, '
+      + 'Ministral-3B-Instruct.', { color: P, tint: T.purple, cols: 70 });
     K.foot(s, 'Dimensions and layer counts come from params.json in the Hugging Face repo. Parameter totals are computed from those shapes and are approximate.');
   };
 
@@ -82,7 +82,7 @@ window.SCENES = window.SCENES || {};
     var L = api.SS.loraVsSft || {}, cols = L.cols || [];
     var sets = [['Aegis v2 validation', L.aegis || []],
                 ['fine-grained taxonomy validation', L.taxonomy || []]];
-    K.label(s, 0, 14, 'lora against full sft');
+    K.label(s, 0, 14, 'both validation sets');
     sets.forEach(function (set, si) {
       var y = 38 + si * 168;
       K.label(s, 0, y, set[0], { color: P });
@@ -108,7 +108,7 @@ window.SCENES = window.SCENES || {};
   /* 24 two checkpoints pulling apart */
   window.SCENES.S_TWOCKPT = function (root, api) {
     var s = K.board(root, { alt: 'P and PG are strong on opposite validation sets.' });
-    K.head(s, 'Two checkpoints, pulling apart', 'each one strong exactly where the other is weak');
+    K.head(s, 'Two checkpoints, pulling apart', 'each is strong where the other is weak');
     var rows = (api.SS.merge || {}).rows || [];
     var pairs = [
       ['Aegis v2 validation', f1of(rows, 'P', 'aegis'), f1of(rows, 'PG', 'aegis')],
@@ -136,7 +136,7 @@ window.SCENES = window.SCENES || {};
       K.text(s, 42, y + 112, (p[1] > p[2] ? 'P' : 'PG') + ' ahead by ' + lead + ' F1',
         { size: 13.5, color: C.ink3 });
     });
-    K.text(s, 0, 404, 'Strong in opposite places, so neither one is the model you ship.',
+    K.text(s, 0, 404, 'The shipped model keeps 0.6 of PG and 0.3 of P.',
       { size: 15, color: C.ink2 });
     K.foot(s, 'Bars are scaled to the local range so the gap is legible. Both are ' + VSET + '.');
   };
@@ -144,7 +144,7 @@ window.SCENES = window.SCENES || {};
   /* 25 the five measured recipes */
   window.SCENES.S_MERGE = function (root, api) {
     var s = K.board(root, { alt: 'Five measured merge recipes on two validation axes.' });
-    K.head(s, 'Five recipes, and only five', 'spherical interpolation between the two checkpoints');
+    K.head(s, 'Five recipes, and only five', 'spherical interpolation, done as pairwise merges');
     var M = api.SS.merge || {}, rows = M.rows || [], cols = M.cols || [];
     var FINAL = '0.6PG+0.3P+0.1I';
     var xs = rows.map(function (r) { return r.aegis[3]; });
@@ -155,7 +155,7 @@ window.SCENES = window.SCENES || {};
     function px(v) { return L + (v - x0) / (x1 - x0) * (Rt - L); }
     function py(v) { return B - (v - y0) / (y1 - y0) * (B - Tp); }
 
-    K.label(s, 0, 14, 'five measured recipes, nothing in between');
+    K.label(s, 0, 14, 'each dot is one measured merge');
     s.appendChild(K.n('rect', { x: L, y: Tp, width: Rt - L, height: B - Tp, fill: '#fff', stroke: C.line }));
     K.label(s, L, B + 18, 'aegis v2 validation f1', { size: 9.5 });
     K.label(s, 0, Tp + 6, 'taxonomy', { size: 9.5 });
@@ -205,14 +205,14 @@ window.SCENES = window.SCENES || {};
   /* 26 what each stage buys */
   window.SCENES.S_STAGES = function (root, api) {
     var s = K.board(root, { alt: 'What each training stage adds.' });
-    K.head(s, 'What each stage actually buys', 'fine-grained taxonomy validation set');
+    K.head(s, 'What each stage buys', 'fine-grained taxonomy validation set');
     var A = api.SS.stageAblation || {}, cols = A.cols || [], rws = A.rows || [];
     var mrow = ((api.SS.merge || {}).rows || []).filter(function (r) {
       return r.name === '0.6PG+0.3P+0.1I'; })[0];
     var names = ['base, no safety training', 'plus public data', 'plus generated data', 'after slerp merge'];
     var body = K.n('g', {}); s.appendChild(body);
 
-    K.label(s, 0, 14, 'fine-grained taxonomy validation set');
+    K.label(s, 0, 14, 'pick a metric');
     K.switcher(s, 0, 26, cols, function (mi) {
       body.innerHTML = '';
       var vals = rws.map(function (r) { return r.vals[mi]; });
@@ -230,10 +230,10 @@ window.SCENES = window.SCENES || {};
         }
       });
       if (mi === 2) {
-        K.text(body, 0, 400, 'Zero recall means the base model never predicts a violation at all.',
+        K.text(body, 0, 400, 'Zero recall means the base model never predicts a violation.',
           { size: 14, color: C.red });
       } else if (mi === 0) {
-        K.text(body, 0, 400, 'The 37.8 accuracy is not partial competence, it is what you get for always answering no.',
+        K.text(body, 0, 400, 'Always answering no scores 37.8 accuracy on this set.',
           { size: 14, color: C.red });
       }
       s.appendChild(body);

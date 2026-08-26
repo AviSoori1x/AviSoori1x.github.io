@@ -6,8 +6,8 @@ window.SCENES = window.SCENES || {};
 
   /* ---- 01 frozen list versus an open slot ---- */
   window.SCENES.S_FROZEN = function (root, api) {
-    var s = K.board(root, { alt: 'A fixed taxonomy moderation model beside a policy adaptive one.' });
-    K.head(s, 'Most of them decided already', 'one of these two can hear you, the other cannot');
+    var s = K.board(root, { alt: 'A fixed taxonomy moderation model beside one that reads its rule at inference time.' });
+    K.head(s, 'Most of them decided already', 'fixed taxonomy on the left, the rule you pick on the right');
     var SSd = api.SS;
     var cats = ['violence', 'hate', 'sexual', 'self-harm', 'weapons', 'crime',
                 'privacy', 'drugs', 'jailbreak', 'csam'];
@@ -65,7 +65,7 @@ window.SCENES = window.SCENES || {};
   /* ---- 02 four label shapes into one row ---- */
   window.SCENES.S_QA = function (root, api) {
     var s = K.board(root, { alt: 'Four incompatible datasets folded into one row shape.' });
-    K.head(s, 'Four label schemes, one row', 'the reformulation that lets them merge at all');
+    K.head(s, 'Four label schemes, one row', 'same three fields, same yes/no answer');
     var inv = (api.SS.benchInventory || []).slice(0, 4);
     K.label(s, 0, 14, 'four sources, four label schemes');
 
@@ -86,7 +86,7 @@ window.SCENES = window.SCENES || {};
     K.mono(s, 430, 228, 'yes | no', { size: 13, color: C.blue, weight: 700 });
 
     K.big(s, 358, 330, 'one', { size: 54, color: C.ink });
-    K.text(s, 358, 358, 'objective absorbs all of them', { size: 15, color: C.ink2 });
+    K.text(s, 358, 358, 'objective covers all four', { size: 15, color: C.ink2 });
     K.foot(s, 'Dataset names and sample counts are the report evaluation inventory. '
       + 'The label-scheme glyphs are drawn for this figure.');
   };
@@ -94,7 +94,7 @@ window.SCENES = window.SCENES || {};
   /* ---- 03 the three fields ---- */
   window.SCENES.S_REQUEST = function (root, api) {
     var s = K.board(root, { alt: 'Anatomy of one request.' });
-    K.head(s, 'Three fields, three jobs', 'change the strictness and watch which words move');
+    K.head(s, 'Three fields, three jobs', 'system message fixed, three tagged fields underneath');
     var SSd = api.SS;
     var tiers = SSd.strictness || [];
     var fmts = SSd.formats || [];
@@ -205,7 +205,7 @@ window.SCENES = window.SCENES || {};
       K.mono(maths, 0, 366, 's = exp(z_yes) / ( exp(z_yes) + exp(z_no) )', { size: 13, color: C.ink3 });
       K.mono(maths, 0, 388, '  = ' + ey.toFixed(2) + ' / ' + (ey + en).toFixed(2)
         + '  =  ' + v.toFixed(3), { size: 13, color: C.ink });
-      K.text(maths, 0, 418, 'Only the gap decides it. Slide both up together and nothing moves.',
+      K.text(maths, 0, 418, 'Slide both up together and the score does not move.',
         { size: 13.5, color: C.ink3 });
     }
     setY(st.yes); setN(st.no);
@@ -238,7 +238,7 @@ window.SCENES = window.SCENES || {};
     }, { tint: 'blue' });
 
     K.foot(s, 'These are the report ground-truth labels for this exact pair of samples. '
-      + 'No model is called on this page. Not one character of the document changes.');
+      + 'No model is called on this page.');
   };
 
   /* ---- 06 same question, different text ---- */
@@ -271,7 +271,7 @@ window.SCENES = window.SCENES || {};
         : 'unsafe, but a different harm type', { size: 13, color: C.ink2 });
     }, { tint: 'blue' });
 
-    K.foot(s, 'Both rewrites are unsafe. Only one matches the question being asked. '
+    K.foot(s, 'Both rewrites are unsafe. They differ in which harm category they hit. '
       + 'Report ground-truth labels, no model call.');
   };
 
@@ -313,7 +313,7 @@ window.SCENES = window.SCENES || {};
     K.mono(s, 148, 308, 'answer:  yes | no', { size: 12.5, color: C.blue });
 
     K.big(s, 0, 400, 'no shared vocabulary', { size: 32, color: C.ink });
-    K.text(s, 0, 428, 'so nothing has to be flattened to fit a common category set',
+    K.text(s, 0, 428, 'nothing gets flattened to fit a common category set',
       { size: 14, color: C.ink3 });
     K.foot(s, 'The three schemes are drawn to show the shape of the problem. '
       + 'The report names label formats, category taxonomies and annotation conventions as the axes of disagreement.');

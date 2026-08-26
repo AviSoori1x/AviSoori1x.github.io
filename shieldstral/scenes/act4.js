@@ -39,7 +39,7 @@ window.SCENES = window.SCENES || {};
     var s = K.board(root, { alt: 'Training and evaluation taxonomies differ by design.' });
     K.head(s, 'An evaluation built not to match', 'different names, different granularity, different groupings');
     var div = api.SS.divergence || [], h = api.SS.headline;
-    K.label(s, 0, 14, 'two trees, built not to match');
+    K.label(s, 0, 14, 'the two taxonomies');
     [['training', h.trainSupers + ' super classes, ' + h.trainLeaves + ' leaves', 'variable subcategory sizes', C.ink3],
      ['evaluation', h.evalSupers + ' / ' + h.evalSubs + ' / ' + h.evalLeaves, 'exactly two leaves per subcategory', G]
     ].forEach(function (t, i) {
@@ -83,7 +83,7 @@ window.SCENES = window.SCENES || {};
       K.para(s, 16, y + 44, (p[0] || {}).document || '', 52, { size: 12, color: C.ink, lh: 16 });
       K.big(s, 520, y + 58, p[2], { size: 32, color: p[3] });
     });
-    K.text(s, 0, 366, 'Both are unsafe. Only one matches the question, so detecting general unsafety gets you nowhere.',
+    K.text(s, 0, 366, 'Only one matches the question, so a model that just detects unsafe text answers yes twice.',
       { size: 14, color: C.ink2 });
     K.arrow(s, 320, 380, 320, 404, { color: C.line });
     K.panel(s, 120, 410, 400, 44, { stroke: G });
@@ -104,7 +104,7 @@ window.SCENES = window.SCENES || {};
     K.switcher(s, 0, 84, ['prompt classification', 'response classification'], function (i) {
       body.innerHTML = '';
       var t = tabs[i][1];
-      K.label(body, 0, 136, 'shieldstral 3b in teal, five baselines behind it', { color: C.ink3 });
+      K.label(body, 0, 136, 'shieldstral 3b in teal, five baselines in grey', { color: C.ink3 });
       benchBlock(body, t, 152);
       s.appendChild(body);
     }, { tint: 'teal' });
@@ -114,7 +114,7 @@ window.SCENES = window.SCENES || {};
   /* 30 multimodal */
   window.SCENES.S_MM = function (root, api) {
     var s = K.board(root, { alt: 'Multimodal benchmarks, including the one it loses.' });
-    K.head(s, 'The strongest result is on images', 'three multimodal benchmarks, one of them a loss');
+    K.head(s, 'The highest mean is on the image benchmarks', 'three multimodal benchmarks, one of them a loss');
     var h = api.SS.headline, t = (api.SS.benchmarks || {}).multimodal;
     K.big(s, 0, 54, h.multimodalF1 + '', { size: 58, color: G });
     K.text(s, 176, 46, 'mean F1 across the three image benchmarks,', { size: 14.5, color: C.ink2 });
@@ -131,7 +131,7 @@ window.SCENES = window.SCENES || {};
   window.SCENES.S_ADAPT = function (root, api) {
     var s = K.board(root, { alt: 'Per category F1 across the adaptability benchmark.' });
     K.head(s, 'Second, and the report says why',
-           'every leaf category, every model, one grid');
+           'every leaf category against every model');
     var h = api.SS.headline, SSd = api.SS;
     var models = SSd.taxonomyModels || [];
     var OURS = models.indexOf('Shieldstral-3B');
@@ -199,8 +199,8 @@ window.SCENES = window.SCENES || {};
       }
     });
     K.callout(s, 0, gy, 640,
-      'Shieldstral leads on ' + ours + ' of ' + tot + ' leaf categories against the 20B model, '
-      + 'and trails on the rest. The column is darker where a model scores higher.',
+      'Shieldstral leads on ' + ours + ' of ' + tot + ' leaf categories against the 20B model '
+      + 'and trails on the rest. Cells are darker where the score is higher.',
       { color: G, tint: T.teal, cols: 74 });
     K.foot(s, 'Adaptability benchmark, per category. This is the test set, not the taxonomy validation set used for the ablations.');
   };
@@ -234,15 +234,15 @@ window.SCENES = window.SCENES || {};
     K.text(s, 30, ly, 'prompt classification', { size: 12.5, color: C.ink2 });
     s.appendChild(K.n('rect', { x: 200, y: ly - 8, width: 22, height: 7, rx: 3.5, fill: 'rgba(31,37,48,.26)' }));
     K.text(s, 230, ly, 'response classification', { size: 12.5, color: C.ink2 });
-    K.text(s, 0, ly + 28, 'Indonesian is the widest split for Shieldstral, ' + rows[0].p.toFixed(1)
+    K.text(s, 0, ly + 28, 'Indonesian has the widest prompt to response gap, ' + rows[0].p.toFixed(1)
       + ' on prompts against ' + rows[0].r.toFixed(1) + ' on responses.', { size: 14, color: C.ink2 });
-    K.foot(s, 'Red marks a prompt score under 70. Others is an aggregate bucket and this table does not name its languages.');
+    K.foot(s, 'Red marks a prompt score under 70. The Others row is an aggregate bucket and the table does not name the languages in it.');
   };
 
   /* 33 running it */
   window.SCENES.S_RUN = function (root, api) {
     var s = K.board(root, { alt: 'The scoring helper and the serve command.' });
-    K.head(s, 'Twelve lines to a verdict', 'the endpoint hands back logprobs, not a score');
+    K.head(s, 'Twelve lines to a verdict', 'serve it, then read the two logprobs yourself');
     var sp = api.SS.systemPrompt || '';
     K.label(s, 0, 14, 'serve it');
     K.code(s, 0, 24, 640, [
@@ -268,19 +268,19 @@ window.SCENES = window.SCENES || {};
       { t: 'score   = exp(z_yes) / (exp(z_yes) + exp(z_no))', c: '#e0a3a3' },
       { t: 'flagged = score > 0.5', c: '#e0a3a3' }
     ]);
-    K.text(s, 0, 452, 'The endpoint hands back token logprobs, not a score. Renormalising over the two is the whole trick.',
+    K.text(s, 0, 452, 'Ask for enough top_logprobs that both yes and no come back, then renormalise over the two.',
       { size: 14, color: C.ink2 });
   };
 
   /* 34 limits */
   window.SCENES.S_LIMITS = function (root, api) {
     var s = K.board(root, { alt: 'What the model will not do for you.' });
-    K.head(s, 'What it will not do for you', 'straight from the model card, unsoftened');
+    K.head(s, 'What it will not do for you', 'from the model card, plus one the architecture implies');
     var lim = (api.SS.limitations || []).slice();
     lim.push({ t: 'No rationale to inspect',
-      d: 'A single token verdict arrives with nothing attached, so understanding a flag means going back to the content and the policy yourself.' });
+      d: 'A single-token verdict has nothing attached. To understand a flag you go back to the content and the policy yourself.' });
     lim.push({ t: 'Context', d: 'Trained on sequences up to 32k tokens. The card recommends staying inside that range.' });
-    K.label(s, 0, 14, 'what it will not do for you');
+    K.label(s, 0, 14, 'limits, one panel each');
     var y = 34;
     lim.forEach(function (l) {
       K.panel(s, 0, y, 640, 4, { fill: C.red, stroke: 'none', r: 2 });

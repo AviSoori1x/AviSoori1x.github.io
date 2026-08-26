@@ -51,13 +51,12 @@ HERO = """
 <div class="hero">
   <div class="eyebrow">a visual guide &nbsp;&middot;&nbsp; paper results, with labelled schematics</div>
   <h1>Shieldstral,<br>taken <em>apart</em></h1>
-  <p class="sub">Shieldstral is an open-weight <b>moderation model</b>. Instead of scoring content
-  against a fixed list of harm categories, it reads the moderation criterion as plain text at
-  inference time and answers one yes/no question about one document.</p>
-  <p class="sub" style="margin-top:14px">This is a visual guide to how it works. I worked on the
-  model, so this walks the method the way I would explain it to a colleague: the reformulation, the
-  data pipeline, the training and the merge, and the results including the ones that are less
-  flattering.</p>
+  <p class="sub">Shieldstral is an open-weight <b>moderation model</b> that carries no fixed list of
+  harm categories in its weights. You pass the moderation criterion as plain text at inference time
+  and it answers one yes/no question about one document.</p>
+  <p class="sub" style="margin-top:14px">I worked on the model, so this walks the method the way I
+  would explain it to a colleague: the reformulation, the data pipeline, the training and the merge,
+  and the results, including the ones that are less flattering.</p>
 
   <div class="metastrip">
     <span class="chip"><a href="https://arxiv.org/abs/2607.25857">arXiv <b>2607.25857</b></a></span>
@@ -68,18 +67,31 @@ HERO = """
   <div class="toc">
     <div class="a1"><h4>Act I &nbsp;&middot;&nbsp; the idea</h4>
       <p>Why a fixed list of harms breaks, moderation as one yes/no question, the three fields, two
-      logits, and the flip that the whole model turns on.</p></div>
+      logits, and one document answered yes and no depending on the question.</p></div>
     <div class="a2"><h4>Act II &nbsp;&middot;&nbsp; the data</h4>
       <p>Per-dataset processors, strictness tiers, seven document formats, hard negatives, the LLM
-      rewrite loop, free positives up the tree, and the image problem.</p></div>
+      rewrite loop, free positives up the tree, and why the image data had to be built
+      differently.</p></div>
     <div class="a3"><h4>Act III &nbsp;&middot;&nbsp; the training</h4>
-      <p>What the checkpoint really is, LoRA against full SFT, two checkpoints wrong in
-      opposite directions, and the SLERP merge that balances them.</p></div>
+      <p>What the checkpoint actually is, LoRA against full SFT, two checkpoints wrong in
+      opposite directions, and the SLERP merge that ships instead of either.</p></div>
     <div class="a4"><h4>Act IV &nbsp;&middot;&nbsp; does it hold up</h4>
-      <p>An evaluation built not to match, the benchmark numbers, the adaptability loss to a 20B
-      model, the language holes, and how to run it.</p></div>
+      <p>An evaluation taxonomy built not to match the training one, the benchmark numbers, the
+      adaptability loss to a 20B model, the language holes, and how to run it.</p></div>
   </div>
   <div class="scrollcue"><i></i> scroll &nbsp;&middot;&nbsp; the figure on the right is live</div>
+</div>
+"""
+
+OUTRO = """
+<div class="outro">
+  <h2>Notes</h2>
+  <p>Numbers and section references come from the paper,
+  <a href="https://arxiv.org/abs/2607.25857">arXiv 2607.25857</a>, and the
+  <a href="https://huggingface.co/mistralai/Shieldstral-1.0-3B">model card</a>. Where the paper does
+  not report something, the beat says so instead of guessing.</p>
+  <p>If a figure here disagrees with the paper, the paper is right. Tell me and I will fix it.</p>
+  <p>Avinash Sooriyarachchi</p>
 </div>
 """
 
@@ -118,6 +130,8 @@ html = f"""<!DOCTYPE html>
 <div id="beats">
 {beats}
 </div>
+
+{OUTRO}
 
 <script>
 {data}
