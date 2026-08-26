@@ -60,12 +60,16 @@
 
   var wide = matchMedia('(min-width: 1080.01px)');
 
+  // Track the CARD, not the 118svh beat container. The container is taller than
+  // the viewport, so its midpoint drifts away from the card you are reading and
+  // the figure changed late, which read as the two columns being out of step.
+  var cards = beats.map(function (b) { return b.querySelector('.stack') || b; });
+
   function pick() {
-    var band = innerHeight * (wide.matches ? 0.5 : 0.34);
+    var band = innerHeight * (wide.matches ? 0.5 : 0.3);
     var best = null, bd = Infinity;
     for (var i = 0; i < beats.length; i++) {
-      var r = beats[i].getBoundingClientRect();
-      if (r.bottom < 0 || r.top > innerHeight) continue;
+      var r = cards[i].getBoundingClientRect();
       var d = Math.abs((r.top + r.height / 2) - band);
       if (d < bd) { bd = d; best = beats[i]; }
     }

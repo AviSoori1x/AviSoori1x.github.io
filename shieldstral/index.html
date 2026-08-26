@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
 <title>Shieldstral, taken apart</title>
-<meta name="description" content="A visual guide to Shieldstral, Mistral AI's 3B policy-adaptive multimodal safety classifier. Thirty-four scenes covering the binary question-answering reformulation, the 54.1M-sample data pipeline, the training and merge, and where the numbers are less flattering. By Avinash Sooriyarachchi, a core contributor to the model.">
+<meta name="description" content="A visual guide to Shieldstral, Mistral AI's policy-adaptive multimodal safety classifier. Thirty-four scenes covering the binary question-answering reformulation, the 54.1M-sample data pipeline, the training and merge, and where the numbers are less flattering. By Avinash Sooriyarachchi, a core contributor to the model.">
 <link rel="canonical" href="https://avisoori1x.github.io/shieldstral/">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Shieldstral, taken apart">
-<meta property="og:description" content="A visual guide to Shieldstral, Mistral AI's 3B policy-adaptive multimodal safety classifier. Thirty-four scenes covering the binary question-answering reformulation, the 54.1M-sample data pipeline, the training and merge, and where the numbers are less flattering. By Avinash Sooriyarachchi, a core contributor to the model.">
+<meta property="og:description" content="A visual guide to Shieldstral, Mistral AI's policy-adaptive multimodal safety classifier. Thirty-four scenes covering the binary question-answering reformulation, the 54.1M-sample data pipeline, the training and merge, and where the numbers are less flattering. By Avinash Sooriyarachchi, a core contributor to the model.">
 <meta property="og:url" content="https://avisoori1x.github.io/shieldstral/">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -191,7 +191,8 @@ h3{
 <div class="hero">
   <div class="eyebrow">a visual guide &nbsp;&middot;&nbsp; paper results, with labelled schematics</div>
   <h1>Shieldstral,<br>taken <em>apart</em></h1>
-  <p class="sub">A 3B guardrail that takes its moderation criterion as plain text <b>at inference time</b>,
+  <p class="sub">A guardrail built on a <b>3B language model</b> with a vision encoder on top. It takes its
+  moderation criterion as plain text <b>at inference time</b>,
   answers one yes/no question about one document, and emits a single token. This walks
   the whole method, the reformulation, the 54.1M-sample data pipeline, the two checkpoints and the
   merge, and the places it loses, in <b>34 scenes</b>.</p>
@@ -199,6 +200,7 @@ h3{
     <span class="chip hl">I was a <b>core contributor</b></span>
     <span class="chip"><a href="https://arxiv.org/abs/2607.25857">arXiv <b>2607.25857</b></a></span>
     <span class="chip"><a href="https://huggingface.co/mistralai/Shieldstral-1.0-3B">weights <b>Apache 2.0</b></a></span>
+    <span class="chip">3B LM <b>plus vision encoder</b></span>
     <span class="chip">text F1 <b>84.9</b></span>
     <span class="chip">multimodal F1 <b>83.8</b></span>
     <span class="chip">34 scenes &middot; every figure live</span>
@@ -211,7 +213,7 @@ h3{
       <p>Per-dataset processors, strictness tiers, seven document formats, hard negatives, the LLM
       rewrite loop, free positives up the tree, and the image problem.</p></div>
     <div class="a3"><h4>Act III &nbsp;&middot;&nbsp; the training</h4>
-      <p>Ministral-3B with a vision encoder, LoRA against full SFT, two checkpoints wrong in
+      <p>What the checkpoint really is, LoRA against full SFT, two checkpoints wrong in
       opposite directions, and the SLERP merge that balances them.</p></div>
     <div class="a4"><h4>Act IV &nbsp;&middot;&nbsp; does it hold up</h4>
       <p>An evaluation built not to match, the benchmark numbers, the adaptability loss to a 20B
@@ -505,11 +507,15 @@ h3{
 <div class="beat a3" data-s="S_BASE" data-act="3" data-sec="§5" data-title="The base model">
   <div class="stack"><div class="card">
     <span class="num">22<span class="sec">§5</span></span>
-    <h3>3B, with eyes</h3>
-    <p>The base is <b>Ministral-3-3B-Base-2512</b> from the Mistral 3 family, with native multimodal
-    support through a Pixtral vision encoder.</p>
-    <p>That is why text and image moderation share one interface instead of being two models bolted
-    together. One checkpoint takes text, images or both.</p>
+    <h3>What the checkpoint actually is</h3>
+    <p>Section 5 names <b>Ministral-3-3B-Base-2512</b> as the starting point, a 3B causal language
+    model with native multimodal support through a <b>Pixtral vision encoder</b>.</p>
+    <p>The 3B in the title is the language model. The vision encoder sits on top of it, so the
+    checkpoint you download is larger than 3B.</p>
+    <p>Two more things the architecture section does not say out loud. LoRA is applied to the
+    <b>language model parameters only</b>. And the model that ships is not any single training run,
+    it is the three-way merge in beat 25, whose third component is
+    <span class="k">Ministral-3B-Instruct</span>, the base instruct checkpoint.</p>
   </div></div>
 </div>
 
@@ -601,7 +607,7 @@ h3{
     <span class="num">29<span class="sec">§7.1</span></span>
     <h3>Level with a model seven times its size</h3>
     <p>Across the text safety benchmarks Shieldstral averages <b>84.9</b> F1, tied exactly with
-    GPT-OSS-Safeguard-20B, while being the smallest model in the comparison at 3B against 4B to 20B.</p>
+    GPT-OSS-Safeguard-20B, while being the smallest model in the comparison.</p>
     <div class="try">Filter to the rows where it does not win. There are plenty.</div>
   </div></div>
 </div>
@@ -1803,30 +1809,42 @@ window.SCENES = window.SCENES || {};
     return null;
   }
 
-  /* 22 the base model */
+  /* 22 what the checkpoint actually is */
   window.SCENES.S_BASE = function (root, api) {
-    var s = K.board(root, { alt: 'One checkpoint accepting three input shapes.' });
-    K.head(s, 'One checkpoint, three input shapes', 'the vision encoder is native, not bolted on');
-    K.label(s, 0, 14, 'ministral-3-3b-base-2512, pixtral vision encoder');
-    var inputs = [['text only', 'a user prompt'], ['image only', 'one picture'],
-                  ['image plus text', 'a picture and a caption']];
-    inputs.forEach(function (inp, i) {
-      var y = 40 + i * 76;
-      K.panel(s, 0, y, 236, 58);
-      K.mono(s, 16, y + 26, inp[0], { size: 13, color: C.ink });
-      K.label(s, 16, y + 44, inp[1], { size: 9.5 });
-      K.arrow(s, 244, y + 29, 306, 156, { curve: true, color: C.line });
+    var s = K.board(root, { alt: 'What the shipped checkpoint is made of.' });
+    K.head(s, 'What the checkpoint actually is',
+           'the 3B is the language model, not the artifact');
+
+    K.label(s, 0, 16, 'the stack');
+    K.panel(s, 0, 28, 340, 62, { fill: T.purple, stroke: P });
+    K.mono(s, 18, 54, 'Ministral-3-3B-Base-2512', { size: 14, color: C.ink });
+    K.label(s, 18, 74, '3B causal language model', { color: P });
+    K.panel(s, 0, 96, 340, 62, { stroke: C.line });
+    K.mono(s, 18, 122, 'Pixtral vision encoder', { size: 14, color: C.ink });
+    K.label(s, 18, 142, 'additional parameters, on top', { color: C.ink3 });
+    K.arrow(s, 348, 94, 400, 94, { color: C.line });
+    K.panel(s, 408, 60, 232, 62, { stroke: P, fill: T.purple });
+    K.mono(s, 426, 86, 'larger than 3B', { size: 15, color: P, weight: 700 });
+    K.label(s, 426, 106, 'what you download', { color: P });
+
+    K.label(s, 0, 200, 'what LoRA touches');
+    K.panel(s, 0, 212, 340, 44, { fill: T.purple, stroke: P });
+    K.mono(s, 18, 240, 'language model parameters', { size: 13, color: P });
+    K.panel(s, 356, 212, 284, 44, { stroke: C.line, fill: 'rgba(31,37,48,.03)' });
+    K.mono(s, 374, 240, 'vision encoder, untouched', { size: 13, color: C.ink3 });
+
+    K.label(s, 0, 296, 'and the model that ships is a merge, not a run');
+    var mix = [['PG', 0.6, P], ['P', 0.3, C.ink3], ['Instruct', 0.1, C.amber]];
+    var cx = 0;
+    mix.forEach(function (m) {
+      var w = m[1] * 640;
+      s.appendChild(K.n('rect', { x: cx, y: 310, width: w - 3, height: 30, rx: 5, fill: m[2] }));
+      K.mono(s, cx + 10, 330, m[0] + ' ' + m[1], { size: 12.5, color: '#fff' });
+      cx += w;
     });
-    K.panel(s, 314, 108, 176, 100, { fill: T.purple, stroke: P });
-    K.big(s, 336, 168, '3B', { size: 44, color: P });
-    K.label(s, 336, 190, 'one checkpoint', { color: P });
-    K.arrow(s, 498, 158, 552, 158, { color: C.line });
-    K.panel(s, 560, 132, 80, 52, { stroke: C.line });
-    K.mono(s, 576, 164, 'yes|no', { size: 13, color: C.ink });
-    K.text(s, 0, 300, 'The vision encoder is native to the base model, so text and image moderation',
+    K.text(s, 0, 366, 'The third component is Ministral-3B-Instruct, the base instruct checkpoint.',
       { size: 14, color: C.ink2 });
-    K.text(s, 0, 322, 'share one interface instead of being two models bolted together.',
-      { size: 14, color: C.ink2 });
+    K.foot(s, 'Section 5 gives the base and the encoder, section 6.1 says LoRA is applied to the language model parameters, and section 6.2 gives the merge.');
   };
 
   /* 23 LoRA against full SFT */
@@ -2138,7 +2156,7 @@ window.SCENES = window.SCENES || {};
 
     /* headline pair */
     [[models[BEST] || 'GPT-OSS-Safeguard-20B', h.adaptabilityBest, C.ink, '20B'],
-     ['Shieldstral', h.adaptabilityF1, G, '3B']].forEach(function (r, i) {
+     ['Shieldstral', h.adaptabilityF1, G, '']].forEach(function (r, i) {
       var y = 16 + i * 40;
       K.mono(s, 0, y + 12, r[0], { size: 13, color: r[2], weight: 700 });
       K.bar(s, 240, y + 2, 300, 14, r[1] / 100, { color: i ? G : 'rgba(31,37,48,.3)' });
@@ -2356,12 +2374,16 @@ window.SCENES = window.SCENES || {};
 
   var wide = matchMedia('(min-width: 1080.01px)');
 
+  // Track the CARD, not the 118svh beat container. The container is taller than
+  // the viewport, so its midpoint drifts away from the card you are reading and
+  // the figure changed late, which read as the two columns being out of step.
+  var cards = beats.map(function (b) { return b.querySelector('.stack') || b; });
+
   function pick() {
-    var band = innerHeight * (wide.matches ? 0.5 : 0.34);
+    var band = innerHeight * (wide.matches ? 0.5 : 0.3);
     var best = null, bd = Infinity;
     for (var i = 0; i < beats.length; i++) {
-      var r = beats[i].getBoundingClientRect();
-      if (r.bottom < 0 || r.top > innerHeight) continue;
+      var r = cards[i].getBoundingClientRect();
       var d = Math.abs((r.top + r.height / 2) - band);
       if (d < bd) { bd = d; best = beats[i]; }
     }

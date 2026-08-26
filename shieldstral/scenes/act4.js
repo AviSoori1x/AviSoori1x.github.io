@@ -139,7 +139,7 @@ window.SCENES = window.SCENES || {};
 
     /* headline pair */
     [[models[BEST] || 'GPT-OSS-Safeguard-20B', h.adaptabilityBest, C.ink, '20B'],
-     ['Shieldstral', h.adaptabilityF1, G, '3B']].forEach(function (r, i) {
+     ['Shieldstral', h.adaptabilityF1, G, '']].forEach(function (r, i) {
       var y = 16 + i * 40;
       K.mono(s, 0, y + 12, r[0], { size: 13, color: r[2], weight: 700 });
       K.bar(s, 240, y + 2, 300, 14, r[1] / 100, { color: i ? G : 'rgba(31,37,48,.3)' });

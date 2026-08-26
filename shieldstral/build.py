@@ -40,7 +40,7 @@ for j in scene_js:
 missing = [w for w in wanted if w not in have]
 
 TITLE = "Shieldstral, taken apart"
-DESC = ("A visual guide to Shieldstral, Mistral AI's 3B policy-adaptive multimodal safety "
+DESC = ("A visual guide to Shieldstral, Mistral AI's policy-adaptive multimodal safety "
         "classifier. Thirty-four scenes covering the binary question-answering reformulation, "
         "the 54.1M-sample data pipeline, the training and merge, and where the numbers are less "
         "flattering. By Avinash Sooriyarachchi, a core contributor to the model.")
@@ -50,7 +50,8 @@ HERO = """
 <div class="hero">
   <div class="eyebrow">a visual guide &nbsp;&middot;&nbsp; paper results, with labelled schematics</div>
   <h1>Shieldstral,<br>taken <em>apart</em></h1>
-  <p class="sub">A 3B guardrail that takes its moderation criterion as plain text <b>at inference time</b>,
+  <p class="sub">A guardrail built on a <b>3B language model</b> with a vision encoder on top. It takes its
+  moderation criterion as plain text <b>at inference time</b>,
   answers one yes/no question about one document, and emits a single token. This walks
   the whole method, the reformulation, the 54.1M-sample data pipeline, the two checkpoints and the
   merge, and the places it loses, in <b>34 scenes</b>.</p>
@@ -58,6 +59,7 @@ HERO = """
     <span class="chip hl">I was a <b>core contributor</b></span>
     <span class="chip"><a href="https://arxiv.org/abs/2607.25857">arXiv <b>2607.25857</b></a></span>
     <span class="chip"><a href="https://huggingface.co/mistralai/Shieldstral-1.0-3B">weights <b>Apache 2.0</b></a></span>
+    <span class="chip">3B LM <b>plus vision encoder</b></span>
     <span class="chip">text F1 <b>84.9</b></span>
     <span class="chip">multimodal F1 <b>83.8</b></span>
     <span class="chip">34 scenes &middot; every figure live</span>
@@ -70,7 +72,7 @@ HERO = """
       <p>Per-dataset processors, strictness tiers, seven document formats, hard negatives, the LLM
       rewrite loop, free positives up the tree, and the image problem.</p></div>
     <div class="a3"><h4>Act III &nbsp;&middot;&nbsp; the training</h4>
-      <p>Ministral-3B with a vision encoder, LoRA against full SFT, two checkpoints wrong in
+      <p>What the checkpoint really is, LoRA against full SFT, two checkpoints wrong in
       opposite directions, and the SLERP merge that balances them.</p></div>
     <div class="a4"><h4>Act IV &nbsp;&middot;&nbsp; does it hold up</h4>
       <p>An evaluation built not to match, the benchmark numbers, the adaptability loss to a 20B

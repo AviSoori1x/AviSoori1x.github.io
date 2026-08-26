@@ -277,11 +277,15 @@
 <div class="beat a3" data-s="S_BASE" data-act="3" data-sec="§5" data-title="The base model">
   <div class="stack"><div class="card">
     <span class="num">22<span class="sec">§5</span></span>
-    <h3>3B, with eyes</h3>
-    <p>The base is <b>Ministral-3-3B-Base-2512</b> from the Mistral 3 family, with native multimodal
-    support through a Pixtral vision encoder.</p>
-    <p>That is why text and image moderation share one interface instead of being two models bolted
-    together. One checkpoint takes text, images or both.</p>
+    <h3>What the checkpoint actually is</h3>
+    <p>Section 5 names <b>Ministral-3-3B-Base-2512</b> as the starting point, a 3B causal language
+    model with native multimodal support through a <b>Pixtral vision encoder</b>.</p>
+    <p>The 3B in the title is the language model. The vision encoder sits on top of it, so the
+    checkpoint you download is larger than 3B.</p>
+    <p>Two more things the architecture section does not say out loud. LoRA is applied to the
+    <b>language model parameters only</b>. And the model that ships is not any single training run,
+    it is the three-way merge in beat 25, whose third component is
+    <span class="k">Ministral-3B-Instruct</span>, the base instruct checkpoint.</p>
   </div></div>
 </div>
 
@@ -373,7 +377,7 @@
     <span class="num">29<span class="sec">§7.1</span></span>
     <h3>Level with a model seven times its size</h3>
     <p>Across the text safety benchmarks Shieldstral averages <b>84.9</b> F1, tied exactly with
-    GPT-OSS-Safeguard-20B, while being the smallest model in the comparison at 3B against 4B to 20B.</p>
+    GPT-OSS-Safeguard-20B, while being the smallest model in the comparison.</p>
     <div class="try">Filter to the rows where it does not win. There are plenty.</div>
   </div></div>
 </div>
