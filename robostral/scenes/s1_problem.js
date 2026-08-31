@@ -59,9 +59,9 @@ window.SCENES = window.SCENES || {};
       });
 
       K.callout(body, 0, 384, 640,
-        'Of the ' + (n_single + n_depth) + ' published systems the paper compares against, ' +
-        n_single + ' work from a single RGB camera and ' + n_depth +
-        ' require depth, LiDAR or several cameras.',
+        'The paper compares against ' + (n_single + n_depth) + ' baseline configurations: ' +
+        n_single + ' from a single RGB camera and ' + n_depth + ' using depth, LiDAR or ' +
+        'several cameras. Three systems appear in both groups.',
         { cols: 66 });
     }
     draw(0);
@@ -113,8 +113,8 @@ window.SCENES = window.SCENES || {};
     ]);
 
     var BODIES = [
-      { n: 'tall, narrow lens', h: f.height_max, r: f.radius_min, pitch: f.pitch_min, c: C.blue },
-      { n: 'short, wide lens', h: f.height_min, r: f.radius_max, pitch: f.pitch_max, c: C.purple }
+      { n: 'tall, camera level', h: f.height_max, r: f.radius_min, pitch: f.pitch_min, c: C.blue },
+      { n: 'short, camera pitched down', h: f.height_min, r: f.radius_max, pitch: f.pitch_max, c: C.purple }
     ];
 
     BODIES.forEach(function (b, i) {
@@ -162,9 +162,9 @@ window.SCENES = window.SCENES || {};
       // straight down the corridor, so the onboard view has depth and a
       // landmark at the end rather than a wall 40 cm from the lens
       var PATH = [
-        new THREE.Vector3(-11.2, 0.05, 1.4), new THREE.Vector3(-6.4, 0.05, 0.6),
-        new THREE.Vector3(-1.4, 0.05, -0.4), new THREE.Vector3(3.6, 0.05, 0.2),
-        new THREE.Vector3(7.8, 0.05, 0.9), new THREE.Vector3(10.0, 0.05, 1.1)
+        new THREE.Vector3(-11.4, 0.05, 0.9), new THREE.Vector3(-6.6, 0.05, -0.5),
+        new THREE.Vector3(-1.6, 0.05, 0.4), new THREE.Vector3(3.4, 0.05, -0.4),
+        new THREE.Vector3(7.6, 0.05, 0.2), new THREE.Vector3(10.4, 0.05, 0.0)
       ];
       var line = ctx.route(THREE, PATH, ctx.C.blue);
       ctx.scene.add(line);
@@ -235,7 +235,7 @@ window.SCENES = window.SCENES || {};
           while (yaw > Math.PI) yaw -= 2 * Math.PI;
           while (yaw < -Math.PI) yaw += 2 * Math.PI;
           thB.textContent = 'Δθ ' + (yaw * 180 / Math.PI).toFixed(0) + '°';
-          dB.textContent = pr.depth.toFixed(1) + ' m away';
+          dB.textContent = pr.depth.toFixed(1) + ' m away  (scene truth, not predicted)';
         }
       };
     });
@@ -260,8 +260,8 @@ window.SCENES = window.SCENES || {};
     var FIELDS = [
       { k: 'u', d: 'image column of the waypoint', c: C.red, kind: 'point' },
       { k: 'v', d: 'image row of the waypoint', c: C.red, kind: 'point' },
-      { k: 'Δx', d: 'forward displacement, metres', c: C.ink3, kind: 'metric' },
-      { k: 'Δy', d: 'lateral displacement, metres', c: C.ink3, kind: 'metric' },
+      { k: 'Δx', d: 'forward displacement, metres', c: C.blue, kind: 'both' },
+      { k: 'Δy', d: 'lateral displacement, metres', c: C.blue, kind: 'both' },
       { k: 'Δθ', d: 'heading change on arrival', c: C.blue, kind: 'both' }
     ];
     FIELDS.forEach(function (fl, i) {
@@ -271,15 +271,15 @@ window.SCENES = window.SCENES || {};
         stroke: fl.kind === 'metric' ? C.line : fl.c });
       K.mono(s, 20, y + 32, fl.k, { size: 20, color: fl.c, weight: 700 });
       K.mono(s, 74, y + 31, fl.d, { size: 13, color: C.ink2 });
-      K.chip(s, 470, y + 13, fl.kind === 'point' ? 'pointing' :
+      K.chip(s, 470, y + 13, fl.kind === 'point' ? 'pointing only' :
         (fl.kind === 'both' ? 'both modes' : 'fallback'), {
         size: 10.5, h: 24, color: fl.c, stroke: fl.c === C.ink3 ? C.line : fl.c });
     });
 
     K.callout(s, 0, 356, 640,
-      'Pointing is the preferred mode. The metric pair is trained on every step as a co-training ' +
-      'task, which is affordable precisely because only about ' + f.invisible_pct +
-      '% of the data actually needs it.', { cols: 66, color: C.blue, tint: T.blue });
+      'Pointing is the preferred mode. Because only about ' + f.invisible_pct + '% of the data ' +
+      'has an invisible destination, predicting the displacements alongside the pixel works as a ' +
+      'co-training task rather than as a rarely used branch.', { cols: 66, color: C.blue, tint: T.blue });
     K.foot(s, 'Equation 1 in section 2.2. The model also emits STOP when the instruction is done.');
   };
 
@@ -300,9 +300,9 @@ window.SCENES = window.SCENES || {};
       var w = ctx.world(THREE, 4);
       ctx.scene.add(w.group);
       var rob = ctx.robot(THREE, { height: 1.15, radius: 0.3, color: ctx.C.purple });
-      rob.position.set(-5.2, 0, 0.6);
+      rob.position.set(-4.6, 0, 0.3);
       ctx.scene.add(rob);
-      var GOAL = new THREE.Vector3(10.2, 0, 1.1);
+      var GOAL = new THREE.Vector3(11.2, 0, 0.0);
       var wp = ctx.waypoint(THREE, ctx.C.red);
       wp.position.copy(GOAL);
       ctx.scene.add(wp);

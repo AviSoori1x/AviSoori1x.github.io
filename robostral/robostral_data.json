@@ -159,6 +159,23 @@
       }
     },
     {
+      "model": "InternVLA-N1 (S1+S2)",
+      "ours": false,
+      "single_camera": false,
+      "group": "depth",
+      "r2r": {
+        "NE": 4.83,
+        "OS": 63.3,
+        "SR": 58.2,
+        "SPL": 54.0
+      },
+      "rxr": {
+        "NE": 5.91,
+        "SR": 53.5,
+        "SPL": 46.1
+      }
+    },
+    {
       "model": "NavFoM",
       "ours": false,
       "single_camera": false,

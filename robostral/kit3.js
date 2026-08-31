@@ -95,8 +95,8 @@
       walls.push(m);
       // a darker cap line so walls read as built rather than as fog
       var cap = new THREE.Mesh(new THREE.BoxGeometry(w + 0.02, 0.05, d + 0.02), M.lam(0xc2b9a8));
-      cap.position.set(x, WALL_H, z);
-      g.add(cap);
+      cap.position.set(0, WALL_H / 2, 0);
+      m.add(cap);
       return m;
     }
 
@@ -107,13 +107,15 @@
     wall(-W / 4 - 2, D / 2, W / 2 - 4, T);
     wall(W / 4 + 2, D / 2, W / 2 - 4, T);
 
-    // two interior partitions forming a corridor down the middle, with doorways
+    // two interior partitions forming a corridor down the middle, with doorways.
+    // Collected separately so a figure that needs clean sightlines can hide them.
+    var partitions = [];
     [-3.2, 3.2].forEach(function (z, i) {
       var sgn = i ? 1 : -1;
-      wall(-8.5, z, 9, T);
-      wall(4.0, z, 8, T);
+      partitions.push(wall(-8.5, z, 9, T));
+      partitions.push(wall(4.0, z, 8, T));
       // a stub that makes the doorway read as a doorway
-      wall(-3.4, z + sgn * 1.1, T, 2.2);
+      partitions.push(wall(-3.4, z + sgn * 1.1, T, 2.2));
     });
 
     // furniture, in the accent palette so the 3D matches the 2D figures
@@ -132,19 +134,28 @@
     // lockers
     props.push(box(-11.4, -1.0, 0.9, 2.0, 4.0, M.lam(0x6f7787)));
     // the orange couch, the landmark in every one of these episodes
-    props.push(box(10.4, 1.1, 1.3, 0.78, 3.0, M.amber));
+    props.push(box(11.2, 0.0, 1.1, 0.82, 2.6, M.amber));
     // planters
-    [[-6.4, 6.1], [1.2, 6.3], [11.0, -5.4], [-2.6, 2.5], [4.8, -2.5]].forEach(function (p) {
+    [[-6.4, 6.1], [1.2, 6.3], [11.0, -5.4]].forEach(function (p) {
       props.push(box(p[0], p[1], 0.7, 0.9, 0.7, M.teal));
     });
-    // columns down the corridor
-    for (var k = -1; k <= 2; k++) {
-      var cm = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.28, WALL_H, 12), M.lam(0xd2caba));
-      cm.position.set(k * 6.2, WALL_H / 2, 0);
-      g.add(cm);
+    [[-8.2, -1.5], [-3.0, 1.6], [2.6, -1.6], [7.4, 1.5]].forEach(function (p) {
+      props.push(box(p[0], p[1], 0.6, 0.62, 0.6, M.teal));
+    });
+    // A colonnade down BOTH sides of the corridor. These used to sit on the
+    // centreline, which put a grey cylinder in the middle of every onboard view.
+    for (var k = -2; k <= 2; k++) {
+      [-2.3, 2.3].forEach(function (cz) {
+        var cm = new THREE.Mesh(new THREE.CylinderGeometry(0.26, 0.26, WALL_H, 14),
+          M.lam(0xd2caba));
+        cm.position.set(k * 5.2, WALL_H / 2, cz);
+        g.add(cm);
+      });
     }
 
-    return { group: g, W: W, D: D, mats: M, props: props, walls: walls };
+    return { group: g, W: W, D: D, mats: M, props: props, walls: walls,
+             partitions: partitions,
+             openUp: function () { partitions.forEach(function (m) { m.visible = false; }); } };
   }
 
   /* ---------- a robot, parameterised the way the paper randomises it ---------- */

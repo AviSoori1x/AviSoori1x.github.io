@@ -62,27 +62,31 @@ window.SCENES = window.SCENES || {};
       s.appendChild(K.n('rect', { x: X0, y: y - 4, width: XW, height: 46, rx: 8,
         fill: i === 0 ? T.blue : (i === 1 ? T.teal : T.amber) }));
       // one second of wall clock, drawn to scale, capped so 100 Hz stays legible
-      var n = Math.min(50, Math.round(L.hz));
+      // 0.5 Hz is one tick every OTHER second, so draw two seconds of wall clock
+      var SECS = L.hz < 1 ? 2 : 1;
+      var n = Math.min(50, Math.max(1, Math.round(L.hz * SECS)));
       var g = K.n('g', {}); s.appendChild(g);
       for (var k = 0; k < n; k++) {
         var x = X0 + 12 + (XW - 24) * (n === 1 ? 0.5 : k / (n - (n > 1 ? 1 : 0)));
         g.appendChild(K.n('rect', { x: x - 1.4, y: y + 4, width: 2.8, height: 30, rx: 1.4,
           fill: L.c, opacity: .9 }));
       }
-      if (L.hz > 50) K.mono(s, X0 + 12, y + 60, 'drawn at 50 of ' + L.hz + ' for legibility',
+      if (L.hz > 50) K.mono(s, X0 + 12, y + 62, 'drawn at 50 of ' + L.hz + ' for legibility',
+        { size: 10.5, color: C.ink3 });
+      if (SECS === 2) K.mono(s, X0 + 12, y + 62, 'one tick, across two seconds',
         { size: 10.5, color: C.ink3 });
       ticks.push({ g: g, hz: L.hz, y: y, c: L.c });
     });
 
     K.mono(s, X0, 402, '|', { size: 11, color: C.ink3 });
     s.appendChild(K.n('line', { x1: X0, y1: 396, x2: X0 + XW, y2: 396, stroke: C.line }));
-    K.mono(s, X0, 416, 'one second', { size: 11.5, color: C.ink3 });
+    K.mono(s, X0, 416, 'two seconds of wall clock', { size: 11.5, color: C.ink3 });
     var head = K.n('rect', { x: X0, y: 30, width: 2, height: 356, fill: C.red, opacity: .55 });
     s.appendChild(head);
 
     K.callout(s, 0, 438, 640,
-      'The vision-language model emits two waypoints per second. Everything between that and the ' +
-      'actuators exists to fill in the gap.', { cols: 66 });
+      'The vision-language model emits one waypoint every two seconds. Everything between that ' +
+      'and the actuators exists to fill in the gap.', { cols: 66 });
 
     return {
       tick: function (t) {
@@ -188,7 +192,11 @@ window.SCENES = window.SCENES || {};
 
     var handle = K3.mount(root, { aspect: '16 / 9' }, function (ctx) {
       var THREE = ctx.THREE;
-      ctx.scene.add(ctx.world(THREE, 21).group);
+      var w = ctx.world(THREE, 21);
+      // this figure is about the body, not the building: clear the partitions so
+      // the camera always has the same unobstructed view of the same waypoint
+      w.openUp();
+      ctx.scene.add(w.group);
 
       var holder = new THREE.Group();
       ctx.scene.add(holder);
@@ -201,7 +209,7 @@ window.SCENES = window.SCENES || {};
         rob.rotation.y = Math.atan2(GOAL.x - (-2.0), GOAL.z - 6.0);
         holder.add(rob);
       }
-      var GOAL = new THREE.Vector3(10.2, 0, 1.1);
+      var GOAL = new THREE.Vector3(11.2, 0, 0.0);
       rebuild();
       var wp = ctx.waypoint(THREE, ctx.C.red);
       wp.position.copy(GOAL);
@@ -219,8 +227,8 @@ window.SCENES = window.SCENES || {};
           ctx.camPose(THREE, rob, st.pitch, camB);
           var pr = ctx.project(THREE, new THREE.Vector3(GOAL.x, 0.35, GOAL.z), camB);
 
-          camA.position.set(-13, 13, 16);
-          camA.lookAt(-1, 0.4, 0.6);
+          camA.position.set(-11, 7.5, 11);
+          camA.lookAt(2.0, 0.6, 0.0);
           camA.updateMatrixWorld();
           wp.userData.pulse.scale.setScalar(1 + Math.sin(t * 3) * 0.1);
 
@@ -261,7 +269,8 @@ window.SCENES = window.SCENES || {};
       function (v) { return v.toFixed(0) + '°'; }, function (v) { st.pitch = v; });
 
     K3.note(root, 'These are the exact ranges the paper randomises over per trajectory. ' +
-      'The policy never sees a consistent viewpoint, so it cannot come to depend on one.', 'teal');
+      'The policy never sees a consistent viewpoint, which is how the paper reduces its ' +
+      'dependence on any particular camera setup, scale or morphology.', 'teal');
     return handle;
   };
 
@@ -277,21 +286,21 @@ window.SCENES = window.SCENES || {};
       // a tall bimanual-style base and a small wheeled one, at the ends of the
       // randomisation range rather than as portraits of specific products
       var tall = ctx.robot(THREE, { height: 1.7, radius: 0.34, camFrac: 0.93, color: ctx.C.blue, layer: 1 });
-      tall.position.set(-6.8, 0, 0.9);
+      tall.position.set(-7.2, 0, -0.9);
       ctx.scene.add(tall);
       var small = ctx.robot(THREE, { height: 0.5, radius: 0.19, camFrac: 0.86, color: ctx.C.amber, layer: 2 });
-      small.position.set(-1.8, 0, -0.6);
+      small.position.set(-2.4, 0, 0.7);
       ctx.scene.add(small);
 
-      var GOAL = new THREE.Vector3(10.2, 0, 1.1);
+      var GOAL = new THREE.Vector3(11.2, 0, 0.0);
       var wp = ctx.waypoint(THREE, ctx.C.red);
       wp.position.copy(GOAL);
       ctx.scene.add(wp);
-      tall.rotation.y = Math.atan2(GOAL.x + 6.8, GOAL.z - 0.9);
-      small.rotation.y = Math.atan2(GOAL.x + 1.8, GOAL.z + 0.6);
+      tall.rotation.y = Math.atan2(GOAL.x + 7.2, GOAL.z + 0.9);
+      small.rotation.y = Math.atan2(GOAL.x + 2.4, GOAL.z - 0.7);
       ctx.scene.add(ctx.route(THREE, [
-        new THREE.Vector3(-6.8, .05, 0.9), new THREE.Vector3(0.4, .05, 0.0),
-        new THREE.Vector3(5.0, .05, 0.6), GOAL.clone().setY(.05)], ctx.C.blue));
+        new THREE.Vector3(-7.2, .05, -0.9), new THREE.Vector3(0.4, .05, 0.0),
+        new THREE.Vector3(5.0, .05, 0.2), GOAL.clone().setY(.05)], ctx.C.blue));
 
       var camA = ctx.thirdPerson(THREE, 40, [1, 2]);
       var camB = new THREE.PerspectiveCamera(58, 1, 0.05, 200);
@@ -308,8 +317,8 @@ window.SCENES = window.SCENES || {};
           ctx.camPose(THREE, rob, 10, camB);
           var pr = ctx.project(THREE, new THREE.Vector3(GOAL.x, 0.35, GOAL.z), camB);
           var a = 0.5 + Math.sin(t * 0.07) * 0.2;
-          camA.position.set(Math.sin(a) * 19 - 3, 13, Math.cos(a) * 19 + 3);
-          camA.lookAt(0.5, 0.5, 0.4);
+          camA.position.set(Math.sin(a) * 13 - 5, 7.5, Math.cos(a) * 13 + 6);
+          camA.lookAt(-3.0, 0.7, 0.0);
           camA.updateMatrixWorld();
           wp.userData.pulse.scale.setScalar(1 + Math.sin(t * 3) * 0.1);
 

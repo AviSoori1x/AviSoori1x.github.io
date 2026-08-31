@@ -51,7 +51,8 @@ window.SCENES = window.SCENES || {};
 
     K3.note(root, 'Offices, homes, commercial spaces and outdoors, varied on layout complexity, ' +
       'object density, lighting and architectural style. Collecting this on real hardware is not ' +
-      'a budget problem, it is an impossibility.', 'blue');
+      'a budget problem, it is prohibitively costly, which is the constraint the recipe is built ' +
+      'to remove.', 'blue');
     return handle;
   };
 
@@ -327,7 +328,7 @@ window.SCENES = window.SCENES || {};
       legendG.innerHTML = '';
       var msg = mode === 0
         ? leaks + ' cells let a step read another step\'s ground-truth action'
-        : 'no cell reads another step\'s action, and every step still sees every frame';
+        : 'no cell reads another step\'s action, and every step still sees every frame up to its own';
       K.panel(legendG, 0, BASE + 46, 640, 60, { flat: true,
         fill: mode === 0 ? T.red : T.teal, stroke: mode === 0 ? C.red : C.teal });
       K.mono(legendG, 18, BASE + 82, msg,
@@ -472,7 +473,7 @@ window.SCENES = window.SCENES || {};
     var f = api.RN.facts;
     var s = K.board(root, { alt: 'Curating a hard subset by rolling out the supervised policy.' });
     K.head(s, 'Only the episodes it already fails',
-      f.hard_tasks_k + ' thousand tasks the supervised policy could not solve');
+      f.hard_tasks_k + ' thousand tasks the supervised policy could not reliably reach the goal on');
 
     K.label(s, 0, 14, 'curation');
     var STEPS = [

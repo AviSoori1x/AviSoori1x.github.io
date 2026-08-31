@@ -286,11 +286,12 @@ h3{
       <p>A big model thinking slowly on top of a small one acting fast, the five numbers it emits,
       the fallback for when the goal is behind you, and one policy on two very different bodies.</p></div>
     <div class="a3"><h4>How it learns</h4>
-      <p>Two and a half million simulated trajectories, an attention mask that turns quadratic
-      training into linear, and the reinforcement learning pass that fixes what imitation cannot.</p></div>
+      <p>2.4 million simulated trajectories, episode packing that turns quadratic training into
+      linear, a mask that stops the model cheating off its own past answers, and the reinforcement
+      learning pass that fixes what imitation cannot.</p></div>
     <div class="a4"><h4>Does it hold up</h4>
       <p>Fifteen baselines, the gap to systems that get depth for free, what reinforcement learning
-      actually bought, and the one number where it still comes second.</p></div>
+      actually bought, and the one number where it still comes third.</p></div>
   </div>
   <div class="scrollcue"><i></i> scroll &nbsp;&middot;&nbsp; the figure on the right is live</div>
 </div>
@@ -353,9 +354,10 @@ h3{
     <p>Robostral Navigate outputs an <b>image coordinate</b>. Given the instruction and the frames so
     far, it names the pixel <span class="k">(u, v)</span> of the furthest waypoint along the route
     that is still visible in the current view, plus the heading change it wants on arrival.</p>
-    <p>The coordinate lives in the image, not in the world. Two robots looking at the same doorway
-    from different heights disagree about how many metres away it is, and agree completely about
-    which part of the picture it occupies.</p>
+    <p>The coordinate lives in the image, not in the world. Each robot names the pixel in the
+    frame it actually has, so no metres-per-unit calibration has to travel with the number.
+    Change the camera and the pixel moves, and covering that variation is exactly what the
+    randomised training data is for.</p>
     <div class="try">Left is the room. Right is what the robot's camera sees. The crosshair is not
     drawn on, it is the world waypoint projected through that camera. Drag the robot along the
     route.</div>
@@ -411,7 +413,7 @@ h3{
   <div class="stack"><div class="card">
     <span class="num">08<span class="sec">§2.1</span></span>
     <h3>Half a hertz of thinking, a hundred hertz of moving</h3>
-    <p>The vision-language model emits a waypoint twice a second. The diffusion policy expands that
+    <p>The vision-language model emits a waypoint once every two seconds. The diffusion policy expands that
     into a dense trajectory at ten hertz. A motion controller, the only part that is specific to the
     robot you bought, turns that into motor commands at a hundred hertz.</p>
     <p>Each layer down is cheaper, faster and dumber than the one above it. Nothing expensive runs
@@ -475,7 +477,7 @@ h3{
   <p>All of it in simulation, then an attention mask that makes the training bill affordable.</p>
 </div></div>
 
-<div class="beat a3" data-s="S_SIM" data-act="3" data-sec="§3.1" data-title="Two and a half million routes">
+<div class="beat a3" data-s="S_SIM" data-act="3" data-sec="§3.1" data-title="2.4 million routes">
   <div class="stack"><div class="card">
     <span class="num">13<span class="sec">§3.1</span></span>
     <h3>No real-world data collection at all</h3>
@@ -560,9 +562,10 @@ h3{
     <h3>Twenty two times fewer tokens, and nothing given up</h3>
     <p>No prediction target is discarded. The saving is pure redundancy removal, and it turns a
     training run measured in months into one measured in days.</p>
-    <p>The effect is largest on RxR-CE, where instructions and trajectories are both considerably
-    longer than R2R-CE. The quadratic term is the one that hurts, so the benchmark with the longest
-    episodes is the one this rescues.</p>
+    <p>The paper calls the technique particularly vital for RxR-CE, where instructions and
+    trajectories are both considerably longer than R2R-CE. The 22 times is a single figure across
+    the training set, not a per-benchmark measurement, but the quadratic term is the one that hurts,
+    so the benchmark with the longest episodes is the one with most to gain.</p>
   </div></div>
 </div>
 
@@ -674,13 +677,14 @@ h3{
 <div class="beat a4" data-s="S_RXR" data-act="4" data-sec="§4.1" data-title="The number that does not go their way">
   <div class="stack"><div class="card">
     <span class="num">28<span class="sec">§4.1</span></span>
-    <h3>On the harder benchmark it comes second on success</h3>
+    <h3>On the harder benchmark it comes third on success</h3>
     <p>RxR-CE has longer instructions and longer routes. Robostral Navigate takes the state of the
     art among single-camera systems, and beats the best depth-assisted model on path efficiency and
-    on navigation error.</p>
-    <p>On raw success rate against that same depth-assisted model, it does not win. The paper says
-    competitive, and competitive is the right word. It is worth stating plainly, because the rest of
-    the results are strong enough not to need the rounding.</p>
+    on navigation error. The split is english-only.</p>
+    <p>On raw success rate it does not win. Two depth-equipped systems finish above it, and the paper
+    compares itself only to the higher of the two, calling the result competitive. Competitive is the
+    right word. Worth stating plainly, because the rest of the results are strong enough not to need
+    the rounding.</p>
   </div></div>
 </div>
 
@@ -713,7 +717,7 @@ h3{
 
 <div class="outro">
   <h2>Notes</h2>
-  <p>Every number here is parsed straight out of the paper,
+  <p>Every number in the figures is parsed straight out of the paper,
   <a href="https://arxiv.org/abs/2607.20785">arXiv 2607.20785</a>, rather than typed in by hand.
   Where the paper does not report something, the beat says so instead of guessing.</p>
   <p>The 3D scenes are generated, not recordings. They are built to be dimensionally honest about
@@ -729,7 +733,7 @@ window.THREE = THREE;
 document.dispatchEvent(new Event('three:ready'));
 </script>
 <script>
-window.RN = {"meta":{"arxiv":"2607.20785","title":"Robostral Navigate","webpage":"https://mistral.ai/news/robostral-navigate"},"table1":[{"model":"NaVid","ours":false,"single_camera":true,"group":"single","r2r":{"NE":5.47,"OS":49.0,"SR":37.0,"SPL":35.0},"rxr":{"NE":5.72,"SR":45.7,"SPL":38.2},"short":"NaVid"},{"model":"Uni-NaVid","ours":false,"single_camera":true,"group":"single","r2r":{"NE":5.58,"OS":53.5,"SR":47.0,"SPL":42.7},"rxr":{"NE":6.24,"SR":48.7,"SPL":40.9},"short":"Uni-NaVid"},{"model":"NaVILA","ours":false,"single_camera":true,"group":"single","r2r":{"NE":5.22,"OS":62.5,"SR":54.0,"SPL":49.0},"rxr":{"NE":6.77,"SR":49.3,"SPL":44.0},"short":"NaVILA"},{"model":"InternVLA-N1","ours":false,"single_camera":true,"group":"single","r2r":{"NE":4.89,"OS":60.6,"SR":55.4,"SPL":52.1},"rxr":{"NE":6.41,"SR":49.5,"SPL":41.8},"short":"InternVLA-N1"},{"model":"Qwen-VLA-Base","ours":false,"single_camera":true,"group":"single","r2r":{"NE":5.2,"OS":61.7,"SR":53.8,"SPL":49.4},"rxr":{"NE":6.4,"SR":45.1,"SPL":45.8},"short":"Qwen-VLA-Base"},{"model":"StreamVLN","ours":false,"single_camera":true,"group":"single","r2r":{"NE":4.98,"OS":64.2,"SR":56.9,"SPL":51.9},"rxr":{"NE":6.22,"SR":52.9,"SPL":46.0},"short":"StreamVLN"},{"model":"Qwen-VLA-Instruct","ours":false,"single_camera":true,"group":"single","r2r":{"NE":5.1,"OS":69.0,"SR":57.5,"SPL":51.2},"rxr":{"NE":5.8,"SR":59.6,"SPL":47.8},"short":"Qwen-VLA-Instruct"},{"model":"Qwen-RobotNav-4B","ours":false,"single_camera":true,"group":"single","r2r":{"NE":4.22,"OS":73.6,"SR":66.9,"SPL":60.5},"rxr":{"NE":4.15,"SR":71.3,"SPL":61.5},"short":"Qwen-RobotNav-4B"},{"model":"Qwen-RobotNav-8B","ours":false,"single_camera":true,"group":"single","r2r":{"NE":4.36,"OS":72.7,"SR":65.7,"SPL":59.6},"rxr":{"NE":4.16,"SR":73.4,"SPL":63.5},"short":"Qwen-RobotNav-8B"},{"model":"NavFoM","ours":false,"single_camera":false,"group":"depth","r2r":{"NE":4.61,"OS":72.1,"SR":61.7,"SPL":55.3},"rxr":{"NE":4.74,"SR":64.4,"SPL":56.2},"short":"NavFoM"},{"model":"ABot-N0","ours":false,"single_camera":false,"group":"depth","r2r":{"NE":3.78,"OS":70.8,"SR":66.4,"SPL":63.9},"rxr":{"NE":3.83,"SR":69.3,"SPL":60.0},"short":"ABot-N0"},{"model":"OmniNav","ours":false,"single_camera":false,"group":"depth","r2r":{"NE":3.74,"OS":74.6,"SR":69.5,"SPL":66.1},"rxr":{"NE":3.77,"SR":73.6,"SPL":62.0},"short":"OmniNav"},{"model":"Qwen-RobotNav-4B","ours":false,"single_camera":false,"group":"depth","r2r":{"NE":3.8,"OS":77.2,"SR":69.5,"SPL":63.6},"rxr":{"NE":3.8,"SR":75.2,"SPL":65.0},"short":"Qwen-RobotNav-4B"},{"model":"Qwen-RobotNav-8B","ours":false,"single_camera":false,"group":"depth","r2r":{"NE":3.73,"OS":72.7,"SR":72.1,"SPL":66.6},"rxr":{"NE":3.58,"SR":76.5,"SPL":65.7},"short":"Qwen-RobotNav-8B"},{"model":"Robostral Navigate (ours)","ours":true,"single_camera":true,"group":"ours","r2r":{"NE":3.2,"OS":81.3,"SR":77.4,"SPL":74.2},"rxr":{"NE":3.47,"SR":75.1,"SPL":68.7},"short":"Robostral Navigate"}],"ours":{"model":"Robostral Navigate (ours)","ours":true,"single_camera":true,"group":"ours","r2r":{"NE":3.2,"OS":81.3,"SR":77.4,"SPL":74.2},"rxr":{"NE":3.47,"SR":75.1,"SPL":68.7}},"facts":{"vlm_params_b":8,"policy_params_m":121,"trajectories_m":2.4,"scenes_k":350,"token_saving_x":22,"hz_vlm":0.5,"hz_policy":10,"hz_motor":100,"chunk_steps":30,"invisible_pct":10,"hard_tasks_k":35,"reward_clip_m":2,"success_radius_m":3,"height_min":0.4,"height_max":1.8,"radius_min":0.15,"radius_max":0.45,"cam_h_min":70,"cam_h_max":100,"pitch_min":0,"pitch_max":25},"rl":{"r2r_sft_seen":75.96,"r2r_sft_unseen":73.4,"r2r_rl_seen":79.43,"r2r_rl_unseen":77.43,"r2r_peak_seen":80.46,"r2r_peak_unseen":77.43,"rxr_sft":71.2,"rxr_rl":75.1,"r2r_gain_seen":3.47,"r2r_gain_unseen":4.03,"rxr_gain":3.9},"headline":{"r2r_sr":77.4,"r2r_spl":74.2,"r2r_ne":3.2,"r2r_os":81.3,"rxr_sr":75.1,"rxr_spl":68.7,"rxr_ne":3.47,"best_single_model":"Qwen-RobotNav-4B","best_single_sr":66.9,"gain_vs_single":10.5,"best_depth_model":"Qwen-RobotNav-8B","best_depth_sr":72.1,"gain_vs_depth":5.3},"metrics":{"NE":"Geodesic distance in metres between where the agent stopped and the goal. Lower is better.","SR":"Share of episodes where the agent stopped within 3 m of the goal.","OS":"Share of episodes that came within 3 m of the goal at any point, whether or not the agent stopped there.","SPL":"Success weighted by path length. Scales success by shortest-path length over actual path length, so detours are penalised."}};
+window.RN = {"meta":{"arxiv":"2607.20785","title":"Robostral Navigate","webpage":"https://mistral.ai/news/robostral-navigate"},"table1":[{"model":"NaVid","ours":false,"single_camera":true,"group":"single","r2r":{"NE":5.47,"OS":49.0,"SR":37.0,"SPL":35.0},"rxr":{"NE":5.72,"SR":45.7,"SPL":38.2},"short":"NaVid","rank":{"r2r":16,"rxr":15}},{"model":"Uni-NaVid","ours":false,"single_camera":true,"group":"single","r2r":{"NE":5.58,"OS":53.5,"SR":47.0,"SPL":42.7},"rxr":{"NE":6.24,"SR":48.7,"SPL":40.9},"short":"Uni-NaVid","rank":{"r2r":15,"rxr":14}},{"model":"NaVILA","ours":false,"single_camera":true,"group":"single","r2r":{"NE":5.22,"OS":62.5,"SR":54.0,"SPL":49.0},"rxr":{"NE":6.77,"SR":49.3,"SPL":44.0},"short":"NaVILA","rank":{"r2r":13,"rxr":13}},{"model":"InternVLA-N1","ours":false,"single_camera":true,"group":"single","r2r":{"NE":4.89,"OS":60.6,"SR":55.4,"SPL":52.1},"rxr":{"NE":6.41,"SR":49.5,"SPL":41.8},"short":"InternVLA-N1","rank":{"r2r":12,"rxr":12}},{"model":"Qwen-VLA-Base","ours":false,"single_camera":true,"group":"single","r2r":{"NE":5.2,"OS":61.7,"SR":53.8,"SPL":49.4},"rxr":{"NE":6.4,"SR":45.1,"SPL":45.8},"short":"Qwen-VLA-Base","rank":{"r2r":14,"rxr":16}},{"model":"StreamVLN","ours":false,"single_camera":true,"group":"single","r2r":{"NE":4.98,"OS":64.2,"SR":56.9,"SPL":51.9},"rxr":{"NE":6.22,"SR":52.9,"SPL":46.0},"short":"StreamVLN","rank":{"r2r":11,"rxr":11}},{"model":"Qwen-VLA-Instruct","ours":false,"single_camera":true,"group":"single","r2r":{"NE":5.1,"OS":69.0,"SR":57.5,"SPL":51.2},"rxr":{"NE":5.8,"SR":59.6,"SPL":47.8},"short":"Qwen-VLA-Instruct","rank":{"r2r":10,"rxr":9}},{"model":"Qwen-RobotNav-4B","ours":false,"single_camera":true,"group":"single","r2r":{"NE":4.22,"OS":73.6,"SR":66.9,"SPL":60.5},"rxr":{"NE":4.15,"SR":71.3,"SPL":61.5},"short":"Qwen-RobotNav-4B (RGB)","rank":{"r2r":5,"rxr":6}},{"model":"Qwen-RobotNav-8B","ours":false,"single_camera":true,"group":"single","r2r":{"NE":4.36,"OS":72.7,"SR":65.7,"SPL":59.6},"rxr":{"NE":4.16,"SR":73.4,"SPL":63.5},"short":"Qwen-RobotNav-8B (RGB)","rank":{"r2r":7,"rxr":5}},{"model":"InternVLA-N1 (S1+S2)","ours":false,"single_camera":false,"group":"depth","r2r":{"NE":4.83,"OS":63.3,"SR":58.2,"SPL":54.0},"rxr":{"NE":5.91,"SR":53.5,"SPL":46.1},"short":"InternVLA-N1 S1+S2","rank":{"r2r":9,"rxr":10}},{"model":"NavFoM","ours":false,"single_camera":false,"group":"depth","r2r":{"NE":4.61,"OS":72.1,"SR":61.7,"SPL":55.3},"rxr":{"NE":4.74,"SR":64.4,"SPL":56.2},"short":"NavFoM","rank":{"r2r":8,"rxr":8}},{"model":"ABot-N0","ours":false,"single_camera":false,"group":"depth","r2r":{"NE":3.78,"OS":70.8,"SR":66.4,"SPL":63.9},"rxr":{"NE":3.83,"SR":69.3,"SPL":60.0},"short":"ABot-N0","rank":{"r2r":6,"rxr":7}},{"model":"OmniNav","ours":false,"single_camera":false,"group":"depth","r2r":{"NE":3.74,"OS":74.6,"SR":69.5,"SPL":66.1},"rxr":{"NE":3.77,"SR":73.6,"SPL":62.0},"short":"OmniNav","rank":{"r2r":3,"rxr":4}},{"model":"Qwen-RobotNav-4B","ours":false,"single_camera":false,"group":"depth","r2r":{"NE":3.8,"OS":77.2,"SR":69.5,"SPL":63.6},"rxr":{"NE":3.8,"SR":75.2,"SPL":65.0},"short":"Qwen-RobotNav-4B (depth)","rank":{"r2r":4,"rxr":2}},{"model":"Qwen-RobotNav-8B","ours":false,"single_camera":false,"group":"depth","r2r":{"NE":3.73,"OS":72.7,"SR":72.1,"SPL":66.6},"rxr":{"NE":3.58,"SR":76.5,"SPL":65.7},"short":"Qwen-RobotNav-8B (depth)","rank":{"r2r":2,"rxr":1}},{"model":"Robostral Navigate (ours)","ours":true,"single_camera":true,"group":"ours","r2r":{"NE":3.2,"OS":81.3,"SR":77.4,"SPL":74.2},"rxr":{"NE":3.47,"SR":75.1,"SPL":68.7},"short":"Robostral Navigate","rank":{"r2r":1,"rxr":3}}],"ours":{"model":"Robostral Navigate (ours)","ours":true,"single_camera":true,"group":"ours","r2r":{"NE":3.2,"OS":81.3,"SR":77.4,"SPL":74.2},"rxr":{"NE":3.47,"SR":75.1,"SPL":68.7},"rank":{"r2r":1,"rxr":3},"short":"Robostral Navigate"},"facts":{"vlm_params_b":8,"policy_params_m":121,"trajectories_m":2.4,"scenes_k":350,"token_saving_x":22,"hz_vlm":0.5,"hz_policy":10,"hz_motor":100,"chunk_steps":30,"invisible_pct":10,"hard_tasks_k":35,"reward_clip_m":2,"success_radius_m":3,"height_min":0.4,"height_max":1.8,"radius_min":0.15,"radius_max":0.45,"cam_h_min":70,"cam_h_max":100,"pitch_min":0,"pitch_max":25},"rl":{"r2r_sft_seen":75.96,"r2r_sft_unseen":73.4,"r2r_rl_seen":79.43,"r2r_rl_unseen":77.43,"r2r_peak_seen":80.46,"r2r_peak_unseen":77.43,"rxr_sft":71.2,"rxr_rl":75.1,"r2r_gain_seen":3.47,"r2r_gain_unseen":4.03,"rxr_gain":3.9},"headline":{"r2r_sr":77.4,"r2r_spl":74.2,"r2r_ne":3.2,"r2r_os":81.3,"rxr_sr":75.1,"rxr_spl":68.7,"rxr_ne":3.47,"best_single_model":"Qwen-RobotNav-4B","best_single_sr":66.9,"gain_vs_single":10.5,"best_depth_model":"Qwen-RobotNav-8B","best_depth_sr":72.1,"gain_vs_depth":5.3},"metrics":{"NE":"Geodesic distance in metres between where the agent stopped and the goal. Lower is better.","SR":"Share of episodes where the agent stopped within 3 m of the goal.","OS":"Share of episodes that came within 3 m of the goal at any point, whether or not the agent stopped there.","SPL":"Success weighted by path length. Scales success by shortest-path length over actual path length, so detours are penalised."},"ours_rank":{"r2r":1,"rxr":3}};
 
 </script>
 <script>
@@ -1331,8 +1335,8 @@ window.RN = {"meta":{"arxiv":"2607.20785","title":"Robostral Navigate","webpage"
       walls.push(m);
       // a darker cap line so walls read as built rather than as fog
       var cap = new THREE.Mesh(new THREE.BoxGeometry(w + 0.02, 0.05, d + 0.02), M.lam(0xc2b9a8));
-      cap.position.set(x, WALL_H, z);
-      g.add(cap);
+      cap.position.set(0, WALL_H / 2, 0);
+      m.add(cap);
       return m;
     }
 
@@ -1343,13 +1347,15 @@ window.RN = {"meta":{"arxiv":"2607.20785","title":"Robostral Navigate","webpage"
     wall(-W / 4 - 2, D / 2, W / 2 - 4, T);
     wall(W / 4 + 2, D / 2, W / 2 - 4, T);
 
-    // two interior partitions forming a corridor down the middle, with doorways
+    // two interior partitions forming a corridor down the middle, with doorways.
+    // Collected separately so a figure that needs clean sightlines can hide them.
+    var partitions = [];
     [-3.2, 3.2].forEach(function (z, i) {
       var sgn = i ? 1 : -1;
-      wall(-8.5, z, 9, T);
-      wall(4.0, z, 8, T);
+      partitions.push(wall(-8.5, z, 9, T));
+      partitions.push(wall(4.0, z, 8, T));
       // a stub that makes the doorway read as a doorway
-      wall(-3.4, z + sgn * 1.1, T, 2.2);
+      partitions.push(wall(-3.4, z + sgn * 1.1, T, 2.2));
     });
 
     // furniture, in the accent palette so the 3D matches the 2D figures
@@ -1368,19 +1374,28 @@ window.RN = {"meta":{"arxiv":"2607.20785","title":"Robostral Navigate","webpage"
     // lockers
     props.push(box(-11.4, -1.0, 0.9, 2.0, 4.0, M.lam(0x6f7787)));
     // the orange couch, the landmark in every one of these episodes
-    props.push(box(10.4, 1.1, 1.3, 0.78, 3.0, M.amber));
+    props.push(box(11.2, 0.0, 1.1, 0.82, 2.6, M.amber));
     // planters
-    [[-6.4, 6.1], [1.2, 6.3], [11.0, -5.4], [-2.6, 2.5], [4.8, -2.5]].forEach(function (p) {
+    [[-6.4, 6.1], [1.2, 6.3], [11.0, -5.4]].forEach(function (p) {
       props.push(box(p[0], p[1], 0.7, 0.9, 0.7, M.teal));
     });
-    // columns down the corridor
-    for (var k = -1; k <= 2; k++) {
-      var cm = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.28, WALL_H, 12), M.lam(0xd2caba));
-      cm.position.set(k * 6.2, WALL_H / 2, 0);
-      g.add(cm);
+    [[-8.2, -1.5], [-3.0, 1.6], [2.6, -1.6], [7.4, 1.5]].forEach(function (p) {
+      props.push(box(p[0], p[1], 0.6, 0.62, 0.6, M.teal));
+    });
+    // A colonnade down BOTH sides of the corridor. These used to sit on the
+    // centreline, which put a grey cylinder in the middle of every onboard view.
+    for (var k = -2; k <= 2; k++) {
+      [-2.3, 2.3].forEach(function (cz) {
+        var cm = new THREE.Mesh(new THREE.CylinderGeometry(0.26, 0.26, WALL_H, 14),
+          M.lam(0xd2caba));
+        cm.position.set(k * 5.2, WALL_H / 2, cz);
+        g.add(cm);
+      });
     }
 
-    return { group: g, W: W, D: D, mats: M, props: props, walls: walls };
+    return { group: g, W: W, D: D, mats: M, props: props, walls: walls,
+             partitions: partitions,
+             openUp: function () { partitions.forEach(function (m) { m.visible = false; }); } };
   }
 
   /* ---------- a robot, parameterised the way the paper randomises it ---------- */
@@ -1788,9 +1803,9 @@ window.SCENES = window.SCENES || {};
       });
 
       K.callout(body, 0, 384, 640,
-        'Of the ' + (n_single + n_depth) + ' published systems the paper compares against, ' +
-        n_single + ' work from a single RGB camera and ' + n_depth +
-        ' require depth, LiDAR or several cameras.',
+        'The paper compares against ' + (n_single + n_depth) + ' baseline configurations: ' +
+        n_single + ' from a single RGB camera and ' + n_depth + ' using depth, LiDAR or ' +
+        'several cameras. Three systems appear in both groups.',
         { cols: 66 });
     }
     draw(0);
@@ -1842,8 +1857,8 @@ window.SCENES = window.SCENES || {};
     ]);
 
     var BODIES = [
-      { n: 'tall, narrow lens', h: f.height_max, r: f.radius_min, pitch: f.pitch_min, c: C.blue },
-      { n: 'short, wide lens', h: f.height_min, r: f.radius_max, pitch: f.pitch_max, c: C.purple }
+      { n: 'tall, camera level', h: f.height_max, r: f.radius_min, pitch: f.pitch_min, c: C.blue },
+      { n: 'short, camera pitched down', h: f.height_min, r: f.radius_max, pitch: f.pitch_max, c: C.purple }
     ];
 
     BODIES.forEach(function (b, i) {
@@ -1891,9 +1906,9 @@ window.SCENES = window.SCENES || {};
       // straight down the corridor, so the onboard view has depth and a
       // landmark at the end rather than a wall 40 cm from the lens
       var PATH = [
-        new THREE.Vector3(-11.2, 0.05, 1.4), new THREE.Vector3(-6.4, 0.05, 0.6),
-        new THREE.Vector3(-1.4, 0.05, -0.4), new THREE.Vector3(3.6, 0.05, 0.2),
-        new THREE.Vector3(7.8, 0.05, 0.9), new THREE.Vector3(10.0, 0.05, 1.1)
+        new THREE.Vector3(-11.4, 0.05, 0.9), new THREE.Vector3(-6.6, 0.05, -0.5),
+        new THREE.Vector3(-1.6, 0.05, 0.4), new THREE.Vector3(3.4, 0.05, -0.4),
+        new THREE.Vector3(7.6, 0.05, 0.2), new THREE.Vector3(10.4, 0.05, 0.0)
       ];
       var line = ctx.route(THREE, PATH, ctx.C.blue);
       ctx.scene.add(line);
@@ -1964,7 +1979,7 @@ window.SCENES = window.SCENES || {};
           while (yaw > Math.PI) yaw -= 2 * Math.PI;
           while (yaw < -Math.PI) yaw += 2 * Math.PI;
           thB.textContent = 'Δθ ' + (yaw * 180 / Math.PI).toFixed(0) + '°';
-          dB.textContent = pr.depth.toFixed(1) + ' m away';
+          dB.textContent = pr.depth.toFixed(1) + ' m away  (scene truth, not predicted)';
         }
       };
     });
@@ -1989,8 +2004,8 @@ window.SCENES = window.SCENES || {};
     var FIELDS = [
       { k: 'u', d: 'image column of the waypoint', c: C.red, kind: 'point' },
       { k: 'v', d: 'image row of the waypoint', c: C.red, kind: 'point' },
-      { k: 'Δx', d: 'forward displacement, metres', c: C.ink3, kind: 'metric' },
-      { k: 'Δy', d: 'lateral displacement, metres', c: C.ink3, kind: 'metric' },
+      { k: 'Δx', d: 'forward displacement, metres', c: C.blue, kind: 'both' },
+      { k: 'Δy', d: 'lateral displacement, metres', c: C.blue, kind: 'both' },
       { k: 'Δθ', d: 'heading change on arrival', c: C.blue, kind: 'both' }
     ];
     FIELDS.forEach(function (fl, i) {
@@ -2000,15 +2015,15 @@ window.SCENES = window.SCENES || {};
         stroke: fl.kind === 'metric' ? C.line : fl.c });
       K.mono(s, 20, y + 32, fl.k, { size: 20, color: fl.c, weight: 700 });
       K.mono(s, 74, y + 31, fl.d, { size: 13, color: C.ink2 });
-      K.chip(s, 470, y + 13, fl.kind === 'point' ? 'pointing' :
+      K.chip(s, 470, y + 13, fl.kind === 'point' ? 'pointing only' :
         (fl.kind === 'both' ? 'both modes' : 'fallback'), {
         size: 10.5, h: 24, color: fl.c, stroke: fl.c === C.ink3 ? C.line : fl.c });
     });
 
     K.callout(s, 0, 356, 640,
-      'Pointing is the preferred mode. The metric pair is trained on every step as a co-training ' +
-      'task, which is affordable precisely because only about ' + f.invisible_pct +
-      '% of the data actually needs it.', { cols: 66, color: C.blue, tint: T.blue });
+      'Pointing is the preferred mode. Because only about ' + f.invisible_pct + '% of the data ' +
+      'has an invisible destination, predicting the displacements alongside the pixel works as a ' +
+      'co-training task rather than as a rarely used branch.', { cols: 66, color: C.blue, tint: T.blue });
     K.foot(s, 'Equation 1 in section 2.2. The model also emits STOP when the instruction is done.');
   };
 
@@ -2029,9 +2044,9 @@ window.SCENES = window.SCENES || {};
       var w = ctx.world(THREE, 4);
       ctx.scene.add(w.group);
       var rob = ctx.robot(THREE, { height: 1.15, radius: 0.3, color: ctx.C.purple });
-      rob.position.set(-5.2, 0, 0.6);
+      rob.position.set(-4.6, 0, 0.3);
       ctx.scene.add(rob);
-      var GOAL = new THREE.Vector3(10.2, 0, 1.1);
+      var GOAL = new THREE.Vector3(11.2, 0, 0.0);
       var wp = ctx.waypoint(THREE, ctx.C.red);
       wp.position.copy(GOAL);
       ctx.scene.add(wp);
@@ -2149,27 +2164,31 @@ window.SCENES = window.SCENES || {};
       s.appendChild(K.n('rect', { x: X0, y: y - 4, width: XW, height: 46, rx: 8,
         fill: i === 0 ? T.blue : (i === 1 ? T.teal : T.amber) }));
       // one second of wall clock, drawn to scale, capped so 100 Hz stays legible
-      var n = Math.min(50, Math.round(L.hz));
+      // 0.5 Hz is one tick every OTHER second, so draw two seconds of wall clock
+      var SECS = L.hz < 1 ? 2 : 1;
+      var n = Math.min(50, Math.max(1, Math.round(L.hz * SECS)));
       var g = K.n('g', {}); s.appendChild(g);
       for (var k = 0; k < n; k++) {
         var x = X0 + 12 + (XW - 24) * (n === 1 ? 0.5 : k / (n - (n > 1 ? 1 : 0)));
         g.appendChild(K.n('rect', { x: x - 1.4, y: y + 4, width: 2.8, height: 30, rx: 1.4,
           fill: L.c, opacity: .9 }));
       }
-      if (L.hz > 50) K.mono(s, X0 + 12, y + 60, 'drawn at 50 of ' + L.hz + ' for legibility',
+      if (L.hz > 50) K.mono(s, X0 + 12, y + 62, 'drawn at 50 of ' + L.hz + ' for legibility',
+        { size: 10.5, color: C.ink3 });
+      if (SECS === 2) K.mono(s, X0 + 12, y + 62, 'one tick, across two seconds',
         { size: 10.5, color: C.ink3 });
       ticks.push({ g: g, hz: L.hz, y: y, c: L.c });
     });
 
     K.mono(s, X0, 402, '|', { size: 11, color: C.ink3 });
     s.appendChild(K.n('line', { x1: X0, y1: 396, x2: X0 + XW, y2: 396, stroke: C.line }));
-    K.mono(s, X0, 416, 'one second', { size: 11.5, color: C.ink3 });
+    K.mono(s, X0, 416, 'two seconds of wall clock', { size: 11.5, color: C.ink3 });
     var head = K.n('rect', { x: X0, y: 30, width: 2, height: 356, fill: C.red, opacity: .55 });
     s.appendChild(head);
 
     K.callout(s, 0, 438, 640,
-      'The vision-language model emits two waypoints per second. Everything between that and the ' +
-      'actuators exists to fill in the gap.', { cols: 66 });
+      'The vision-language model emits one waypoint every two seconds. Everything between that ' +
+      'and the actuators exists to fill in the gap.', { cols: 66 });
 
     return {
       tick: function (t) {
@@ -2275,7 +2294,11 @@ window.SCENES = window.SCENES || {};
 
     var handle = K3.mount(root, { aspect: '16 / 9' }, function (ctx) {
       var THREE = ctx.THREE;
-      ctx.scene.add(ctx.world(THREE, 21).group);
+      var w = ctx.world(THREE, 21);
+      // this figure is about the body, not the building: clear the partitions so
+      // the camera always has the same unobstructed view of the same waypoint
+      w.openUp();
+      ctx.scene.add(w.group);
 
       var holder = new THREE.Group();
       ctx.scene.add(holder);
@@ -2288,7 +2311,7 @@ window.SCENES = window.SCENES || {};
         rob.rotation.y = Math.atan2(GOAL.x - (-2.0), GOAL.z - 6.0);
         holder.add(rob);
       }
-      var GOAL = new THREE.Vector3(10.2, 0, 1.1);
+      var GOAL = new THREE.Vector3(11.2, 0, 0.0);
       rebuild();
       var wp = ctx.waypoint(THREE, ctx.C.red);
       wp.position.copy(GOAL);
@@ -2306,8 +2329,8 @@ window.SCENES = window.SCENES || {};
           ctx.camPose(THREE, rob, st.pitch, camB);
           var pr = ctx.project(THREE, new THREE.Vector3(GOAL.x, 0.35, GOAL.z), camB);
 
-          camA.position.set(-13, 13, 16);
-          camA.lookAt(-1, 0.4, 0.6);
+          camA.position.set(-11, 7.5, 11);
+          camA.lookAt(2.0, 0.6, 0.0);
           camA.updateMatrixWorld();
           wp.userData.pulse.scale.setScalar(1 + Math.sin(t * 3) * 0.1);
 
@@ -2348,7 +2371,8 @@ window.SCENES = window.SCENES || {};
       function (v) { return v.toFixed(0) + '°'; }, function (v) { st.pitch = v; });
 
     K3.note(root, 'These are the exact ranges the paper randomises over per trajectory. ' +
-      'The policy never sees a consistent viewpoint, so it cannot come to depend on one.', 'teal');
+      'The policy never sees a consistent viewpoint, which is how the paper reduces its ' +
+      'dependence on any particular camera setup, scale or morphology.', 'teal');
     return handle;
   };
 
@@ -2364,21 +2388,21 @@ window.SCENES = window.SCENES || {};
       // a tall bimanual-style base and a small wheeled one, at the ends of the
       // randomisation range rather than as portraits of specific products
       var tall = ctx.robot(THREE, { height: 1.7, radius: 0.34, camFrac: 0.93, color: ctx.C.blue, layer: 1 });
-      tall.position.set(-6.8, 0, 0.9);
+      tall.position.set(-7.2, 0, -0.9);
       ctx.scene.add(tall);
       var small = ctx.robot(THREE, { height: 0.5, radius: 0.19, camFrac: 0.86, color: ctx.C.amber, layer: 2 });
-      small.position.set(-1.8, 0, -0.6);
+      small.position.set(-2.4, 0, 0.7);
       ctx.scene.add(small);
 
-      var GOAL = new THREE.Vector3(10.2, 0, 1.1);
+      var GOAL = new THREE.Vector3(11.2, 0, 0.0);
       var wp = ctx.waypoint(THREE, ctx.C.red);
       wp.position.copy(GOAL);
       ctx.scene.add(wp);
-      tall.rotation.y = Math.atan2(GOAL.x + 6.8, GOAL.z - 0.9);
-      small.rotation.y = Math.atan2(GOAL.x + 1.8, GOAL.z + 0.6);
+      tall.rotation.y = Math.atan2(GOAL.x + 7.2, GOAL.z + 0.9);
+      small.rotation.y = Math.atan2(GOAL.x + 2.4, GOAL.z - 0.7);
       ctx.scene.add(ctx.route(THREE, [
-        new THREE.Vector3(-6.8, .05, 0.9), new THREE.Vector3(0.4, .05, 0.0),
-        new THREE.Vector3(5.0, .05, 0.6), GOAL.clone().setY(.05)], ctx.C.blue));
+        new THREE.Vector3(-7.2, .05, -0.9), new THREE.Vector3(0.4, .05, 0.0),
+        new THREE.Vector3(5.0, .05, 0.2), GOAL.clone().setY(.05)], ctx.C.blue));
 
       var camA = ctx.thirdPerson(THREE, 40, [1, 2]);
       var camB = new THREE.PerspectiveCamera(58, 1, 0.05, 200);
@@ -2395,8 +2419,8 @@ window.SCENES = window.SCENES || {};
           ctx.camPose(THREE, rob, 10, camB);
           var pr = ctx.project(THREE, new THREE.Vector3(GOAL.x, 0.35, GOAL.z), camB);
           var a = 0.5 + Math.sin(t * 0.07) * 0.2;
-          camA.position.set(Math.sin(a) * 19 - 3, 13, Math.cos(a) * 19 + 3);
-          camA.lookAt(0.5, 0.5, 0.4);
+          camA.position.set(Math.sin(a) * 13 - 5, 7.5, Math.cos(a) * 13 + 6);
+          camA.lookAt(-3.0, 0.7, 0.0);
           camA.updateMatrixWorld();
           wp.userData.pulse.scale.setScalar(1 + Math.sin(t * 3) * 0.1);
 
@@ -2477,7 +2501,8 @@ window.SCENES = window.SCENES || {};
 
     K3.note(root, 'Offices, homes, commercial spaces and outdoors, varied on layout complexity, ' +
       'object density, lighting and architectural style. Collecting this on real hardware is not ' +
-      'a budget problem, it is an impossibility.', 'blue');
+      'a budget problem, it is prohibitively costly, which is the constraint the recipe is built ' +
+      'to remove.', 'blue');
     return handle;
   };
 
@@ -2753,7 +2778,7 @@ window.SCENES = window.SCENES || {};
       legendG.innerHTML = '';
       var msg = mode === 0
         ? leaks + ' cells let a step read another step\'s ground-truth action'
-        : 'no cell reads another step\'s action, and every step still sees every frame';
+        : 'no cell reads another step\'s action, and every step still sees every frame up to its own';
       K.panel(legendG, 0, BASE + 46, 640, 60, { flat: true,
         fill: mode === 0 ? T.red : T.teal, stroke: mode === 0 ? C.red : C.teal });
       K.mono(legendG, 18, BASE + 82, msg,
@@ -2898,7 +2923,7 @@ window.SCENES = window.SCENES || {};
     var f = api.RN.facts;
     var s = K.board(root, { alt: 'Curating a hard subset by rolling out the supervised policy.' });
     K.head(s, 'Only the episodes it already fails',
-      f.hard_tasks_k + ' thousand tasks the supervised policy could not solve');
+      f.hard_tasks_k + ' thousand tasks the supervised policy could not reliably reach the goal on');
 
     K.label(s, 0, 14, 'curation');
     var STEPS = [
@@ -2979,7 +3004,7 @@ window.SCENES = window.SCENES || {};
   window.SCENES.S_METRICS = function (root, api) {
     var M = api.RN.metrics, f = api.RN.facts, o = api.RN.ours;
     var s = K.board(root, { alt: 'What the four navigation metrics measure.' });
-    K.head(s, 'What the columns mean', 'two of them measure success, two measure how it got there');
+    K.head(s, 'What the columns mean', 'three describe where it ended up, one describes the route');
 
     var ROWS = [
       { k: 'NE', dir: 'lower', c: C.purple, d: M.NE, v: o.r2r.NE.toFixed(2) + ' m' },
@@ -3007,7 +3032,7 @@ window.SCENES = window.SCENES || {};
   window.SCENES.S_TABLE = function (root, api) {
     var RN = api.RN, rows = RN.table1.slice();
     var s = K.board(root, { alt: 'Every baseline in the paper table, sortable by metric.' });
-    K.head(s, 'Fifteen systems', 'colour is the sensing class, not the score');
+    K.head(s, 'Every row in the table', 'colour is the sensing class, not the score');
 
     var bench = 'r2r', metric = 'SR';
     var body = K.n('g', {}); s.appendChild(body);
@@ -3060,8 +3085,9 @@ window.SCENES = window.SCENES || {};
         { size: 10.5, color: C.ink3 });
     }
     draw();
-    K.foot(s, 'Table 1, validation unseen on both benchmarks. Parsed from the paper rather than ' +
-      'retyped, so the ordering here is whatever the numbers say.');
+    K.foot(s, 'Table 1, validation unseen on both benchmarks, RxR-CE english-only. Three systems ' +
+      'appear in both sensing groups and are suffixed accordingly. Parsed from the paper rather ' +
+      'than retyped, so the ordering is whatever the numbers say.');
   };
 
   /* ---- 26 the headline ---- */
@@ -3106,7 +3132,7 @@ window.SCENES = window.SCENES || {};
   window.SCENES.S_RLGAIN = function (root, api) {
     var rl = api.RN.rl;
     var s = K.board(root, { alt: 'Success rate before and after the reinforcement learning pass.' });
-    K.head(s, 'The last few points came from RL', 'supervised baseline against the shipped checkpoint');
+    K.head(s, 'The last few points came from RL', 'supervised baseline against the post-RL checkpoint');
 
     var SETS = [
       { n: 'R2R-CE, seen', a: rl.r2r_sft_seen, b: rl.r2r_rl_seen, g: rl.r2r_gain_seen },
@@ -3143,8 +3169,8 @@ window.SCENES = window.SCENES || {};
     K.mono(s, 18, 466, 'higher than the reported checkpoint on the seen split, worth noticing',
       { size: 11.5, color: C.amber });
 
-    K.foot(s, 'The paper attributes the gain to exploration and recovery, which shortest-path ' +
-      'imitation cannot teach.');
+    K.foot(s, 'The paper attributes the gain to information-seeking and recovery, which ' +
+      'shortest-path imitation cannot demonstrate.');
   };
 
   /* ---- 28 the one it loses ---- */
@@ -3158,8 +3184,8 @@ window.SCENES = window.SCENES || {};
       .sort(function (a, b) { return b.rxr.SR - a.rxr.SR; })[0];
 
     var s = K.board(root, { alt: 'RxR-CE, where the model wins and where it does not.' });
-    K.head(s, 'Second on success, first on efficiency',
-      'RxR-CE validation unseen, against the best depth-assisted system');
+    K.head(s, 'Third on success, first on efficiency',
+      'RxR-CE validation unseen, english-only, against the best depth system');
 
     var CMP = [
       { k: 'SR', ours: o.rxr.SR, them: rival.rxr.SR, unit: '%', hi: true },
@@ -3185,14 +3211,17 @@ window.SCENES = window.SCENES || {};
         weight: 700, anchor: 'end' });
     });
 
+    var above = RN.table1.filter(function (x) { return x.rxr.SR > o.rxr.SR; });
     K.panel(s, 0, 344, 640, 74, { flat: true, fill: T.blue, stroke: C.blue });
     K.mono(s, 18, 372, 'among single-camera systems it is first: ' + o.rxr.SR.toFixed(1) +
       '% against ' + bestSingle.rxr.SR.toFixed(1) + '%', { size: 13, color: C.blue });
-    K.mono(s, 18, 396, 'the loss is only to a model that gets depth', { size: 11.5, color: C.blue });
+    K.mono(s, 18, 396, 'the ' + (above.length === 1 ? 'one system' : above.length + ' systems') +
+      ' above it all get depth or several cameras', { size: 11.5, color: C.blue });
 
     K.callout(s, 0, 434, 640,
-      'The paper says competitive, and competitive is the right word. Worth stating plainly, ' +
-      'because the rest of the results do not need the rounding.', { cols: 66 });
+      'The paper compares itself only to the higher of the two and calls the result competitive. ' +
+      'That is the right word, and worth stating plainly, because the rest of the results do not ' +
+      'need the rounding.', { cols: 66 });
   };
 
   /* ---- 29 scope ---- */

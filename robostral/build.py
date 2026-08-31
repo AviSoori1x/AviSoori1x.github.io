@@ -74,11 +74,12 @@ HERO = """
       <p>A big model thinking slowly on top of a small one acting fast, the five numbers it emits,
       the fallback for when the goal is behind you, and one policy on two very different bodies.</p></div>
     <div class="a3"><h4>How it learns</h4>
-      <p>Two and a half million simulated trajectories, an attention mask that turns quadratic
-      training into linear, and the reinforcement learning pass that fixes what imitation cannot.</p></div>
+      <p>2.4 million simulated trajectories, episode packing that turns quadratic training into
+      linear, a mask that stops the model cheating off its own past answers, and the reinforcement
+      learning pass that fixes what imitation cannot.</p></div>
     <div class="a4"><h4>Does it hold up</h4>
       <p>Fifteen baselines, the gap to systems that get depth for free, what reinforcement learning
-      actually bought, and the one number where it still comes second.</p></div>
+      actually bought, and the one number where it still comes third.</p></div>
   </div>
   <div class="scrollcue"><i></i> scroll &nbsp;&middot;&nbsp; the figure on the right is live</div>
 </div>
@@ -87,7 +88,7 @@ HERO = """
 OUTRO = """
 <div class="outro">
   <h2>Notes</h2>
-  <p>Every number here is parsed straight out of the paper,
+  <p>Every number in the figures is parsed straight out of the paper,
   <a href="https://arxiv.org/abs/2607.20785">arXiv 2607.20785</a>, rather than typed in by hand.
   Where the paper does not report something, the beat says so instead of guessing.</p>
   <p>The 3D scenes are generated, not recordings. They are built to be dimensionally honest about

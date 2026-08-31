@@ -12,7 +12,7 @@ window.SCENES = window.SCENES || {};
   window.SCENES.S_METRICS = function (root, api) {
     var M = api.RN.metrics, f = api.RN.facts, o = api.RN.ours;
     var s = K.board(root, { alt: 'What the four navigation metrics measure.' });
-    K.head(s, 'What the columns mean', 'two of them measure success, two measure how it got there');
+    K.head(s, 'What the columns mean', 'three describe where it ended up, one describes the route');
 
     var ROWS = [
       { k: 'NE', dir: 'lower', c: C.purple, d: M.NE, v: o.r2r.NE.toFixed(2) + ' m' },
@@ -40,7 +40,7 @@ window.SCENES = window.SCENES || {};
   window.SCENES.S_TABLE = function (root, api) {
     var RN = api.RN, rows = RN.table1.slice();
     var s = K.board(root, { alt: 'Every baseline in the paper table, sortable by metric.' });
-    K.head(s, 'Fifteen systems', 'colour is the sensing class, not the score');
+    K.head(s, 'Every row in the table', 'colour is the sensing class, not the score');
 
     var bench = 'r2r', metric = 'SR';
     var body = K.n('g', {}); s.appendChild(body);
@@ -93,8 +93,9 @@ window.SCENES = window.SCENES || {};
         { size: 10.5, color: C.ink3 });
     }
     draw();
-    K.foot(s, 'Table 1, validation unseen on both benchmarks. Parsed from the paper rather than ' +
-      'retyped, so the ordering here is whatever the numbers say.');
+    K.foot(s, 'Table 1, validation unseen on both benchmarks, RxR-CE english-only. Three systems ' +
+      'appear in both sensing groups and are suffixed accordingly. Parsed from the paper rather ' +
+      'than retyped, so the ordering is whatever the numbers say.');
   };
 
   /* ---- 26 the headline ---- */
@@ -139,7 +140,7 @@ window.SCENES = window.SCENES || {};
   window.SCENES.S_RLGAIN = function (root, api) {
     var rl = api.RN.rl;
     var s = K.board(root, { alt: 'Success rate before and after the reinforcement learning pass.' });
-    K.head(s, 'The last few points came from RL', 'supervised baseline against the shipped checkpoint');
+    K.head(s, 'The last few points came from RL', 'supervised baseline against the post-RL checkpoint');
 
     var SETS = [
       { n: 'R2R-CE, seen', a: rl.r2r_sft_seen, b: rl.r2r_rl_seen, g: rl.r2r_gain_seen },
@@ -176,8 +177,8 @@ window.SCENES = window.SCENES || {};
     K.mono(s, 18, 466, 'higher than the reported checkpoint on the seen split, worth noticing',
       { size: 11.5, color: C.amber });
 
-    K.foot(s, 'The paper attributes the gain to exploration and recovery, which shortest-path ' +
-      'imitation cannot teach.');
+    K.foot(s, 'The paper attributes the gain to information-seeking and recovery, which ' +
+      'shortest-path imitation cannot demonstrate.');
   };
 
   /* ---- 28 the one it loses ---- */
@@ -191,8 +192,8 @@ window.SCENES = window.SCENES || {};
       .sort(function (a, b) { return b.rxr.SR - a.rxr.SR; })[0];
 
     var s = K.board(root, { alt: 'RxR-CE, where the model wins and where it does not.' });
-    K.head(s, 'Second on success, first on efficiency',
-      'RxR-CE validation unseen, against the best depth-assisted system');
+    K.head(s, 'Third on success, first on efficiency',
+      'RxR-CE validation unseen, english-only, against the best depth system');
 
     var CMP = [
       { k: 'SR', ours: o.rxr.SR, them: rival.rxr.SR, unit: '%', hi: true },
@@ -218,14 +219,17 @@ window.SCENES = window.SCENES || {};
         weight: 700, anchor: 'end' });
     });
 
+    var above = RN.table1.filter(function (x) { return x.rxr.SR > o.rxr.SR; });
     K.panel(s, 0, 344, 640, 74, { flat: true, fill: T.blue, stroke: C.blue });
     K.mono(s, 18, 372, 'among single-camera systems it is first: ' + o.rxr.SR.toFixed(1) +
       '% against ' + bestSingle.rxr.SR.toFixed(1) + '%', { size: 13, color: C.blue });
-    K.mono(s, 18, 396, 'the loss is only to a model that gets depth', { size: 11.5, color: C.blue });
+    K.mono(s, 18, 396, 'the ' + (above.length === 1 ? 'one system' : above.length + ' systems') +
+      ' above it all get depth or several cameras', { size: 11.5, color: C.blue });
 
     K.callout(s, 0, 434, 640,
-      'The paper says competitive, and competitive is the right word. Worth stating plainly, ' +
-      'because the rest of the results do not need the rounding.', { cols: 66 });
+      'The paper compares itself only to the higher of the two and calls the result competitive. ' +
+      'That is the right word, and worth stating plainly, because the rest of the results do not ' +
+      'need the rounding.', { cols: 66 });
   };
 
   /* ---- 29 scope ---- */

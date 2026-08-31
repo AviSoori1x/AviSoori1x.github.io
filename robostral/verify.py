@@ -97,7 +97,7 @@ with sync_playwright() as p:
             ".scrollIntoView({block:'center'})", i)
         pg.wait_for_timeout(60)
         # 3D scenes need a couple of animation frames before they have drawn
-        pg.wait_for_timeout(520 if i < 2 else 380)
+        pg.wait_for_timeout(1500 if i < 2 else 1250)
         m = pg.evaluate(MEASURE, b["id"])
         m["id"] = b["id"]
         m["title"] = b["title"]
