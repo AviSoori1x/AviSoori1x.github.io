@@ -9,18 +9,18 @@ window.SCENES = window.SCENES || {};
     var f = api.RN.facts;
     var s = K.board(root, { alt: 'A large reasoning model in series with a small geometric one.' });
     K.head(s, 'Split the job, then size each half',
-      'reasoning is expensive, geometry is not');
+      'the split is by capacity, not by speed');
 
     var ROWS = [
       { c: C.blue, name: 'Robostral Navigate', sz: f.vlm_params_b + 'B', kind: 'vision-language model',
         job: 'read the instruction, understand the room, choose the next waypoint',
         why: 'needs reasoning, so it gets the parameters' },
       { c: C.teal, name: 'diffusion policy', sz: f.policy_params_m + 'M', kind: 'diffusion transformer',
-        job: 'turn one waypoint into a dense, obstacle-free trajectory',
-        why: 'geometry at this scale does not need a large model' },
+        job: 'turn one waypoint into a dense trajectory toward the goal, avoiding obstacles',
+        why: 'sufficient capacity for the geometric understanding needed' },
       { c: C.ink3, name: 'motion controller', sz: 'varies', kind: 'platform specific',
         job: 'track that trajectory with actuator commands',
-        why: 'the only piece that changes when you change robot' }
+        why: 'the only piece that differed between the two platforms' }
     ];
 
     ROWS.forEach(function (r, i) {
@@ -36,8 +36,8 @@ window.SCENES = window.SCENES || {};
     });
 
     K.callout(s, 0, 456, 640,
-      'Nothing expensive runs at the frequency the motors need. That is the whole reason for ' +
-      'the split.', { cols: 66 });
+      'Reasoning needs a large model and the geometry does not, so the two run in series at ' +
+      'different frequencies. That is the paper\'s reason for the split.', { cols: 66 });
   };
 
   /* ---- 08 the rate ladder, animated ---- */
@@ -45,7 +45,7 @@ window.SCENES = window.SCENES || {};
     var f = api.RN.facts;
     var s = K.board(root, { alt: 'Three components running at half a hertz, ten hertz and a hundred hertz.' });
     K.head(s, 'Half a hertz of thinking',
-      'each layer down is cheaper, faster and simpler');
+      'each layer down runs at a higher frequency');
 
     var LANES = [
       { hz: f.hz_vlm, c: C.blue, n: 'waypoint', who: 'vision-language model' },
@@ -63,17 +63,16 @@ window.SCENES = window.SCENES || {};
         fill: i === 0 ? T.blue : (i === 1 ? T.teal : T.amber) }));
       // one second of wall clock, drawn to scale, capped so 100 Hz stays legible
       // 0.5 Hz is one tick every OTHER second, so draw two seconds of wall clock
-      var SECS = L.hz < 1 ? 2 : 1;
-      var n = Math.min(50, Math.max(1, Math.round(L.hz * SECS)));
+      var SECS = 2;
+      var n = Math.min(60, Math.max(1, Math.round(L.hz * SECS)));
       var g = K.n('g', {}); s.appendChild(g);
       for (var k = 0; k < n; k++) {
         var x = X0 + 12 + (XW - 24) * (n === 1 ? 0.5 : k / (n - (n > 1 ? 1 : 0)));
         g.appendChild(K.n('rect', { x: x - 1.4, y: y + 4, width: 2.8, height: 30, rx: 1.4,
           fill: L.c, opacity: .9 }));
       }
-      if (L.hz > 50) K.mono(s, X0 + 12, y + 62, 'drawn at 50 of ' + L.hz + ' for legibility',
-        { size: 10.5, color: C.ink3 });
-      if (SECS === 2) K.mono(s, X0 + 12, y + 62, 'one tick, across two seconds',
+      if (L.hz * SECS > 60) K.mono(s, X0 + 12, y + 62,
+        'drawn at 60 of ' + Math.round(L.hz * SECS) + ' for legibility',
         { size: 10.5, color: C.ink3 });
       ticks.push({ g: g, hz: L.hz, y: y, c: L.c });
     });
@@ -85,8 +84,8 @@ window.SCENES = window.SCENES || {};
     s.appendChild(head);
 
     K.callout(s, 0, 438, 640,
-      'The vision-language model emits one waypoint every two seconds. Everything between that ' +
-      'and the actuators exists to fill in the gap.', { cols: 66 });
+      'One waypoint every two seconds. Everything between that and the actuators exists to fill ' +
+      'in the gap. All three lanes are drawn over the same two seconds.', { cols: 66 });
 
     return {
       tick: function (t) {
@@ -181,8 +180,8 @@ window.SCENES = window.SCENES || {};
   /* ---- 11 randomise the body, watch the pixel move ---- */
   window.SCENES.S_RANDOM = function (root, api) {
     var f = api.RN.facts;
-    K3.head(root, 'Never let it learn one body',
-      'the world point is fixed. change the body and the pixel moves.');
+    K3.head(root, 'Do not let it settle on one body',
+      'the world point is fixed. change the camera height or pitch and the pixel moves.');
 
     var read = K3.el('div', 'k3read');
     var uvB = K3.el('b', null, 'u, v'), hB = K3.el('b', 'off', 'camera');
@@ -276,7 +275,7 @@ window.SCENES = window.SCENES || {};
 
   /* ---- 12 two bodies, one set of weights ---- */
   window.SCENES.S_ROBOTS = function (root, api) {
-    K3.head(root, 'Two machines that share nothing',
+    K3.head(root, 'Two substantially different machines',
       'same vision-language model, same diffusion policy, different controller');
 
     var handle = K3.mount(root, { aspect: '16 / 9' }, function (ctx) {
@@ -340,8 +339,9 @@ window.SCENES = window.SCENES || {};
     K3.seg(row, ['look through the tall one', 'look through the short one'],
       function (i) { if (root.__pick) root.__pick(i); }, 0);
     K3.note(root, 'The paper deploys on a Galaxea R1 and a Hiwonder JetAuto with identical ' +
-      'weights, changing only the low-level controller. Both are wheeled, so the legged and ' +
-      'aerial part of the claim is an argument rather than a demonstration.');
+      'weights, changing only the low-level controller. It calls them two substantially ' +
+      'different mobile robot platforms, so the legged and aerial part of the claim is an ' +
+      'argument rather than a demonstration.');
     return handle;
   };
 })();

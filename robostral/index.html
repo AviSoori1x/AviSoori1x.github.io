@@ -269,14 +269,14 @@ h3{
   Navigate takes a <b>single RGB camera</b> and predicts where to go by <b>pointing at a pixel</b>
   in the frame it is already looking at.</p>
   <p class="sub" style="margin-top:14px">I contributed to the original paper, and this is my
-  attempt to lay it out visually. The 3D figures are real scenes rather than diagrams, so when a figure claims
-  the image coordinate survives a change of camera, you can move the camera and check.</p>
+  attempt to lay it out visually. The 3D figures are generated scenes rather than diagrams, so where a figure
+  is about an image coordinate you can move the camera and watch that coordinate move.</p>
 
   <div class="metastrip">
     <span class="chip"><a href="https://arxiv.org/abs/2607.20785">arXiv <b>2607.20785</b></a></span>
     <span class="chip"><a href="https://mistral.ai/news/robostral-navigate">project page</a></span>
-    <span class="chip">R2R-CE SR <b>77.4</b></span>
-    <span class="chip">RxR-CE SR <b>75.1</b></span>
+    <span class="chip">R2R-CE val unseen SR <b>77.4</b></span>
+    <span class="chip">RxR-CE val unseen SR <b>75.1</b></span>
   </div>
   <div class="toc">
     <div class="a1"><h4>The problem</h4>
@@ -288,7 +288,7 @@ h3{
     <div class="a3"><h4>How it learns</h4>
       <p>2.4 million simulated trajectories, episode packing that turns quadratic training into
       linear, a mask that stops the model cheating off its own past answers, and the reinforcement
-      learning pass that fixes what imitation cannot.</p></div>
+      learning pass that adds what shortest-path imitation never shows.</p></div>
     <div class="a4"><h4>Does it hold up</h4>
       <p>Fifteen baselines, the gap to systems that get depth for free, what reinforcement learning
       actually bought, and the one number where it still comes third.</p></div>
@@ -305,8 +305,8 @@ h3{
 <!-- ==================== 1. THE PROBLEM ==================== -->
 <div class="actdiv a1"><div class="stack">
   <h2>The problem</h2>
-  <p>Navigation systems get good by adding sensors. Every sensor you add is a robot you can no
-  longer run on.</p>
+  <p>The systems that score best depend on extra sensing. Every requirement you add narrows the
+  set of robots you can run on.</p>
 </div></div>
 
 <div class="beat a1" data-s="S_SENSORS" data-act="1" data-sec="§1" data-title="The sensor tax">
@@ -314,11 +314,11 @@ h3{
     <span class="num">01<span class="sec">§1</span></span>
     <h3>Every extra sensor is a robot you lose</h3>
     <p>The strongest published navigators lean on depth cameras, LiDAR, multi-camera rigs, or a map
-    of the building made in advance. Each one buys accuracy. Each one also narrows the set of
-    hardware the policy can run on, raises the cost per unit, and adds a calibration step that has
-    to happen in every new environment.</p>
-    <p>That trade is invisible in a benchmark table, because a benchmark does not charge you for
-    the rig. It shows up the moment you try to put the same policy on a different robot.</p>
+    of the building made in advance. The paper names what each one costs: a narrower set of
+    compatible robots, a higher cost per unit, and calibration that has to happen in every new
+    environment.</p>
+    <p>A benchmark table does not charge you for the rig, so none of that shows up in the score. It
+    shows up when you try to put the same policy on different hardware.</p>
     <div class="try">Add sensors and watch the set of compatible platforms shrink.</div>
   </div></div>
 </div>
@@ -327,8 +327,8 @@ h3{
   <div class="stack"><div class="card">
     <span class="num">02<span class="sec">§1</span></span>
     <h3>Optimise for the recipe, not the score</h3>
-    <p>The paper sets itself a different target from the start. Not the most accurate navigator, but
-    the most <b>scalable recipe</b> for one: minimise what you assume about sensors, generalise
+    <p>The paper sets itself a different target from the start. Not just a more accurate navigator, but
+    a <b>scalable recipe</b> for one: minimise what you assume about sensors, generalise
     across robot bodies, and train efficiently enough that iteration is cheap.</p>
     <p>Three constraints, and every design decision downstream is traceable to one of them. It is
     worth holding onto them, because the parts that look strange later are strange for a reason.</p>
@@ -342,9 +342,9 @@ h3{
     <p>The conventional output is a metric displacement: go forward this many metres, turn this many
     degrees. That number is entangled with the body that produced it. It assumes a camera at a
     particular height and pitch, a particular field of view, and a scale calibrated to that machine.</p>
-    <p>Move it to a robot a third the height, with a wider base and a camera tilted further down,
-    and the geometry underneath the number has changed even though the instruction and the room
-    have not.</p>
+    <p>Change the machine and that geometry changes underneath the number, even though the
+    instruction and the room have not. It is why the paper randomises height, base radius, camera
+    height and camera pitch when it generates training data.</p>
   </div></div>
 </div>
 
@@ -405,7 +405,8 @@ h3{
     <p>Navigation is really two problems. Read the instruction, understand the room and plan a rough
     path. Then turn that rough path into motion that does not hit anything.</p>
     <p>They want different machines. The first gets an 8B vision-language model, because it needs
-    reasoning. The second gets a 121M diffusion policy, because geometry at that scale does not.
+    reasoning. The second gets a 121M diffusion policy, which the paper says has enough capacity for the
+    geometric understanding navigation needs.
     They run in series at different rates, and the rate ladder is the interesting part.</p>
   </div></div>
 </div>
@@ -417,8 +418,8 @@ h3{
     <p>The vision-language model emits a waypoint once every two seconds. The diffusion policy expands that
     into a dense trajectory at ten hertz. A motion controller, the only part that is specific to the
     robot you bought, turns that into motor commands at a hundred hertz.</p>
-    <p>Each layer down is cheaper, faster and dumber than the one above it. Nothing expensive runs
-    at the frequency the actuators need.</p>
+    <p>Each layer down runs faster and carries less of the thinking. The paper's reason for the
+    split is capacity rather than speed: reasoning needs a large model, the geometry does not.</p>
   </div></div>
 </div>
 
@@ -442,19 +443,20 @@ h3{
     <p>The diffusion policy takes the waypoint, the robot's height and radius, and two frames: the
     one the vision-language model actually looked at, and the one from right now. Those are not the
     same frame, because inference took time and the robot kept moving.</p>
-    <p>Handing it both is how the system stays honest about its own latency. Out comes a chunk of
-    thirty relative moves covering the next second.</p>
+    <p>Handing it both is how the system stays honest about its own latency. Out comes an action chunk of
+    30 delta coordinates covering the next second.</p>
   </div></div>
 </div>
 
 <div class="beat a2" data-s="S_RANDOM" data-act="2" data-sec="§2.4" data-title="Randomise the body">
   <div class="stack"><div class="card">
     <span class="num">11<span class="sec">§2.4</span></span>
-    <h3>Never let it learn one body</h3>
+    <h3>Do not let it settle on one body</h3>
     <p>Pointing gets you most of the way to cross-robot transfer. The training data closes the rest
     of the gap by refusing to hold the body fixed. Robot height, robot radius, how far up the robot
     the camera sits, and how far down it is tilted are all sampled per trajectory.</p>
-    <p>The policy never sees a consistent viewpoint, so it cannot come to depend on one.</p>
+    <p>The policy never sees a consistent viewpoint, which is how the paper reduces its dependence
+    on any particular camera setup, physical scale or morphology.</p>
     <div class="try">Change the body and watch the same world waypoint land on a different pixel.
     That variation is the training signal.</div>
   </div></div>
@@ -463,12 +465,12 @@ h3{
 <div class="beat a2" data-s="S_ROBOTS" data-act="2" data-sec="§2.4" data-title="Two robots, one set of weights">
   <div class="stack"><div class="card">
     <span class="num">12<span class="sec">§2.4</span></span>
-    <h3>Same weights on two machines that share nothing</h3>
+    <h3>Same weights on two substantially different machines</h3>
     <p>The deployment test is a Galaxea R1 and a Hiwonder JetAuto. They differ in morphology, camera
     height, camera configuration and base geometry. Both run the <b>same</b> vision-language model
     and the <b>same</b> diffusion policy. Only the low-level controller changes.</p>
     <p>Worth being precise about the scope: the abstract argues the approach extends to wheeled,
-    legged and aerial platforms, and the demonstration is two wheeled ones.</p>
+    legged and aerial platforms, and what the paper demonstrates is two mobile robot platforms.</p>
   </div></div>
 </div>
 
@@ -485,8 +487,8 @@ h3{
     <p>Roughly 2.4 million expert trajectories across 350 thousand simulated scenes. Offices,
     homes, commercial spaces and outdoors, varied deliberately in layout complexity, object density,
     lighting and architectural style.</p>
-    <p>Collecting that on real hardware is not a budget problem, it is an impossibility. Which is the
-    point: the recipe is built so that the expensive ingredient is compute, not fieldwork.</p>
+    <p>Collecting that on real hardware would be ruinously expensive, which is the point. The paper's
+    stated aim is to remove the reliance on costly real-world data collection.</p>
   </div></div>
 </div>
 
@@ -494,9 +496,9 @@ h3{
   <div class="stack"><div class="card">
     <span class="num">14<span class="sec">§3.1</span></span>
     <h3>Spread the endpoints out on purpose</h3>
-    <p>Start and goal pairs come from farthest point sampling over the navigable area, which is a
-    cheap way to stop a generator from producing a thousand variations of the same short hop across
-    one room. Trajectories come out at a range of lengths, and some of them cross floors.</p>
+    <p>Start and goal pairs come from farthest point sampling over the navigable area, which the paper uses
+    to ensure diverse start and goal positions. Trajectories come out at a range of lengths, and
+    some of them cross floors.</p>
     <div class="try">Watch the sampler pick endpoints. Each new pick is pushed away from everything
     already chosen.</div>
   </div></div>
@@ -535,10 +537,9 @@ h3{
     <h3>Flattening it opens a hole</h3>
     <p>The actions are now sitting in the context. Ordinary causal attention lets the model at time
     t read the ground-truth actions from every earlier step, and at deployment those do not exist.</p>
-    <p>Worse, they are unusually informative here. Because each waypoint is the furthest visible
-    point along the route, consecutive ground-truth actions are strongly related, so a model allowed
-    to see them will learn to extrapolate from them rather than look at the room. It would train
-    beautifully and fail on a robot.</p>
+    <p>Worse, they are unusually informative here. Because a waypoint is the furthest visible
+    point along the route, previous ground-truth actions are often very informative of the next one,
+    so a model allowed to see them would lean on information it will not have on a robot.</p>
   </div></div>
 </div>
 
@@ -573,13 +574,13 @@ h3{
 <div class="beat a3" data-s="S_EXPOSURE" data-act="3" data-sec="§3.3" data-title="Where imitation runs out">
   <div class="stack"><div class="card">
     <span class="num">20<span class="sec">§3.3</span></span>
-    <h3>Copying an expert teaches you nothing about being lost</h3>
+    <h3>Copying an expert does not show you how to be lost</h3>
     <p>Supervised training is behavioural cloning, and it inherits the usual two problems. Small
     errors compound until the agent is somewhere its training data never went, and once there it has
     no idea what to do.</p>
-    <p>The specific gap here is sharp. The training trajectories are shortest paths. A shortest path
-    never contains a wrong turn, never backtracks and never pauses to work out where it is, so a
-    model trained only on them has never once seen a recovery.</p>
+    <p>The specific gap here is sharp. The training trajectories are shortest paths, and the paper
+    says shortest paths do not demonstrate information-seeking or recovery, which is what leads to
+    poor performance when those abilities are needed.</p>
   </div></div>
 </div>
 
@@ -589,9 +590,9 @@ h3{
     <h3>A reward that stops caring once you are close</h3>
     <p>Online reinforcement learning with CISPO, on top of the supervised model. The reward is the
     negative geodesic distance to the goal, clipped so it flattens out two metres away.</p>
-    <p>The clip is doing real work. Without it an agent can farm reward by shuffling around near the
-    target forever. With it, once you are close, the only thing left to gain is ending the episode,
-    so the model learns to actually emit the stop.</p>
+    <p>The clip is doing real work. The paper's reasoning is that it stops the agent manoeuvring near
+    the target to collect reward unrelated to task success, and that it pushes the model toward
+    emitting STOP instead.</p>
     <div class="try">Drag the agent's final distance and watch where the reward stops responding.</div>
   </div></div>
 </div>
@@ -602,8 +603,8 @@ h3{
     <h3>Only the episodes it already fails</h3>
     <p>Rather than roll out everything, they run the supervised policy over the task pool and keep
     the 35 thousand it cannot reliably solve: the tangled layouts, the ambiguous instructions, the
-    long ones. Everything the model already handles is dropped, so no compute is spent confirming
-    what already works.</p>
+    long ones. Episodes it already handles are dropped, so the RL compute lands on the
+    cases where the policy most needs improvement.</p>
     <p>Tasks are then packed by scene, so consecutive rollouts share a building. That accident of
     batching turns out to be an implicit visual curriculum, and it beats shuffling.</p>
   </div></div>
@@ -613,12 +614,12 @@ h3{
   <div class="stack"><div class="card">
     <span class="num">23<span class="sec">§3.3</span></span>
     <h3>The hard part is not the algorithm</h3>
-    <p>Online RL for a model this size means three GPU-bound systems running at once and waiting on
-    each other: a simulator rendering hundreds of parallel environments, an inference engine
-    generating the actions, and the training ranks applying updates.</p>
+    <p>Online RL for a model this size means three GPU-bound workloads running at once: a simulator
+    rendering hundreds of parallel environments, an inference engine generating the actions, and
+    the training ranks applying updates.</p>
     <p>The simulator is the awkward one, because rendering competes for the same memory and compute
-    as the learning. The paper is candid that most of the difficulty here was balancing those three
-    so that nothing sat idle.</p>
+    as the learning. The paper says allocation had to be balanced carefully so the generators and
+    the training ranks were not left waiting on rendering.</p>
   </div></div>
 </div>
 
@@ -635,8 +636,8 @@ h3{
     <p>Navigation error is how far from the goal it stopped. Success rate is the fraction of
     episodes that ended within three metres. Oracle success is the fraction that ever came within
     three metres, whether or not the agent realised.</p>
-    <p>The gap between those last two is a measure of one specific failure: passing the goal and not
-    stopping. Success weighted by path length then scales success by how direct the route was, so
+    <p>The gap between those last two counts episodes that came within three metres and did not stop
+    there. Success weighted by path length then scales success by how direct the route was, so
     wandering into the right answer scores worse than walking to it.</p>
   </div></div>
 </div>
@@ -644,8 +645,8 @@ h3{
 <div class="beat a4" data-s="S_TABLE" data-act="4" data-sec="§4.1" data-title="The table">
   <div class="stack"><div class="card">
     <span class="num">25<span class="sec">§4.1</span></span>
-    <h3>Fifteen systems, sorted honestly</h3>
-    <p>Every published comparison in the paper's table, split by whether the system gets a single RGB
+    <h3>Fifteen baselines, and ours</h3>
+    <p>Every row of the paper's comparison table, split by whether the system gets a single RGB
     camera or is allowed depth, LiDAR or several cameras. Pick a metric and a benchmark.</p>
     <div class="try">Switch benchmark and metric. The sensing class stays colour coded, so you can
     see where the single-camera systems sit.</div>
@@ -658,8 +659,8 @@ h3{
     <h3>It beats the rigs without the rig</h3>
     <p>On R2R-CE validation unseen it is first on every metric in the table. The margin over the
     best other single-camera system is large. The margin over the best system that gets depth or
-    multiple cameras is smaller but it is the one that matters, because that comparison is the whole
-    argument: the extra sensing was not buying what it appeared to be buying.</p>
+    multiple cameras is smaller, and it is the one carrying the argument: a minimal-sensor recipe
+    can outperform approaches that get privileged sensing.</p>
   </div></div>
 </div>
 
@@ -682,8 +683,9 @@ h3{
     <p>RxR-CE has longer instructions and longer routes. Robostral Navigate takes the state of the
     art among single-camera systems, and beats the best depth-assisted model on path efficiency and
     on navigation error. The split is english-only.</p>
-    <p>On raw success rate it does not win. Two depth-equipped systems finish above it, and the paper
-    compares itself only to the higher of the two, calling the result competitive. Competitive is the
+    <p>On raw success rate it does not win. Two systems from the depth and multi-camera group finish
+    above it, and the paper compares itself only to the higher of the two, calling the result
+    competitive. Competitive is the
     right word. Worth stating plainly, because the rest of the results are strong enough not to need
     the rounding.</p>
   </div></div>
@@ -695,7 +697,7 @@ h3{
     <h3>Read the scope before the score</h3>
     <p>Three things the numbers do not cover. Evaluation uses a pathfinder between the predicted
     waypoints, so the benchmark measures the waypoints rather than the full stack that runs on the
-    robot. The cross-embodiment claim is demonstrated on two wheeled platforms. And all training is
+    robot. The cross-embodiment claim is demonstrated on two mobile robot platforms. And all training is
     simulated, so the real-world evidence is the two deployments, not the benchmark rows.</p>
     <p>None of that undoes the result. It just means the result is about the recipe, which is what
     the paper set out to argue in the first place.</p>
@@ -706,10 +708,11 @@ h3{
   <div class="stack"><div class="card">
     <span class="num">30<span class="sec">§5</span></span>
     <h3>The whole thing in one line</h3>
-    <p>Drop the sensor assumptions to one RGB camera, move the output into image space so it is not
-    tied to a body, make the training cheap enough to iterate, then spend the savings on
-    reinforcement learning. The claim is not that pointing is a clever trick. It is that a recipe
-    built for scale can beat one built for a leaderboard, on the leaderboard.</p>
+    <p>Drop the sensor assumptions to one RGB camera, move the preferred output into image space so
+    it is not tied to a body, pack the episodes so training is cheap enough to iterate, then run
+    online reinforcement learning on top. The paper's own summing up is that large-scale
+    simulation, efficient training and reinforcement learning together produce a state-of-the-art
+    navigator with minimal sensing requirements.</p>
   </div></div>
 </div>
 
@@ -720,10 +723,11 @@ h3{
   <h2>Notes</h2>
   <p>Every number in the figures is parsed straight out of the paper,
   <a href="https://arxiv.org/abs/2607.20785">arXiv 2607.20785</a>, rather than typed in by hand.
-  Where the paper does not report something, the beat says so instead of guessing.</p>
-  <p>The 3D scenes are generated, not recordings. They are built to be dimensionally honest about
-  the thing being explained, and the image coordinates in them come from projecting a world point
-  through the camera you are looking through, but they are not frames from a real robot.</p>
+  The prose around them is my reading of the paper, not the paper's words, so check anything that
+  matters against the source.</p>
+  <p>The 3D scenes are generated, not recordings. The image coordinates in them come from
+  projecting a world point through the camera you are looking through, which is real geometry, but
+  the rooms are invented and none of it is a frame from a real robot.</p>
   <p>If a figure here disagrees with the paper, the paper is right. Tell me and I will fix it.</p>
 </div>
 
@@ -1756,13 +1760,13 @@ window.SCENES = window.SCENES || {};
 
     var TIERS = [
       { k: 'rgb', name: 'one RGB camera', chips: ['rgb'],
-        cost: ['nothing to calibrate', 'runs on anything with a webcam'] },
+        cost: ['the most universally available sensor', 'no additional sensing requirement'] },
       { k: 'depth', name: 'plus depth', chips: ['rgb', 'depth'],
-        cost: ['needs a depth sensor on every unit', 'fails on glass, dark and sunlight'] },
-      { k: 'rig', name: 'plus a camera rig', chips: ['rgb', 'depth', 'cam x4'],
-        cost: ['fixed extrinsics per platform', 'recalibrate whenever the body changes'] },
-      { k: 'map', name: 'plus a prebuilt map', chips: ['rgb', 'depth', 'cam x4', 'map'],
-        cost: ['survey every building first', 'stale the moment furniture moves'] }
+        cost: ['narrows the set of compatible robots', 'increases the cost per unit'] },
+      { k: 'rig', name: 'plus multiple cameras', chips: ['rgb', 'depth', 'multi-cam'],
+        cost: ['narrows the set of compatible robots further', 'increases the cost per unit'] },
+      { k: 'map', name: 'plus a prebuilt map', chips: ['rgb', 'depth', 'multi-cam', 'map'],
+        cost: ['demands environment-specific calibration', 'has to be redone per environment'] }
     ];
 
     K.label(s, 0, 12, 'what the system is allowed to assume');
@@ -1810,8 +1814,9 @@ window.SCENES = window.SCENES || {};
         { cols: 66 });
     }
     draw(0);
-    K.foot(s, 'The three costs are the ones named in the introduction: fewer compatible robots, ' +
-      'higher cost per unit, and environment-specific calibration.');
+    K.foot(s, 'The costs shown are the three the introduction names: fewer compatible robots, ' +
+      'higher cost per unit, and environment-specific calibration. The paper never states how ' +
+      'many cameras a multi-camera baseline uses, so neither does this figure.');
   };
 
   /* ---- 02 the three constraints ---- */
@@ -1821,11 +1826,11 @@ window.SCENES = window.SCENES || {};
 
     var ITEMS = [
       { c: C.blue, k: 'minimise sensing', t: 'one monocular RGB stream, the sensor every platform already has',
-        to: 'points at a pixel instead of measuring a distance' },
+        to: 'a pixel when the goal is visible, metric displacement when it is not' },
       { c: C.teal, k: 'generalise across bodies', t: 'no dependence on a particular height, lens or base',
         to: 'image-space output plus randomised bodies in training' },
       { c: C.amber, k: 'train efficiently', t: 'iteration speed is a first-class design constraint',
-        to: 'prefix-tree packing, then RL with the compute it saved' }
+        to: 'prefix-tree packing for the supervised phase, then online RL on top' }
     ];
 
     ITEMS.forEach(function (it, i) {
@@ -1840,8 +1845,8 @@ window.SCENES = window.SCENES || {};
     });
 
     K.callout(s, 0, 424, 640,
-      'The paper is explicit that it is chasing a scalable recipe rather than a leaderboard ' +
-      'position. The odd-looking choices later are all downstream of that.', { cols: 66 });
+      'The paper frames the challenge as not just a more accurate navigator but a scalable recipe ' +
+      'for one. The odd-looking choices later are downstream of that.', { cols: 66 });
   };
 
   /* ---- 03 a metric waypoint belongs to one body ---- */
@@ -1864,9 +1869,10 @@ window.SCENES = window.SCENES || {};
     // two bodies at the ends of the ranges the paper randomises over, drawn to
     // a shared scale so the comparison is a measurement and not a cartoon
     var BODIES = [
-      { n: 'tall, camera level', h: f.height_max, r: f.radius_min, pitch: f.pitch_min, c: C.blue },
+      { n: 'tall, camera level', h: f.height_max, r: f.radius_min, pitch: f.pitch_min,
+        cf: f.cam_h_max / 100, c: C.blue },
       { n: 'short, camera pitched down', h: f.height_min, r: f.radius_max,
-        pitch: f.pitch_max, c: C.purple }
+        pitch: f.pitch_max, cf: f.cam_h_min / 100, c: C.purple }
     ];
     var PW = 310, PX = [0, 330], PY = 152, PH = 250;
     var GROUND = PY + PH - 42, PPM = 150 / f.height_max;   // pixels per metre
@@ -1893,7 +1899,7 @@ window.SCENES = window.SCENES || {};
       s.appendChild(K.n('rect', { x: cx - bw / 2, y: GROUND - bh, width: bw, height: bh,
         rx: 4, fill: b.c, opacity: .26, stroke: b.c }));
       // the camera, at its randomised fraction of the body height
-      var camY = GROUND - b.h * 0.9 * PPM;
+      var camY = GROUND - b.h * b.cf * PPM;
       s.appendChild(K.n('circle', { cx: cx, cy: camY, r: 5, fill: b.c }));
       // and where it is looking, which is the part the metres depend on
       var ang = b.pitch * Math.PI / 180;
@@ -1904,7 +1910,7 @@ window.SCENES = window.SCENES || {};
 
       var rows = [
         [b.h.toFixed(1) + ' m', 'body height'],
-        [(b.h * 0.9).toFixed(2) + ' m', 'camera height'],
+        [(b.h * b.cf).toFixed(2) + ' m', 'camera height'],
         [b.r.toFixed(2) + ' m', 'base radius'],
         [b.pitch + '°', 'camera pitch']
       ];
@@ -2034,7 +2040,7 @@ window.SCENES = window.SCENES || {};
   window.SCENES.S_UV = function (root, api) {
     var RN = api.RN, f = RN.facts;
     var s = K.board(root, { alt: 'The five quantities predicted when the goal is visible.' });
-    K.head(s, 'Five numbers, most of the time', 'a_vis when the destination is in frame');
+    K.head(s, 'Five numbers when the goal is visible', 'a_vis, the joint prediction of section 2.2');
 
     K.label(s, 0, 14, 'predicted jointly');
     var FIELDS = [
@@ -2147,18 +2153,18 @@ window.SCENES = window.SCENES || {};
     var f = api.RN.facts;
     var s = K.board(root, { alt: 'A large reasoning model in series with a small geometric one.' });
     K.head(s, 'Split the job, then size each half',
-      'reasoning is expensive, geometry is not');
+      'the split is by capacity, not by speed');
 
     var ROWS = [
       { c: C.blue, name: 'Robostral Navigate', sz: f.vlm_params_b + 'B', kind: 'vision-language model',
         job: 'read the instruction, understand the room, choose the next waypoint',
         why: 'needs reasoning, so it gets the parameters' },
       { c: C.teal, name: 'diffusion policy', sz: f.policy_params_m + 'M', kind: 'diffusion transformer',
-        job: 'turn one waypoint into a dense, obstacle-free trajectory',
-        why: 'geometry at this scale does not need a large model' },
+        job: 'turn one waypoint into a dense trajectory toward the goal, avoiding obstacles',
+        why: 'sufficient capacity for the geometric understanding needed' },
       { c: C.ink3, name: 'motion controller', sz: 'varies', kind: 'platform specific',
         job: 'track that trajectory with actuator commands',
-        why: 'the only piece that changes when you change robot' }
+        why: 'the only piece that differed between the two platforms' }
     ];
 
     ROWS.forEach(function (r, i) {
@@ -2174,8 +2180,8 @@ window.SCENES = window.SCENES || {};
     });
 
     K.callout(s, 0, 456, 640,
-      'Nothing expensive runs at the frequency the motors need. That is the whole reason for ' +
-      'the split.', { cols: 66 });
+      'Reasoning needs a large model and the geometry does not, so the two run in series at ' +
+      'different frequencies. That is the paper\'s reason for the split.', { cols: 66 });
   };
 
   /* ---- 08 the rate ladder, animated ---- */
@@ -2183,7 +2189,7 @@ window.SCENES = window.SCENES || {};
     var f = api.RN.facts;
     var s = K.board(root, { alt: 'Three components running at half a hertz, ten hertz and a hundred hertz.' });
     K.head(s, 'Half a hertz of thinking',
-      'each layer down is cheaper, faster and simpler');
+      'each layer down runs at a higher frequency');
 
     var LANES = [
       { hz: f.hz_vlm, c: C.blue, n: 'waypoint', who: 'vision-language model' },
@@ -2201,17 +2207,16 @@ window.SCENES = window.SCENES || {};
         fill: i === 0 ? T.blue : (i === 1 ? T.teal : T.amber) }));
       // one second of wall clock, drawn to scale, capped so 100 Hz stays legible
       // 0.5 Hz is one tick every OTHER second, so draw two seconds of wall clock
-      var SECS = L.hz < 1 ? 2 : 1;
-      var n = Math.min(50, Math.max(1, Math.round(L.hz * SECS)));
+      var SECS = 2;
+      var n = Math.min(60, Math.max(1, Math.round(L.hz * SECS)));
       var g = K.n('g', {}); s.appendChild(g);
       for (var k = 0; k < n; k++) {
         var x = X0 + 12 + (XW - 24) * (n === 1 ? 0.5 : k / (n - (n > 1 ? 1 : 0)));
         g.appendChild(K.n('rect', { x: x - 1.4, y: y + 4, width: 2.8, height: 30, rx: 1.4,
           fill: L.c, opacity: .9 }));
       }
-      if (L.hz > 50) K.mono(s, X0 + 12, y + 62, 'drawn at 50 of ' + L.hz + ' for legibility',
-        { size: 10.5, color: C.ink3 });
-      if (SECS === 2) K.mono(s, X0 + 12, y + 62, 'one tick, across two seconds',
+      if (L.hz * SECS > 60) K.mono(s, X0 + 12, y + 62,
+        'drawn at 60 of ' + Math.round(L.hz * SECS) + ' for legibility',
         { size: 10.5, color: C.ink3 });
       ticks.push({ g: g, hz: L.hz, y: y, c: L.c });
     });
@@ -2223,8 +2228,8 @@ window.SCENES = window.SCENES || {};
     s.appendChild(head);
 
     K.callout(s, 0, 438, 640,
-      'The vision-language model emits one waypoint every two seconds. Everything between that ' +
-      'and the actuators exists to fill in the gap.', { cols: 66 });
+      'One waypoint every two seconds. Everything between that and the actuators exists to fill ' +
+      'in the gap. All three lanes are drawn over the same two seconds.', { cols: 66 });
 
     return {
       tick: function (t) {
@@ -2319,8 +2324,8 @@ window.SCENES = window.SCENES || {};
   /* ---- 11 randomise the body, watch the pixel move ---- */
   window.SCENES.S_RANDOM = function (root, api) {
     var f = api.RN.facts;
-    K3.head(root, 'Never let it learn one body',
-      'the world point is fixed. change the body and the pixel moves.');
+    K3.head(root, 'Do not let it settle on one body',
+      'the world point is fixed. change the camera height or pitch and the pixel moves.');
 
     var read = K3.el('div', 'k3read');
     var uvB = K3.el('b', null, 'u, v'), hB = K3.el('b', 'off', 'camera');
@@ -2414,7 +2419,7 @@ window.SCENES = window.SCENES || {};
 
   /* ---- 12 two bodies, one set of weights ---- */
   window.SCENES.S_ROBOTS = function (root, api) {
-    K3.head(root, 'Two machines that share nothing',
+    K3.head(root, 'Two substantially different machines',
       'same vision-language model, same diffusion policy, different controller');
 
     var handle = K3.mount(root, { aspect: '16 / 9' }, function (ctx) {
@@ -2478,8 +2483,9 @@ window.SCENES = window.SCENES || {};
     K3.seg(row, ['look through the tall one', 'look through the short one'],
       function (i) { if (root.__pick) root.__pick(i); }, 0);
     K3.note(root, 'The paper deploys on a Galaxea R1 and a Hiwonder JetAuto with identical ' +
-      'weights, changing only the low-level controller. Both are wheeled, so the legged and ' +
-      'aerial part of the claim is an argument rather than a demonstration.');
+      'weights, changing only the low-level controller. It calls them two substantially ' +
+      'different mobile robot platforms, so the legged and aerial part of the claim is an ' +
+      'argument rather than a demonstration.');
     return handle;
   };
 })();
@@ -2606,8 +2612,8 @@ window.SCENES = window.SCENES || {};
     }
 
     K.callout(s, 0, 448, 640,
-      'Uniform sampling gives you a thousand variations of the same short hop. This gives ' +
-      'trajectories of genuinely different lengths, some of them crossing floors.', { cols: 66 });
+      'The paper uses farthest point sampling to ensure diverse start and goal positions, giving ' +
+      'trajectories of various lengths, sometimes spanning multiple floors.', { cols: 66 });
 
     var last = -1;
     return {
@@ -2736,16 +2742,16 @@ window.SCENES = window.SCENES || {};
 
     K.label(s, 0, 134, 'why it matters more here than usual');
     K.panel(s, 0, 148, 640, 118, { stroke: C.red, fill: T.red });
-    K.para(s, 18, 176, 'Each waypoint is the furthest visible point along the route, so ' +
-      'consecutive ground-truth actions are strongly related to each other. A model allowed to ' +
-      'see them learns to extrapolate the sequence instead of looking at the room.', 62,
+    K.para(s, 18, 176, 'In pointing mode the target is the furthest visible waypoint, so previous ' +
+      'ground-truth actions are often very informative of the next one. A model allowed to see ' +
+      'them would lean on information it does not have at deployment.', 62,
       { size: 13, color: C.red });
 
     K.panel(s, 0, 286, 640, 92, { flat: true, fill: T.ink, stroke: C.line });
-    K.mono(s, 18, 314, 'trains beautifully', { size: 14, color: C.ink2, weight: 500 });
-    K.mono(s, 18, 340, 'fails on a robot', { size: 14, color: C.red, weight: 500 });
-    K.mono(s, 210, 314, 'because the crutch is in the training data', { size: 12, color: C.ink3 });
-    K.mono(s, 210, 340, 'and it is not in the world', { size: 12, color: C.ink3 });
+    K.mono(s, 18, 314, 'available in training', { size: 14, color: C.ink2, weight: 500 });
+    K.mono(s, 18, 340, 'absent at deployment', { size: 14, color: C.red, weight: 500 });
+    K.mono(s, 210, 314, 'the ground-truth actions sit in the context', { size: 12, color: C.ink3 });
+    K.mono(s, 210, 340, 'and a robot never has them', { size: 12, color: C.ink3 });
 
     K.callout(s, 0, 400, 640,
       'The fix is not to change the data. It is to change what the model is allowed to look at.',
@@ -2898,7 +2904,8 @@ window.SCENES = window.SCENES || {};
     });
 
     K.callout(s, 0, 484, 640,
-      'No amount of extra shortest paths fixes this. Recovery is not in the distribution.',
+      'The shortest-path demonstrations do not show information-seeking or recovery, which is what ' +
+      'leaves the policy exposed in the states it reaches after an error.',
       { cols: 66 });
   };
 
@@ -2990,15 +2997,15 @@ window.SCENES = window.SCENES || {};
       { size: 12, color: C.ink3 });
 
     K.callout(s, 0, 424, 640,
-      'Empirically the scene-contiguous ordering beats random shuffling. No compute is spent ' +
-      'confirming what the model already does well.', { cols: 66 });
+      'Empirically the scene-contiguous ordering beats random shuffling, and the curation focuses ' +
+      'RL compute on the cases where the policy most needs improvement.', { cols: 66 });
   };
 
   /* ---- 23 three workloads ---- */
   window.SCENES.S_SYSTEMS = function (root, api) {
     var s = K.board(root, { alt: 'Three GPU-bound workloads sharing one cluster.' });
-    K.head(s, 'The hard part is not the algorithm',
-      'three GPU-bound systems running at once, waiting on each other');
+    K.head(s, 'A systems engineering problem',
+      'three GPU-bound workloads that have to run at once without stalling');
 
     var W = [
       { n: 'simulator', d: 'physics and rendering for hundreds of parallel environments',
@@ -3021,8 +3028,8 @@ window.SCENES = window.SCENES || {};
     K.arrow(s, 620, 248, 620, 272, { color: C.line, w: 1.4 });
 
     K.callout(s, 0, 408, 640,
-      'The paper is candid that most of the difficulty was balancing these three so that nothing ' +
-      'sat idle. That is a systems result, not an algorithmic one.', { cols: 66 });
+      'The paper says allocation had to be balanced carefully across the cluster so the generators ' +
+      'and the training ranks were not left waiting on simulator rendering.', { cols: 66 });
   };
 })();
 /* ---- s4_results ---- */
@@ -3040,7 +3047,7 @@ window.SCENES = window.SCENES || {};
   window.SCENES.S_METRICS = function (root, api) {
     var M = api.RN.metrics, f = api.RN.facts, o = api.RN.ours;
     var s = K.board(root, { alt: 'What the four navigation metrics measure.' });
-    K.head(s, 'What the columns mean', 'three describe where it ended up, one describes the route');
+    K.head(s, 'What the columns mean', 'where it stopped, whether it ever arrived, and how direct');
 
     var ROWS = [
       { k: 'NE', dir: 'lower', c: C.purple, d: M.NE, v: o.r2r.NE.toFixed(2) + ' m' },
@@ -3059,8 +3066,8 @@ window.SCENES = window.SCENES || {};
     });
 
     K.callout(s, 0, 402, 640,
-      'The gap between oracle success and success rate measures one specific failure: coming ' +
-      'within ' + f.success_radius_m + ' m of the goal and not realising it. Ours is ' +
+      'The gap between oracle success and success rate is the share of episodes that came within ' +
+      f.success_radius_m + ' m of the goal but did not stop within it. Ours is ' +
       (o.r2r.OS - o.r2r.SR).toFixed(1) + ' points.', { cols: 66, color: C.blue, tint: T.blue });
   };
 
@@ -3160,8 +3167,8 @@ window.SCENES = window.SCENES || {};
     });
 
     K.callout(s, 0, 500, 640,
-      'The second margin is the one that carries the argument. The extra sensing was not buying ' +
-      'what it appeared to be buying.', { cols: 66 });
+      'The second margin carries the argument: a minimal-sensor recipe outperforming approaches ' +
+      'that leverage privileged sensing.', { cols: 66 });
   };
 
   /* ---- 27 what RL bought ---- */
@@ -3255,9 +3262,8 @@ window.SCENES = window.SCENES || {};
       ' above it all get depth or several cameras', { size: 11.5, color: C.blue });
 
     K.callout(s, 0, 434, 640,
-      'The paper compares itself only to the higher of the two and calls the result competitive. ' +
-      'That is the right word, and worth stating plainly, because the rest of the results do not ' +
-      'need the rounding.', { cols: 66 });
+      'The paper compares itself only to the higher of the two, and calls that result competitive: ' +
+      o.rxr.SR.toFixed(1) + '% against ' + rival.rxr.SR.toFixed(1) + '%.', { cols: 66 });
   };
 
   /* ---- 29 scope ---- */
@@ -3269,9 +3275,10 @@ window.SCENES = window.SCENES || {};
       { t: 'the benchmark measures the waypoints, not the stack',
         d: 'evaluation runs a Habitat pathfinder between predicted waypoints, so the diffusion ' +
            'policy and controller that run on the real robot are not what is being scored' },
-      { t: 'cross-embodiment is shown on two wheeled platforms',
-        d: 'the abstract argues the recipe reaches legged and aerial robots. The deployments in ' +
-           'the paper are a Galaxea R1 and a Hiwonder JetAuto, both wheeled' },
+      { t: 'cross-embodiment is shown on two mobile robot platforms',
+        d: 'the abstract argues the recipe reaches wheeled, legged and aerial robots. What the ' +
+           'paper demonstrates is two substantially different mobile robot platforms, a Galaxea ' +
+           'R1 and a Hiwonder JetAuto' },
       { t: 'training is entirely simulated',
         d: 'which is the point of the recipe, but it means the real-world evidence is the two ' +
            'deployments rather than the benchmark rows' }
@@ -3296,10 +3303,10 @@ window.SCENES = window.SCENES || {};
     K.head(s, 'The recipe, end to end', 'four decisions, each one traceable to the same objective');
 
     var STEPS = [
-      ['one RGB camera', 'the sensor every platform already has', C.blue],
-      ['output a pixel', 'so the waypoint is not tied to a body', C.teal],
+      ['one RGB camera', 'the most universally available sensor', C.blue],
+      ['point at a pixel', 'with a metric fallback when the goal is out of frame', C.teal],
       ['pack the episode', f.token_saving_x + '× fewer tokens, months to days', C.purple],
-      ['spend it on RL', 'exploration and recovery, which imitation cannot teach', C.amber]
+      ['then online RL', 'exploration and recovery, which shortest paths never show', C.amber]
     ];
     STEPS.forEach(function (st, i) {
       var y = 12 + i * 84;
@@ -3318,8 +3325,8 @@ window.SCENES = window.SCENES || {};
     K.mono(s, 350, 434, 'RxR-CE success, validation unseen', { size: 11, color: C.red });
 
     K.callout(s, 0, 472, 640,
-      'The claim is not that pointing is a clever trick. It is that a recipe built for scale can ' +
-      'win on the leaderboard built for something else.', { cols: 66 });
+      'The paper leads R2R-CE on every reported metric, and takes RxR-CE on path efficiency and ' +
+      'navigation error while placing third on its success rate.', { cols: 66 });
   };
 })();
 </script>

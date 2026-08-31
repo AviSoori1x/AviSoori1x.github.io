@@ -12,7 +12,7 @@ window.SCENES = window.SCENES || {};
   window.SCENES.S_METRICS = function (root, api) {
     var M = api.RN.metrics, f = api.RN.facts, o = api.RN.ours;
     var s = K.board(root, { alt: 'What the four navigation metrics measure.' });
-    K.head(s, 'What the columns mean', 'three describe where it ended up, one describes the route');
+    K.head(s, 'What the columns mean', 'where it stopped, whether it ever arrived, and how direct');
 
     var ROWS = [
       { k: 'NE', dir: 'lower', c: C.purple, d: M.NE, v: o.r2r.NE.toFixed(2) + ' m' },
@@ -31,8 +31,8 @@ window.SCENES = window.SCENES || {};
     });
 
     K.callout(s, 0, 402, 640,
-      'The gap between oracle success and success rate measures one specific failure: coming ' +
-      'within ' + f.success_radius_m + ' m of the goal and not realising it. Ours is ' +
+      'The gap between oracle success and success rate is the share of episodes that came within ' +
+      f.success_radius_m + ' m of the goal but did not stop within it. Ours is ' +
       (o.r2r.OS - o.r2r.SR).toFixed(1) + ' points.', { cols: 66, color: C.blue, tint: T.blue });
   };
 
@@ -132,8 +132,8 @@ window.SCENES = window.SCENES || {};
     });
 
     K.callout(s, 0, 500, 640,
-      'The second margin is the one that carries the argument. The extra sensing was not buying ' +
-      'what it appeared to be buying.', { cols: 66 });
+      'The second margin carries the argument: a minimal-sensor recipe outperforming approaches ' +
+      'that leverage privileged sensing.', { cols: 66 });
   };
 
   /* ---- 27 what RL bought ---- */
@@ -227,9 +227,8 @@ window.SCENES = window.SCENES || {};
       ' above it all get depth or several cameras', { size: 11.5, color: C.blue });
 
     K.callout(s, 0, 434, 640,
-      'The paper compares itself only to the higher of the two and calls the result competitive. ' +
-      'That is the right word, and worth stating plainly, because the rest of the results do not ' +
-      'need the rounding.', { cols: 66 });
+      'The paper compares itself only to the higher of the two, and calls that result competitive: ' +
+      o.rxr.SR.toFixed(1) + '% against ' + rival.rxr.SR.toFixed(1) + '%.', { cols: 66 });
   };
 
   /* ---- 29 scope ---- */
@@ -241,9 +240,10 @@ window.SCENES = window.SCENES || {};
       { t: 'the benchmark measures the waypoints, not the stack',
         d: 'evaluation runs a Habitat pathfinder between predicted waypoints, so the diffusion ' +
            'policy and controller that run on the real robot are not what is being scored' },
-      { t: 'cross-embodiment is shown on two wheeled platforms',
-        d: 'the abstract argues the recipe reaches legged and aerial robots. The deployments in ' +
-           'the paper are a Galaxea R1 and a Hiwonder JetAuto, both wheeled' },
+      { t: 'cross-embodiment is shown on two mobile robot platforms',
+        d: 'the abstract argues the recipe reaches wheeled, legged and aerial robots. What the ' +
+           'paper demonstrates is two substantially different mobile robot platforms, a Galaxea ' +
+           'R1 and a Hiwonder JetAuto' },
       { t: 'training is entirely simulated',
         d: 'which is the point of the recipe, but it means the real-world evidence is the two ' +
            'deployments rather than the benchmark rows' }
@@ -268,10 +268,10 @@ window.SCENES = window.SCENES || {};
     K.head(s, 'The recipe, end to end', 'four decisions, each one traceable to the same objective');
 
     var STEPS = [
-      ['one RGB camera', 'the sensor every platform already has', C.blue],
-      ['output a pixel', 'so the waypoint is not tied to a body', C.teal],
+      ['one RGB camera', 'the most universally available sensor', C.blue],
+      ['point at a pixel', 'with a metric fallback when the goal is out of frame', C.teal],
       ['pack the episode', f.token_saving_x + '× fewer tokens, months to days', C.purple],
-      ['spend it on RL', 'exploration and recovery, which imitation cannot teach', C.amber]
+      ['then online RL', 'exploration and recovery, which shortest paths never show', C.amber]
     ];
     STEPS.forEach(function (st, i) {
       var y = 12 + i * 84;
@@ -290,7 +290,7 @@ window.SCENES = window.SCENES || {};
     K.mono(s, 350, 434, 'RxR-CE success, validation unseen', { size: 11, color: C.red });
 
     K.callout(s, 0, 472, 640,
-      'The claim is not that pointing is a clever trick. It is that a recipe built for scale can ' +
-      'win on the leaderboard built for something else.', { cols: 66 });
+      'The paper leads R2R-CE on every reported metric, and takes RxR-CE on path efficiency and ' +
+      'navigation error while placing third on its success rate.', { cols: 66 });
   };
 })();

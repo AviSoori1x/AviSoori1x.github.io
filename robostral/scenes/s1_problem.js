@@ -11,13 +11,13 @@ window.SCENES = window.SCENES || {};
 
     var TIERS = [
       { k: 'rgb', name: 'one RGB camera', chips: ['rgb'],
-        cost: ['nothing to calibrate', 'runs on anything with a webcam'] },
+        cost: ['the most universally available sensor', 'no additional sensing requirement'] },
       { k: 'depth', name: 'plus depth', chips: ['rgb', 'depth'],
-        cost: ['needs a depth sensor on every unit', 'fails on glass, dark and sunlight'] },
-      { k: 'rig', name: 'plus a camera rig', chips: ['rgb', 'depth', 'cam x4'],
-        cost: ['fixed extrinsics per platform', 'recalibrate whenever the body changes'] },
-      { k: 'map', name: 'plus a prebuilt map', chips: ['rgb', 'depth', 'cam x4', 'map'],
-        cost: ['survey every building first', 'stale the moment furniture moves'] }
+        cost: ['narrows the set of compatible robots', 'increases the cost per unit'] },
+      { k: 'rig', name: 'plus multiple cameras', chips: ['rgb', 'depth', 'multi-cam'],
+        cost: ['narrows the set of compatible robots further', 'increases the cost per unit'] },
+      { k: 'map', name: 'plus a prebuilt map', chips: ['rgb', 'depth', 'multi-cam', 'map'],
+        cost: ['demands environment-specific calibration', 'has to be redone per environment'] }
     ];
 
     K.label(s, 0, 12, 'what the system is allowed to assume');
@@ -65,8 +65,9 @@ window.SCENES = window.SCENES || {};
         { cols: 66 });
     }
     draw(0);
-    K.foot(s, 'The three costs are the ones named in the introduction: fewer compatible robots, ' +
-      'higher cost per unit, and environment-specific calibration.');
+    K.foot(s, 'The costs shown are the three the introduction names: fewer compatible robots, ' +
+      'higher cost per unit, and environment-specific calibration. The paper never states how ' +
+      'many cameras a multi-camera baseline uses, so neither does this figure.');
   };
 
   /* ---- 02 the three constraints ---- */
@@ -76,11 +77,11 @@ window.SCENES = window.SCENES || {};
 
     var ITEMS = [
       { c: C.blue, k: 'minimise sensing', t: 'one monocular RGB stream, the sensor every platform already has',
-        to: 'points at a pixel instead of measuring a distance' },
+        to: 'a pixel when the goal is visible, metric displacement when it is not' },
       { c: C.teal, k: 'generalise across bodies', t: 'no dependence on a particular height, lens or base',
         to: 'image-space output plus randomised bodies in training' },
       { c: C.amber, k: 'train efficiently', t: 'iteration speed is a first-class design constraint',
-        to: 'prefix-tree packing, then RL with the compute it saved' }
+        to: 'prefix-tree packing for the supervised phase, then online RL on top' }
     ];
 
     ITEMS.forEach(function (it, i) {
@@ -95,8 +96,8 @@ window.SCENES = window.SCENES || {};
     });
 
     K.callout(s, 0, 424, 640,
-      'The paper is explicit that it is chasing a scalable recipe rather than a leaderboard ' +
-      'position. The odd-looking choices later are all downstream of that.', { cols: 66 });
+      'The paper frames the challenge as not just a more accurate navigator but a scalable recipe ' +
+      'for one. The odd-looking choices later are downstream of that.', { cols: 66 });
   };
 
   /* ---- 03 a metric waypoint belongs to one body ---- */
@@ -119,9 +120,10 @@ window.SCENES = window.SCENES || {};
     // two bodies at the ends of the ranges the paper randomises over, drawn to
     // a shared scale so the comparison is a measurement and not a cartoon
     var BODIES = [
-      { n: 'tall, camera level', h: f.height_max, r: f.radius_min, pitch: f.pitch_min, c: C.blue },
+      { n: 'tall, camera level', h: f.height_max, r: f.radius_min, pitch: f.pitch_min,
+        cf: f.cam_h_max / 100, c: C.blue },
       { n: 'short, camera pitched down', h: f.height_min, r: f.radius_max,
-        pitch: f.pitch_max, c: C.purple }
+        pitch: f.pitch_max, cf: f.cam_h_min / 100, c: C.purple }
     ];
     var PW = 310, PX = [0, 330], PY = 152, PH = 250;
     var GROUND = PY + PH - 42, PPM = 150 / f.height_max;   // pixels per metre
@@ -148,7 +150,7 @@ window.SCENES = window.SCENES || {};
       s.appendChild(K.n('rect', { x: cx - bw / 2, y: GROUND - bh, width: bw, height: bh,
         rx: 4, fill: b.c, opacity: .26, stroke: b.c }));
       // the camera, at its randomised fraction of the body height
-      var camY = GROUND - b.h * 0.9 * PPM;
+      var camY = GROUND - b.h * b.cf * PPM;
       s.appendChild(K.n('circle', { cx: cx, cy: camY, r: 5, fill: b.c }));
       // and where it is looking, which is the part the metres depend on
       var ang = b.pitch * Math.PI / 180;
@@ -159,7 +161,7 @@ window.SCENES = window.SCENES || {};
 
       var rows = [
         [b.h.toFixed(1) + ' m', 'body height'],
-        [(b.h * 0.9).toFixed(2) + ' m', 'camera height'],
+        [(b.h * b.cf).toFixed(2) + ' m', 'camera height'],
         [b.r.toFixed(2) + ' m', 'base radius'],
         [b.pitch + '°', 'camera pitch']
       ];
@@ -289,7 +291,7 @@ window.SCENES = window.SCENES || {};
   window.SCENES.S_UV = function (root, api) {
     var RN = api.RN, f = RN.facts;
     var s = K.board(root, { alt: 'The five quantities predicted when the goal is visible.' });
-    K.head(s, 'Five numbers, most of the time', 'a_vis when the destination is in frame');
+    K.head(s, 'Five numbers when the goal is visible', 'a_vis, the joint prediction of section 2.2');
 
     K.label(s, 0, 14, 'predicted jointly');
     var FIELDS = [

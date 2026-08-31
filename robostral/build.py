@@ -57,14 +57,14 @@ HERO = """
   Navigate takes a <b>single RGB camera</b> and predicts where to go by <b>pointing at a pixel</b>
   in the frame it is already looking at.</p>
   <p class="sub" style="margin-top:14px">I contributed to the original paper, and this is my
-  attempt to lay it out visually. The 3D figures are real scenes rather than diagrams, so when a figure claims
-  the image coordinate survives a change of camera, you can move the camera and check.</p>
+  attempt to lay it out visually. The 3D figures are generated scenes rather than diagrams, so where a figure
+  is about an image coordinate you can move the camera and watch that coordinate move.</p>
 
   <div class="metastrip">
     <span class="chip"><a href="https://arxiv.org/abs/2607.20785">arXiv <b>2607.20785</b></a></span>
     <span class="chip"><a href="https://mistral.ai/news/robostral-navigate">project page</a></span>
-    <span class="chip">R2R-CE SR <b>77.4</b></span>
-    <span class="chip">RxR-CE SR <b>75.1</b></span>
+    <span class="chip">R2R-CE val unseen SR <b>77.4</b></span>
+    <span class="chip">RxR-CE val unseen SR <b>75.1</b></span>
   </div>
   <div class="toc">
     <div class="a1"><h4>The problem</h4>
@@ -76,7 +76,7 @@ HERO = """
     <div class="a3"><h4>How it learns</h4>
       <p>2.4 million simulated trajectories, episode packing that turns quadratic training into
       linear, a mask that stops the model cheating off its own past answers, and the reinforcement
-      learning pass that fixes what imitation cannot.</p></div>
+      learning pass that adds what shortest-path imitation never shows.</p></div>
     <div class="a4"><h4>Does it hold up</h4>
       <p>Fifteen baselines, the gap to systems that get depth for free, what reinforcement learning
       actually bought, and the one number where it still comes third.</p></div>
@@ -90,10 +90,11 @@ OUTRO = """
   <h2>Notes</h2>
   <p>Every number in the figures is parsed straight out of the paper,
   <a href="https://arxiv.org/abs/2607.20785">arXiv 2607.20785</a>, rather than typed in by hand.
-  Where the paper does not report something, the beat says so instead of guessing.</p>
-  <p>The 3D scenes are generated, not recordings. They are built to be dimensionally honest about
-  the thing being explained, and the image coordinates in them come from projecting a world point
-  through the camera you are looking through, but they are not frames from a real robot.</p>
+  The prose around them is my reading of the paper, not the paper's words, so check anything that
+  matters against the source.</p>
+  <p>The 3D scenes are generated, not recordings. The image coordinates in them come from
+  projecting a world point through the camera you are looking through, which is real geometry, but
+  the rooms are invented and none of it is a frame from a real robot.</p>
   <p>If a figure here disagrees with the paper, the paper is right. Tell me and I will fix it.</p>
 </div>
 """

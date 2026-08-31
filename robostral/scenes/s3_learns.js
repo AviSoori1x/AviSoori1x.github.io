@@ -120,8 +120,8 @@ window.SCENES = window.SCENES || {};
     }
 
     K.callout(s, 0, 448, 640,
-      'Uniform sampling gives you a thousand variations of the same short hop. This gives ' +
-      'trajectories of genuinely different lengths, some of them crossing floors.', { cols: 66 });
+      'The paper uses farthest point sampling to ensure diverse start and goal positions, giving ' +
+      'trajectories of various lengths, sometimes spanning multiple floors.', { cols: 66 });
 
     var last = -1;
     return {
@@ -250,16 +250,16 @@ window.SCENES = window.SCENES || {};
 
     K.label(s, 0, 134, 'why it matters more here than usual');
     K.panel(s, 0, 148, 640, 118, { stroke: C.red, fill: T.red });
-    K.para(s, 18, 176, 'Each waypoint is the furthest visible point along the route, so ' +
-      'consecutive ground-truth actions are strongly related to each other. A model allowed to ' +
-      'see them learns to extrapolate the sequence instead of looking at the room.', 62,
+    K.para(s, 18, 176, 'In pointing mode the target is the furthest visible waypoint, so previous ' +
+      'ground-truth actions are often very informative of the next one. A model allowed to see ' +
+      'them would lean on information it does not have at deployment.', 62,
       { size: 13, color: C.red });
 
     K.panel(s, 0, 286, 640, 92, { flat: true, fill: T.ink, stroke: C.line });
-    K.mono(s, 18, 314, 'trains beautifully', { size: 14, color: C.ink2, weight: 500 });
-    K.mono(s, 18, 340, 'fails on a robot', { size: 14, color: C.red, weight: 500 });
-    K.mono(s, 210, 314, 'because the crutch is in the training data', { size: 12, color: C.ink3 });
-    K.mono(s, 210, 340, 'and it is not in the world', { size: 12, color: C.ink3 });
+    K.mono(s, 18, 314, 'available in training', { size: 14, color: C.ink2, weight: 500 });
+    K.mono(s, 18, 340, 'absent at deployment', { size: 14, color: C.red, weight: 500 });
+    K.mono(s, 210, 314, 'the ground-truth actions sit in the context', { size: 12, color: C.ink3 });
+    K.mono(s, 210, 340, 'and a robot never has them', { size: 12, color: C.ink3 });
 
     K.callout(s, 0, 400, 640,
       'The fix is not to change the data. It is to change what the model is allowed to look at.',
@@ -412,7 +412,8 @@ window.SCENES = window.SCENES || {};
     });
 
     K.callout(s, 0, 484, 640,
-      'No amount of extra shortest paths fixes this. Recovery is not in the distribution.',
+      'The shortest-path demonstrations do not show information-seeking or recovery, which is what ' +
+      'leaves the policy exposed in the states it reaches after an error.',
       { cols: 66 });
   };
 
@@ -504,15 +505,15 @@ window.SCENES = window.SCENES || {};
       { size: 12, color: C.ink3 });
 
     K.callout(s, 0, 424, 640,
-      'Empirically the scene-contiguous ordering beats random shuffling. No compute is spent ' +
-      'confirming what the model already does well.', { cols: 66 });
+      'Empirically the scene-contiguous ordering beats random shuffling, and the curation focuses ' +
+      'RL compute on the cases where the policy most needs improvement.', { cols: 66 });
   };
 
   /* ---- 23 three workloads ---- */
   window.SCENES.S_SYSTEMS = function (root, api) {
     var s = K.board(root, { alt: 'Three GPU-bound workloads sharing one cluster.' });
-    K.head(s, 'The hard part is not the algorithm',
-      'three GPU-bound systems running at once, waiting on each other');
+    K.head(s, 'A systems engineering problem',
+      'three GPU-bound workloads that have to run at once without stalling');
 
     var W = [
       { n: 'simulator', d: 'physics and rendering for hundreds of parallel environments',
@@ -535,7 +536,7 @@ window.SCENES = window.SCENES || {};
     K.arrow(s, 620, 248, 620, 272, { color: C.line, w: 1.4 });
 
     K.callout(s, 0, 408, 640,
-      'The paper is candid that most of the difficulty was balancing these three so that nothing ' +
-      'sat idle. That is a systems result, not an algorithmic one.', { cols: 66 });
+      'The paper says allocation had to be balanced carefully across the cluster so the generators ' +
+      'and the training ranks were not left waiting on simulator rendering.', { cols: 66 });
   };
 })();

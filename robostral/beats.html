@@ -1,8 +1,8 @@
 <!-- ==================== 1. THE PROBLEM ==================== -->
 <div class="actdiv a1"><div class="stack">
   <h2>The problem</h2>
-  <p>Navigation systems get good by adding sensors. Every sensor you add is a robot you can no
-  longer run on.</p>
+  <p>The systems that score best depend on extra sensing. Every requirement you add narrows the
+  set of robots you can run on.</p>
 </div></div>
 
 <div class="beat a1" data-s="S_SENSORS" data-act="1" data-sec="§1" data-title="The sensor tax">
@@ -10,11 +10,11 @@
     <span class="num">01<span class="sec">§1</span></span>
     <h3>Every extra sensor is a robot you lose</h3>
     <p>The strongest published navigators lean on depth cameras, LiDAR, multi-camera rigs, or a map
-    of the building made in advance. Each one buys accuracy. Each one also narrows the set of
-    hardware the policy can run on, raises the cost per unit, and adds a calibration step that has
-    to happen in every new environment.</p>
-    <p>That trade is invisible in a benchmark table, because a benchmark does not charge you for
-    the rig. It shows up the moment you try to put the same policy on a different robot.</p>
+    of the building made in advance. The paper names what each one costs: a narrower set of
+    compatible robots, a higher cost per unit, and calibration that has to happen in every new
+    environment.</p>
+    <p>A benchmark table does not charge you for the rig, so none of that shows up in the score. It
+    shows up when you try to put the same policy on different hardware.</p>
     <div class="try">Add sensors and watch the set of compatible platforms shrink.</div>
   </div></div>
 </div>
@@ -23,8 +23,8 @@
   <div class="stack"><div class="card">
     <span class="num">02<span class="sec">§1</span></span>
     <h3>Optimise for the recipe, not the score</h3>
-    <p>The paper sets itself a different target from the start. Not the most accurate navigator, but
-    the most <b>scalable recipe</b> for one: minimise what you assume about sensors, generalise
+    <p>The paper sets itself a different target from the start. Not just a more accurate navigator, but
+    a <b>scalable recipe</b> for one: minimise what you assume about sensors, generalise
     across robot bodies, and train efficiently enough that iteration is cheap.</p>
     <p>Three constraints, and every design decision downstream is traceable to one of them. It is
     worth holding onto them, because the parts that look strange later are strange for a reason.</p>
@@ -38,9 +38,9 @@
     <p>The conventional output is a metric displacement: go forward this many metres, turn this many
     degrees. That number is entangled with the body that produced it. It assumes a camera at a
     particular height and pitch, a particular field of view, and a scale calibrated to that machine.</p>
-    <p>Move it to a robot a third the height, with a wider base and a camera tilted further down,
-    and the geometry underneath the number has changed even though the instruction and the room
-    have not.</p>
+    <p>Change the machine and that geometry changes underneath the number, even though the
+    instruction and the room have not. It is why the paper randomises height, base radius, camera
+    height and camera pitch when it generates training data.</p>
   </div></div>
 </div>
 
@@ -101,7 +101,8 @@
     <p>Navigation is really two problems. Read the instruction, understand the room and plan a rough
     path. Then turn that rough path into motion that does not hit anything.</p>
     <p>They want different machines. The first gets an 8B vision-language model, because it needs
-    reasoning. The second gets a 121M diffusion policy, because geometry at that scale does not.
+    reasoning. The second gets a 121M diffusion policy, which the paper says has enough capacity for the
+    geometric understanding navigation needs.
     They run in series at different rates, and the rate ladder is the interesting part.</p>
   </div></div>
 </div>
@@ -113,8 +114,8 @@
     <p>The vision-language model emits a waypoint once every two seconds. The diffusion policy expands that
     into a dense trajectory at ten hertz. A motion controller, the only part that is specific to the
     robot you bought, turns that into motor commands at a hundred hertz.</p>
-    <p>Each layer down is cheaper, faster and dumber than the one above it. Nothing expensive runs
-    at the frequency the actuators need.</p>
+    <p>Each layer down runs faster and carries less of the thinking. The paper's reason for the
+    split is capacity rather than speed: reasoning needs a large model, the geometry does not.</p>
   </div></div>
 </div>
 
@@ -138,19 +139,20 @@
     <p>The diffusion policy takes the waypoint, the robot's height and radius, and two frames: the
     one the vision-language model actually looked at, and the one from right now. Those are not the
     same frame, because inference took time and the robot kept moving.</p>
-    <p>Handing it both is how the system stays honest about its own latency. Out comes a chunk of
-    thirty relative moves covering the next second.</p>
+    <p>Handing it both is how the system stays honest about its own latency. Out comes an action chunk of
+    30 delta coordinates covering the next second.</p>
   </div></div>
 </div>
 
 <div class="beat a2" data-s="S_RANDOM" data-act="2" data-sec="§2.4" data-title="Randomise the body">
   <div class="stack"><div class="card">
     <span class="num">11<span class="sec">§2.4</span></span>
-    <h3>Never let it learn one body</h3>
+    <h3>Do not let it settle on one body</h3>
     <p>Pointing gets you most of the way to cross-robot transfer. The training data closes the rest
     of the gap by refusing to hold the body fixed. Robot height, robot radius, how far up the robot
     the camera sits, and how far down it is tilted are all sampled per trajectory.</p>
-    <p>The policy never sees a consistent viewpoint, so it cannot come to depend on one.</p>
+    <p>The policy never sees a consistent viewpoint, which is how the paper reduces its dependence
+    on any particular camera setup, physical scale or morphology.</p>
     <div class="try">Change the body and watch the same world waypoint land on a different pixel.
     That variation is the training signal.</div>
   </div></div>
@@ -159,12 +161,12 @@
 <div class="beat a2" data-s="S_ROBOTS" data-act="2" data-sec="§2.4" data-title="Two robots, one set of weights">
   <div class="stack"><div class="card">
     <span class="num">12<span class="sec">§2.4</span></span>
-    <h3>Same weights on two machines that share nothing</h3>
+    <h3>Same weights on two substantially different machines</h3>
     <p>The deployment test is a Galaxea R1 and a Hiwonder JetAuto. They differ in morphology, camera
     height, camera configuration and base geometry. Both run the <b>same</b> vision-language model
     and the <b>same</b> diffusion policy. Only the low-level controller changes.</p>
     <p>Worth being precise about the scope: the abstract argues the approach extends to wheeled,
-    legged and aerial platforms, and the demonstration is two wheeled ones.</p>
+    legged and aerial platforms, and what the paper demonstrates is two mobile robot platforms.</p>
   </div></div>
 </div>
 
@@ -181,8 +183,8 @@
     <p>Roughly 2.4 million expert trajectories across 350 thousand simulated scenes. Offices,
     homes, commercial spaces and outdoors, varied deliberately in layout complexity, object density,
     lighting and architectural style.</p>
-    <p>Collecting that on real hardware is not a budget problem, it is an impossibility. Which is the
-    point: the recipe is built so that the expensive ingredient is compute, not fieldwork.</p>
+    <p>Collecting that on real hardware would be ruinously expensive, which is the point. The paper's
+    stated aim is to remove the reliance on costly real-world data collection.</p>
   </div></div>
 </div>
 
@@ -190,9 +192,9 @@
   <div class="stack"><div class="card">
     <span class="num">14<span class="sec">§3.1</span></span>
     <h3>Spread the endpoints out on purpose</h3>
-    <p>Start and goal pairs come from farthest point sampling over the navigable area, which is a
-    cheap way to stop a generator from producing a thousand variations of the same short hop across
-    one room. Trajectories come out at a range of lengths, and some of them cross floors.</p>
+    <p>Start and goal pairs come from farthest point sampling over the navigable area, which the paper uses
+    to ensure diverse start and goal positions. Trajectories come out at a range of lengths, and
+    some of them cross floors.</p>
     <div class="try">Watch the sampler pick endpoints. Each new pick is pushed away from everything
     already chosen.</div>
   </div></div>
@@ -231,10 +233,9 @@
     <h3>Flattening it opens a hole</h3>
     <p>The actions are now sitting in the context. Ordinary causal attention lets the model at time
     t read the ground-truth actions from every earlier step, and at deployment those do not exist.</p>
-    <p>Worse, they are unusually informative here. Because each waypoint is the furthest visible
-    point along the route, consecutive ground-truth actions are strongly related, so a model allowed
-    to see them will learn to extrapolate from them rather than look at the room. It would train
-    beautifully and fail on a robot.</p>
+    <p>Worse, they are unusually informative here. Because a waypoint is the furthest visible
+    point along the route, previous ground-truth actions are often very informative of the next one,
+    so a model allowed to see them would lean on information it will not have on a robot.</p>
   </div></div>
 </div>
 
@@ -269,13 +270,13 @@
 <div class="beat a3" data-s="S_EXPOSURE" data-act="3" data-sec="§3.3" data-title="Where imitation runs out">
   <div class="stack"><div class="card">
     <span class="num">20<span class="sec">§3.3</span></span>
-    <h3>Copying an expert teaches you nothing about being lost</h3>
+    <h3>Copying an expert does not show you how to be lost</h3>
     <p>Supervised training is behavioural cloning, and it inherits the usual two problems. Small
     errors compound until the agent is somewhere its training data never went, and once there it has
     no idea what to do.</p>
-    <p>The specific gap here is sharp. The training trajectories are shortest paths. A shortest path
-    never contains a wrong turn, never backtracks and never pauses to work out where it is, so a
-    model trained only on them has never once seen a recovery.</p>
+    <p>The specific gap here is sharp. The training trajectories are shortest paths, and the paper
+    says shortest paths do not demonstrate information-seeking or recovery, which is what leads to
+    poor performance when those abilities are needed.</p>
   </div></div>
 </div>
 
@@ -285,9 +286,9 @@
     <h3>A reward that stops caring once you are close</h3>
     <p>Online reinforcement learning with CISPO, on top of the supervised model. The reward is the
     negative geodesic distance to the goal, clipped so it flattens out two metres away.</p>
-    <p>The clip is doing real work. Without it an agent can farm reward by shuffling around near the
-    target forever. With it, once you are close, the only thing left to gain is ending the episode,
-    so the model learns to actually emit the stop.</p>
+    <p>The clip is doing real work. The paper's reasoning is that it stops the agent manoeuvring near
+    the target to collect reward unrelated to task success, and that it pushes the model toward
+    emitting STOP instead.</p>
     <div class="try">Drag the agent's final distance and watch where the reward stops responding.</div>
   </div></div>
 </div>
@@ -298,8 +299,8 @@
     <h3>Only the episodes it already fails</h3>
     <p>Rather than roll out everything, they run the supervised policy over the task pool and keep
     the 35 thousand it cannot reliably solve: the tangled layouts, the ambiguous instructions, the
-    long ones. Everything the model already handles is dropped, so no compute is spent confirming
-    what already works.</p>
+    long ones. Episodes it already handles are dropped, so the RL compute lands on the
+    cases where the policy most needs improvement.</p>
     <p>Tasks are then packed by scene, so consecutive rollouts share a building. That accident of
     batching turns out to be an implicit visual curriculum, and it beats shuffling.</p>
   </div></div>
@@ -309,12 +310,12 @@
   <div class="stack"><div class="card">
     <span class="num">23<span class="sec">§3.3</span></span>
     <h3>The hard part is not the algorithm</h3>
-    <p>Online RL for a model this size means three GPU-bound systems running at once and waiting on
-    each other: a simulator rendering hundreds of parallel environments, an inference engine
-    generating the actions, and the training ranks applying updates.</p>
+    <p>Online RL for a model this size means three GPU-bound workloads running at once: a simulator
+    rendering hundreds of parallel environments, an inference engine generating the actions, and
+    the training ranks applying updates.</p>
     <p>The simulator is the awkward one, because rendering competes for the same memory and compute
-    as the learning. The paper is candid that most of the difficulty here was balancing those three
-    so that nothing sat idle.</p>
+    as the learning. The paper says allocation had to be balanced carefully so the generators and
+    the training ranks were not left waiting on rendering.</p>
   </div></div>
 </div>
 
@@ -331,8 +332,8 @@
     <p>Navigation error is how far from the goal it stopped. Success rate is the fraction of
     episodes that ended within three metres. Oracle success is the fraction that ever came within
     three metres, whether or not the agent realised.</p>
-    <p>The gap between those last two is a measure of one specific failure: passing the goal and not
-    stopping. Success weighted by path length then scales success by how direct the route was, so
+    <p>The gap between those last two counts episodes that came within three metres and did not stop
+    there. Success weighted by path length then scales success by how direct the route was, so
     wandering into the right answer scores worse than walking to it.</p>
   </div></div>
 </div>
@@ -340,8 +341,8 @@
 <div class="beat a4" data-s="S_TABLE" data-act="4" data-sec="§4.1" data-title="The table">
   <div class="stack"><div class="card">
     <span class="num">25<span class="sec">§4.1</span></span>
-    <h3>Fifteen systems, sorted honestly</h3>
-    <p>Every published comparison in the paper's table, split by whether the system gets a single RGB
+    <h3>Fifteen baselines, and ours</h3>
+    <p>Every row of the paper's comparison table, split by whether the system gets a single RGB
     camera or is allowed depth, LiDAR or several cameras. Pick a metric and a benchmark.</p>
     <div class="try">Switch benchmark and metric. The sensing class stays colour coded, so you can
     see where the single-camera systems sit.</div>
@@ -354,8 +355,8 @@
     <h3>It beats the rigs without the rig</h3>
     <p>On R2R-CE validation unseen it is first on every metric in the table. The margin over the
     best other single-camera system is large. The margin over the best system that gets depth or
-    multiple cameras is smaller but it is the one that matters, because that comparison is the whole
-    argument: the extra sensing was not buying what it appeared to be buying.</p>
+    multiple cameras is smaller, and it is the one carrying the argument: a minimal-sensor recipe
+    can outperform approaches that get privileged sensing.</p>
   </div></div>
 </div>
 
@@ -378,8 +379,9 @@
     <p>RxR-CE has longer instructions and longer routes. Robostral Navigate takes the state of the
     art among single-camera systems, and beats the best depth-assisted model on path efficiency and
     on navigation error. The split is english-only.</p>
-    <p>On raw success rate it does not win. Two depth-equipped systems finish above it, and the paper
-    compares itself only to the higher of the two, calling the result competitive. Competitive is the
+    <p>On raw success rate it does not win. Two systems from the depth and multi-camera group finish
+    above it, and the paper compares itself only to the higher of the two, calling the result
+    competitive. Competitive is the
     right word. Worth stating plainly, because the rest of the results are strong enough not to need
     the rounding.</p>
   </div></div>
@@ -391,7 +393,7 @@
     <h3>Read the scope before the score</h3>
     <p>Three things the numbers do not cover. Evaluation uses a pathfinder between the predicted
     waypoints, so the benchmark measures the waypoints rather than the full stack that runs on the
-    robot. The cross-embodiment claim is demonstrated on two wheeled platforms. And all training is
+    robot. The cross-embodiment claim is demonstrated on two mobile robot platforms. And all training is
     simulated, so the real-world evidence is the two deployments, not the benchmark rows.</p>
     <p>None of that undoes the result. It just means the result is about the recipe, which is what
     the paper set out to argue in the first place.</p>
@@ -402,9 +404,10 @@
   <div class="stack"><div class="card">
     <span class="num">30<span class="sec">§5</span></span>
     <h3>The whole thing in one line</h3>
-    <p>Drop the sensor assumptions to one RGB camera, move the output into image space so it is not
-    tied to a body, make the training cheap enough to iterate, then spend the savings on
-    reinforcement learning. The claim is not that pointing is a clever trick. It is that a recipe
-    built for scale can beat one built for a leaderboard, on the leaderboard.</p>
+    <p>Drop the sensor assumptions to one RGB camera, move the preferred output into image space so
+    it is not tied to a body, pack the episodes so training is cheap enough to iterate, then run
+    online reinforcement learning on top. The paper's own summing up is that large-scale
+    simulation, efficient training and reinforcement learning together produce a state-of-the-art
+    navigator with minimal sensing requirements.</p>
   </div></div>
 </div>
