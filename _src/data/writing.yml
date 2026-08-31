@@ -1,6 +1,16 @@
 # `secondary: true` keeps a piece in the collapsed fold rather than the
 # selected list. Used for lighter, seasonal or heavily co-authored marketing posts.
 items:
+  - title: "Robostral Navigate, taken apart"
+    publisher: avisoori1x
+    date: "2026"
+    sort: "2026-08-31"
+    url: /robostral/
+    note: >-
+      A visual breakdown of the Robostral Navigate paper, a navigation model I worked on. It
+      drives from a single RGB camera by pointing at a pixel. Thirty scenes you scroll through,
+      several of them live 3D, so you can move the camera and watch the image coordinate move
+      with it.
   - title: "Shieldstral, taken apart"
     publisher: avisoori1x
     date: "2026"

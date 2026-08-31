@@ -1,0 +1,33 @@
+/* The overlay is rebuilt on every animation frame, so the figure entrance
+   stagger would restart it at opacity 0 forever. It is live readout, not a
+   figure element, so it must never animate. */
+.k3ov, .k3ov * { animation: none !important; opacity: 1; }
+
+/* furniture for the three.js figures, matched to KIT.head in the SVG ones */
+.k3head { margin: 0 0 16px; }
+.k3head i { display: block; width: 34px; height: 3px; border-radius: 1.5px;
+  background: var(--amber); margin-bottom: 14px; }
+.k3head h4 { font: 700 27px/1.15 'Sora', system-ui, sans-serif; letter-spacing: -.022em;
+  color: var(--ink); margin: 0; }
+.k3head p { font: 400 13px/1.4 'JetBrains Mono', monospace; color: var(--ink3);
+  margin: 8px 0 0; }
+
+.k3note { margin-top: 14px; padding: 11px 16px; border-radius: 9px;
+  font: 500 13.5px/1.45 'JetBrains Mono', monospace;
+  background: rgba(180,85,26,.09); border: 1px solid rgba(180,85,26,.45); color: var(--amber); }
+.k3note.blue { background: rgba(28,110,140,.08); border-color: rgba(28,110,140,.45); color: var(--blue); }
+.k3note.teal { background: rgba(15,110,86,.08); border-color: rgba(15,110,86,.45); color: var(--teal); }
+.k3note.red  { background: rgba(163,45,45,.07);  border-color: rgba(163,45,45,.45);  color: var(--red); }
+
+.k3cap { display:flex; gap:10px; margin-top:10px; }
+.k3cap span { flex:1; font: 500 10.5px/1 'JetBrains Mono', monospace; letter-spacing:.14em;
+  text-transform: uppercase; color: var(--ink3); }
+.k3cap span:last-child { text-align: right; }
+
+/* the readout strip under a 3D view */
+.k3read { display:flex; flex-wrap:wrap; gap:7px; margin-top:12px; }
+.k3read b { font: 500 12px/1 'JetBrains Mono', monospace; color:#fff; background: var(--ink);
+  padding:7px 11px; border-radius:999px; font-weight:500; }
+.k3read b.off { background: transparent; color: var(--ink3); border:1px solid var(--line); }
+.k3read b.hot { background: var(--red); }
+.k3read b.ok  { background: var(--teal); }

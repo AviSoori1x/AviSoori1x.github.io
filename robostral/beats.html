@@ -1,0 +1,406 @@
+<!-- ==================== 1. THE PROBLEM ==================== -->
+<div class="actdiv a1"><div class="stack">
+  <h2>The problem</h2>
+  <p>Navigation systems get good by adding sensors. Every sensor you add is a robot you can no
+  longer run on.</p>
+</div></div>
+
+<div class="beat a1" data-s="S_SENSORS" data-act="1" data-sec="§1" data-title="The sensor tax">
+  <div class="stack"><div class="card">
+    <span class="num">01<span class="sec">§1</span></span>
+    <h3>Every extra sensor is a robot you lose</h3>
+    <p>The strongest published navigators lean on depth cameras, LiDAR, multi-camera rigs, or a map
+    of the building made in advance. Each one buys accuracy. Each one also narrows the set of
+    hardware the policy can run on, raises the cost per unit, and adds a calibration step that has
+    to happen in every new environment.</p>
+    <p>That trade is invisible in a benchmark table, because a benchmark does not charge you for
+    the rig. It shows up the moment you try to put the same policy on a different robot.</p>
+    <div class="try">Add sensors and watch the set of compatible platforms shrink.</div>
+  </div></div>
+</div>
+
+<div class="beat a1" data-s="S_RECIPE" data-act="1" data-sec="§1" data-title="The scalability lens">
+  <div class="stack"><div class="card">
+    <span class="num">02<span class="sec">§1</span></span>
+    <h3>Optimise for the recipe, not the score</h3>
+    <p>The paper sets itself a different target from the start. Not the most accurate navigator, but
+    the most <b>scalable recipe</b> for one: minimise what you assume about sensors, generalise
+    across robot bodies, and train efficiently enough that iteration is cheap.</p>
+    <p>Three constraints, and every design decision downstream is traceable to one of them. It is
+    worth holding onto them, because the parts that look strange later are strange for a reason.</p>
+  </div></div>
+</div>
+
+<div class="beat a1" data-s="S_METRIC" data-act="1" data-sec="§1" data-title="Metric waypoints do not travel">
+  <div class="stack"><div class="card">
+    <span class="num">03<span class="sec">§1</span></span>
+    <h3>A distance in metres belongs to one robot</h3>
+    <p>The conventional output is a metric displacement: go forward this many metres, turn this many
+    degrees. That number is entangled with the body that produced it. It assumes a camera at a
+    particular height and pitch, a particular field of view, and a scale calibrated to that machine.</p>
+    <p>Move it to a robot half the height with a wider lens and the geometry underneath the number
+    has changed, even though the instruction and the room have not.</p>
+  </div></div>
+</div>
+
+<div class="beat a1" data-s="S_POINT" data-act="1" data-sec="§2.2" data-title="Point at a pixel">
+  <div class="stack"><div class="card">
+    <span class="num">04<span class="sec">§2.2</span></span>
+    <h3>So point at the picture instead</h3>
+    <p>Robostral Navigate outputs an <b>image coordinate</b>. Given the instruction and the frames so
+    far, it names the pixel <span class="k">(u, v)</span> of the furthest waypoint along the route
+    that is still visible in the current view, plus the heading change it wants on arrival.</p>
+    <p>The coordinate lives in the image, not in the world. Two robots looking at the same doorway
+    from different heights disagree about how many metres away it is, and agree completely about
+    which part of the picture it occupies.</p>
+    <div class="try">Left is the room. Right is what the robot's camera sees. The crosshair is not
+    drawn on, it is the world waypoint projected through that camera. Drag the robot along the
+    route.</div>
+  </div></div>
+</div>
+
+<div class="beat a1" data-s="S_UV" data-act="1" data-sec="§2.2" data-title="Five numbers">
+  <div class="stack"><div class="card">
+    <span class="num">05<span class="sec">§2.2</span></span>
+    <h3>Five numbers, most of the time</h3>
+    <p>When the destination is visible the model predicts all five at once: the two image
+    coordinates, a metric displacement, and the heading change. The paper writes this as
+    <span class="k">a<sub>vis</sub> = (u, v, &Delta;x, &Delta;y, &Delta;&theta;)</span>.</p>
+    <p>Pointing is the mode that matters. The metric pair rides along as a co-training task, which
+    is worth doing precisely because the model so rarely has to fall back on it.</p>
+  </div></div>
+</div>
+
+<div class="beat a1" data-s="S_FALLBACK" data-act="1" data-sec="§2.2" data-title="When the goal is behind you">
+  <div class="stack"><div class="card">
+    <span class="num">06<span class="sec">§2.2</span></span>
+    <h3>You cannot point at something behind you</h3>
+    <p>Pointing has one hole in it. If the next place to go is outside the current field of view, no
+    pixel in this frame refers to it. Turning around is the obvious case.</p>
+    <p>So the model drops the image coordinates and emits only the metric displacement,
+    <span class="k">a<sub>invis</sub> = (&Delta;x, &Delta;y, &Delta;&theta;)</span>. The fallback is
+    not a fifth wheel, it is the thing that guarantees the robot can always make progress. It also
+    explains why the metric pair is trained on every step rather than only the hard ones.</p>
+    <div class="try">Turn the robot until the waypoint leaves the frame and watch the output change
+    shape.</div>
+  </div></div>
+</div>
+
+<!-- ==================== 2. HOW IT MOVES ==================== -->
+<div class="actdiv a2"><div class="stack">
+  <h2>How it moves</h2>
+  <p>A large model that thinks slowly, sitting on top of a small one that acts quickly.</p>
+</div></div>
+
+<div class="beat a2" data-s="S_STACK" data-act="2" data-sec="§2" data-title="Two models in series">
+  <div class="stack"><div class="card">
+    <span class="num">07<span class="sec">§2</span></span>
+    <h3>Split the job, then run the halves at different speeds</h3>
+    <p>Navigation is really two problems. Read the instruction, understand the room and plan a rough
+    path. Then turn that rough path into motion that does not hit anything.</p>
+    <p>They want different machines. The first gets an 8B vision-language model, because it needs
+    reasoning. The second gets a 121M diffusion policy, because geometry at that scale does not.
+    They run in series at different rates, and the rate ladder is the interesting part.</p>
+  </div></div>
+</div>
+
+<div class="beat a2" data-s="S_RATES" data-act="2" data-sec="§2.1" data-title="The rate ladder">
+  <div class="stack"><div class="card">
+    <span class="num">08<span class="sec">§2.1</span></span>
+    <h3>Half a hertz of thinking, a hundred hertz of moving</h3>
+    <p>The vision-language model emits a waypoint twice a second. The diffusion policy expands that
+    into a dense trajectory at ten hertz. A motion controller, the only part that is specific to the
+    robot you bought, turns that into motor commands at a hundred hertz.</p>
+    <p>Each layer down is cheaper, faster and dumber than the one above it. Nothing expensive runs
+    at the frequency the actuators need.</p>
+  </div></div>
+</div>
+
+<div class="beat a2" data-s="S_TOKENS" data-act="2" data-sec="§2.1" data-title="What goes in">
+  <div class="stack"><div class="card">
+    <span class="num">09<span class="sec">§2.1</span></span>
+    <h3>Grounding first, navigation as an extension of it</h3>
+    <p>The model starts from a dense 8B vision-language model already built for spatial grounding:
+    pointing, counting, locating objects. The paper's framing is that navigation is a short step from
+    there. Once a model can say where a thing is in an image, teaching it to move toward that thing
+    is not a new capability so much as a new use of an existing one.</p>
+    <p>Frames go through a vision encoder into visual tokens, which are appended to the tokenised
+    instruction. The history is what lets it know where it has already been.</p>
+  </div></div>
+</div>
+
+<div class="beat a2" data-s="S_CHUNK" data-act="2" data-sec="§2.3" data-title="Turning a point into motion">
+  <div class="stack"><div class="card">
+    <span class="num">10<span class="sec">§2.3</span></span>
+    <h3>The small model has to cover for the big one being slow</h3>
+    <p>The diffusion policy takes the waypoint, the robot's height and radius, and two frames: the
+    one the vision-language model actually looked at, and the one from right now. Those are not the
+    same frame, because inference took time and the robot kept moving.</p>
+    <p>Handing it both is how the system stays honest about its own latency. Out comes a chunk of
+    thirty relative moves covering the next second.</p>
+  </div></div>
+</div>
+
+<div class="beat a2" data-s="S_RANDOM" data-act="2" data-sec="§2.4" data-title="Randomise the body">
+  <div class="stack"><div class="card">
+    <span class="num">11<span class="sec">§2.4</span></span>
+    <h3>Never let it learn one body</h3>
+    <p>Pointing gets you most of the way to cross-robot transfer. The training data closes the rest
+    of the gap by refusing to hold the body fixed. Robot height, robot radius, how far up the robot
+    the camera sits, and how far down it is tilted are all sampled per trajectory.</p>
+    <p>The policy never sees a consistent viewpoint, so it cannot come to depend on one.</p>
+    <div class="try">Change the body and watch the same world waypoint land on a different pixel.
+    That variation is the training signal.</div>
+  </div></div>
+</div>
+
+<div class="beat a2" data-s="S_ROBOTS" data-act="2" data-sec="§2.4" data-title="Two robots, one set of weights">
+  <div class="stack"><div class="card">
+    <span class="num">12<span class="sec">§2.4</span></span>
+    <h3>Same weights on two machines that share nothing</h3>
+    <p>The deployment test is a Galaxea R1 and a Hiwonder JetAuto. They differ in morphology, camera
+    height, camera configuration and base geometry. Both run the <b>same</b> vision-language model
+    and the <b>same</b> diffusion policy. Only the low-level controller changes.</p>
+    <p>Worth being precise about the scope: the abstract argues the approach extends to wheeled,
+    legged and aerial platforms, and the demonstration is two wheeled ones.</p>
+  </div></div>
+</div>
+
+<!-- ==================== 3. HOW IT LEARNS ==================== -->
+<div class="actdiv a3"><div class="stack">
+  <h2>How it learns</h2>
+  <p>All of it in simulation, then an attention mask that makes the training bill affordable.</p>
+</div></div>
+
+<div class="beat a3" data-s="S_SIM" data-act="3" data-sec="§3.1" data-title="Two and a half million routes">
+  <div class="stack"><div class="card">
+    <span class="num">13<span class="sec">§3.1</span></span>
+    <h3>No real-world data collection at all</h3>
+    <p>Roughly 2.4 million expert trajectories across 350 thousand simulated scenes. Offices,
+    homes, commercial spaces and outdoors, varied deliberately in layout complexity, object density,
+    lighting and architectural style.</p>
+    <p>Collecting that on real hardware is not a budget problem, it is an impossibility. Which is the
+    point: the recipe is built so that the expensive ingredient is compute, not fieldwork.</p>
+  </div></div>
+</div>
+
+<div class="beat a3" data-s="S_FPS" data-act="3" data-sec="§3.1" data-title="Sampling starts and goals">
+  <div class="stack"><div class="card">
+    <span class="num">14<span class="sec">§3.1</span></span>
+    <h3>Spread the endpoints out on purpose</h3>
+    <p>Start and goal pairs come from farthest point sampling over the navigable area, which is a
+    cheap way to stop a generator from producing a thousand variations of the same short hop across
+    one room. Trajectories come out at a range of lengths, and some of them cross floors.</p>
+    <div class="try">Watch the sampler pick endpoints. Each new pick is pushed away from everything
+    already chosen.</div>
+  </div></div>
+</div>
+
+<div class="beat a3" data-s="S_NAIVE" data-act="3" data-sec="§3.2" data-title="The quadratic bill">
+  <div class="stack"><div class="card">
+    <span class="num">15<span class="sec">§3.2</span></span>
+    <h3>Train it the obvious way and you pay twice for everything</h3>
+    <p>Treat each timestep as its own training sample and a trajectory of length T becomes T
+    separate sequences. The first holds one frame, the last holds all of them, and every frame in
+    between is encoded again in every sequence that follows it.</p>
+    <p>Total tokens grow with the square of the episode length. Nothing about that is wrong, it is
+    just enormously wasteful, and it gets worse exactly where you want to work hardest, on the long
+    episodes.</p>
+    <div class="try">Drag the episode length and watch the two bills separate.</div>
+  </div></div>
+</div>
+
+<div class="beat a3" data-s="S_PACK" data-act="3" data-sec="§3.2" data-title="One sequence per episode">
+  <div class="stack"><div class="card">
+    <span class="num">16<span class="sec">§3.2</span></span>
+    <h3>Encode the episode once</h3>
+    <p>Instead, lay the whole episode out flat: the instruction, then observations interleaved with
+    the actions taken after them. Every frame is encoded exactly once, and the losses for all
+    timesteps come out of a single forward pass.</p>
+    <p>Token cost drops from quadratic to linear. This is the same trick used for amortising a shared
+    context across independent questions, pushed onto the nested structure of a trajectory, where
+    each step's history is a prefix of the next one's.</p>
+  </div></div>
+</div>
+
+<div class="beat a3" data-s="S_LEAK" data-act="3" data-sec="§3.2" data-title="The leak that creates">
+  <div class="stack"><div class="card">
+    <span class="num">17<span class="sec">§3.2</span></span>
+    <h3>Flattening it opens a hole</h3>
+    <p>The actions are now sitting in the context. Ordinary causal attention lets the model at time
+    t read the ground-truth actions from every earlier step, and at deployment those do not exist.</p>
+    <p>Worse, they are unusually informative here. Because each waypoint is the furthest visible
+    point along the route, consecutive ground-truth actions are strongly related, so a model allowed
+    to see them will learn to extrapolate from them rather than look at the room. It would train
+    beautifully and fail on a robot.</p>
+  </div></div>
+</div>
+
+<div class="beat a3" data-s="S_TREE" data-act="3" data-sec="§3.2" data-title="The prefix tree mask">
+  <div class="stack"><div class="card">
+    <span class="num">18<span class="sec">§3.2</span></span>
+    <h3>Close it with the mask, not the data</h3>
+    <p>A prefix tree merges the shared start of many sequences into one trunk and keeps each
+    sequence's tail in its own branch. Encode that as an attention rule and the leak closes: a token
+    may attend to an earlier token only if that token is in the <b>trunk</b>, or in the
+    <b>same branch</b> as itself.</p>
+    <p>Observations are trunk, so everyone sees the whole visual history. Actions are branch, so no
+    step can read another step's answer. The paper's claim is the strong one, that this gives
+    provably the same training signal as the per-timestep samples it replaces.</p>
+    <div class="try">Toggle the rule and watch which cells the mask opens.</div>
+  </div></div>
+</div>
+
+<div class="beat a3" data-s="S_22X" data-act="3" data-sec="§3.2" data-title="What it bought">
+  <div class="stack"><div class="card">
+    <span class="num">19<span class="sec">§3.2</span></span>
+    <h3>Twenty two times fewer tokens, and nothing given up</h3>
+    <p>No prediction target is discarded. The saving is pure redundancy removal, and it turns a
+    training run measured in months into one measured in days.</p>
+    <p>The effect is largest on RxR-CE, where instructions and trajectories are both considerably
+    longer than R2R-CE. The quadratic term is the one that hurts, so the benchmark with the longest
+    episodes is the one this rescues.</p>
+  </div></div>
+</div>
+
+<div class="beat a3" data-s="S_EXPOSURE" data-act="3" data-sec="§3.3" data-title="Where imitation runs out">
+  <div class="stack"><div class="card">
+    <span class="num">20<span class="sec">§3.3</span></span>
+    <h3>Copying an expert teaches you nothing about being lost</h3>
+    <p>Supervised training is behavioural cloning, and it inherits the usual two problems. Small
+    errors compound until the agent is somewhere its training data never went, and once there it has
+    no idea what to do.</p>
+    <p>The specific gap here is sharp. The training trajectories are shortest paths. A shortest path
+    never contains a wrong turn, never backtracks and never pauses to work out where it is, so a
+    model trained only on them has never once seen a recovery.</p>
+  </div></div>
+</div>
+
+<div class="beat a3" data-s="S_CISPO" data-act="3" data-sec="§3.3" data-title="Reward the stop">
+  <div class="stack"><div class="card">
+    <span class="num">21<span class="sec">§3.3</span></span>
+    <h3>A reward that stops caring once you are close</h3>
+    <p>Online reinforcement learning with CISPO, on top of the supervised model. The reward is the
+    negative geodesic distance to the goal, clipped so it flattens out two metres away.</p>
+    <p>The clip is doing real work. Without it an agent can farm reward by shuffling around near the
+    target forever. With it, once you are close, the only thing left to gain is ending the episode,
+    so the model learns to actually emit the stop.</p>
+    <div class="try">Drag the agent's final distance and watch where the reward stops responding.</div>
+  </div></div>
+</div>
+
+<div class="beat a3" data-s="S_HARD" data-act="3" data-sec="§3.3" data-title="Train on the failures">
+  <div class="stack"><div class="card">
+    <span class="num">22<span class="sec">§3.3</span></span>
+    <h3>Only the episodes it already fails</h3>
+    <p>Rather than roll out everything, they run the supervised policy over the task pool and keep
+    the 35 thousand it cannot reliably solve: the tangled layouts, the ambiguous instructions, the
+    long ones. Everything the model already handles is dropped, so no compute is spent confirming
+    what already works.</p>
+    <p>Tasks are then packed by scene, so consecutive rollouts share a building. That accident of
+    batching turns out to be an implicit visual curriculum, and it beats shuffling.</p>
+  </div></div>
+</div>
+
+<div class="beat a3" data-s="S_SYSTEMS" data-act="3" data-sec="§3.3" data-title="Three workloads, one cluster">
+  <div class="stack"><div class="card">
+    <span class="num">23<span class="sec">§3.3</span></span>
+    <h3>The hard part is not the algorithm</h3>
+    <p>Online RL for a model this size means three GPU-bound systems running at once and waiting on
+    each other: a simulator rendering hundreds of parallel environments, an inference engine
+    generating the actions, and the training ranks applying updates.</p>
+    <p>The simulator is the awkward one, because rendering competes for the same memory and compute
+    as the learning. The paper is candid that most of the difficulty here was balancing those three
+    so that nothing sat idle.</p>
+  </div></div>
+</div>
+
+<!-- ==================== 4. DOES IT HOLD UP ==================== -->
+<div class="actdiv a4"><div class="stack">
+  <h2>Does it hold up</h2>
+  <p>Two benchmarks, fifteen baselines, and one number that does not go their way.</p>
+</div></div>
+
+<div class="beat a4" data-s="S_METRICS" data-act="4" data-sec="§4" data-title="Four metrics">
+  <div class="stack"><div class="card">
+    <span class="num">24<span class="sec">§4</span></span>
+    <h3>What the columns mean</h3>
+    <p>Navigation error is how far from the goal it stopped. Success rate is the fraction of
+    episodes that ended within three metres. Oracle success is the fraction that ever came within
+    three metres, whether or not the agent realised.</p>
+    <p>The gap between those last two is a measure of one specific failure: passing the goal and not
+    stopping. Success weighted by path length then scales success by how direct the route was, so
+    wandering into the right answer scores worse than walking to it.</p>
+  </div></div>
+</div>
+
+<div class="beat a4" data-s="S_TABLE" data-act="4" data-sec="§4.1" data-title="The table">
+  <div class="stack"><div class="card">
+    <span class="num">25<span class="sec">§4.1</span></span>
+    <h3>Fifteen systems, sorted honestly</h3>
+    <p>Every published comparison in the paper's table, split by whether the system gets a single RGB
+    camera or is allowed depth, LiDAR or several cameras. Pick a metric and a benchmark.</p>
+    <div class="try">Switch benchmark and metric. The sensing class stays colour coded, so you can
+    see where the single-camera systems sit.</div>
+  </div></div>
+</div>
+
+<div class="beat a4" data-s="S_SENSORGAP" data-act="4" data-sec="§4.1" data-title="The headline">
+  <div class="stack"><div class="card">
+    <span class="num">26<span class="sec">§4.1</span></span>
+    <h3>It beats the rigs without the rig</h3>
+    <p>On R2R-CE validation unseen it is first on every metric in the table. The margin over the
+    best other single-camera system is large. The margin over the best system that gets depth or
+    multiple cameras is smaller but it is the one that matters, because that comparison is the whole
+    argument: the extra sensing was not buying what it appeared to be buying.</p>
+  </div></div>
+</div>
+
+<div class="beat a4" data-s="S_RLGAIN" data-act="4" data-sec="§4.1" data-title="What RL bought">
+  <div class="stack"><div class="card">
+    <span class="num">27<span class="sec">§4.1</span></span>
+    <h3>The last four points came from reinforcement learning</h3>
+    <p>The supervised model was already respectable. Reinforcement learning moved it several points
+    on both splits of R2R-CE and again on RxR-CE, and the paper attributes the shift specifically to
+    exploration and recovery, the behaviours shortest-path imitation cannot teach.</p>
+    <p>Peak validation during the run was slightly higher than the reported checkpoint on the seen
+    split, which is worth noticing rather than glossing over.</p>
+  </div></div>
+</div>
+
+<div class="beat a4" data-s="S_RXR" data-act="4" data-sec="§4.1" data-title="The number that does not go their way">
+  <div class="stack"><div class="card">
+    <span class="num">28<span class="sec">§4.1</span></span>
+    <h3>On the harder benchmark it comes second on success</h3>
+    <p>RxR-CE has longer instructions and longer routes. Robostral Navigate takes the state of the
+    art among single-camera systems, and beats the best depth-assisted model on path efficiency and
+    on navigation error.</p>
+    <p>On raw success rate against that same depth-assisted model, it does not win. The paper says
+    competitive, and competitive is the right word. It is worth stating plainly, because the rest of
+    the results are strong enough not to need the rounding.</p>
+  </div></div>
+</div>
+
+<div class="beat a4" data-s="S_LIMITS" data-act="4" data-sec="§5" data-title="What this does not show">
+  <div class="stack"><div class="card">
+    <span class="num">29<span class="sec">§5</span></span>
+    <h3>Read the scope before the score</h3>
+    <p>Three things the numbers do not cover. Evaluation uses a pathfinder between the predicted
+    waypoints, so the benchmark measures the waypoints rather than the full stack that runs on the
+    robot. The cross-embodiment claim is demonstrated on two wheeled platforms. And all training is
+    simulated, so the real-world evidence is the two deployments, not the benchmark rows.</p>
+    <p>None of that undoes the result. It just means the result is about the recipe, which is what
+    the paper set out to argue in the first place.</p>
+  </div></div>
+</div>
+
+<div class="beat a4" data-s="S_END" data-act="4" data-sec="§5" data-title="Where it lands">
+  <div class="stack"><div class="card">
+    <span class="num">30<span class="sec">§5</span></span>
+    <h3>The whole thing in one line</h3>
+    <p>Drop the sensor assumptions to one RGB camera, move the output into image space so it is not
+    tied to a body, make the training cheap enough to iterate, then spend the savings on
+    reinforcement learning. The claim is not that pointing is a clever trick. It is that a recipe
+    built for scale can beat one built for a leaderboard, on the leaderboard.</p>
+  </div></div>
+</div>

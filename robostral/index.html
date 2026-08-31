@@ -1,0 +1,3364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Robostral Navigate, taken apart</title>
+<meta name="description" content="An 8B vision-language model that navigates from one RGB camera by pointing at where to go next. A scrollable walk through the paper, with the 3D scenes live so you can move the camera and watch the waypoint move with it.">
+<link rel="canonical" href="https://avisoori1x.github.io/robostral/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Avinash Sooriyarachchi">
+<meta property="og:title" content="Robostral Navigate, taken apart">
+<meta property="og:description" content="An 8B vision-language model that navigates from one RGB camera by pointing at where to go next. A scrollable walk through the paper, with the 3D scenes live so you can move the camera and watch the waypoint move with it.">
+<meta property="og:url" content="https://avisoori1x.github.io/robostral/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://avisoori1x.github.io/robostral/og.png">
+<meta property="og:image:secure_url" content="https://avisoori1x.github.io/robostral/og.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Robostral Navigate, taken apart">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@aviTwit3">
+<meta name="twitter:creator" content="@aviTwit3">
+<meta name="twitter:title" content="Robostral Navigate, taken apart">
+<meta name="twitter:description" content="An 8B vision-language model that navigates from one RGB camera by pointing at where to go next. A scrollable walk through the paper, with the 3D scenes live so you can move the camera and watch the waypoint move with it.">
+<meta name="twitter:image" content="https://avisoori1x.github.io/robostral/og.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23141922%22/><circle cx=%2250%22 cy=%2250%22 r=%2216%22 fill=%22none%22 stroke=%22%23b4551a%22 stroke-width=%228%22/></svg>">
+<style>
+/* Design system ported from the LingBot visual guide. Values kept verbatim so
+   this reads as the same family of document rather than an interpretation of it. */
+:root{
+  --bg:#f4f1ea; --panel:#fff;
+  --line:rgba(31,37,48,.14); --line2:rgba(31,37,48,.08);
+  --ink:#141922; --ink2:#39404f; --ink3:#5d6474;
+  --blue:#1c6e8c; --teal:#0f6e56; --amber:#b4551a; --purple:#6b3fa8; --red:#a32d2d;
+
+  --fd:'Sora',ui-sans-serif,system-ui,sans-serif;
+  --fb:'IBM Plex Sans',ui-sans-serif,system-ui,-apple-system,sans-serif;
+  --fm:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+
+  --artR:min(54vw,840px); --txtw:400px; --cardfs:15px; --sh:100svh;
+  --gapC:52px;
+  --pageW:calc(var(--artR) + var(--gapC) + var(--txtw));
+  --dx:max(24px, calc((100vw - var(--pageW)) / 2));
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;background:var(--bg)}
+body{
+  margin:0;background:var(--bg);color:var(--ink);font-family:var(--fb);
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+
+/* ---------------- hero ---------------- */
+.hero{
+  min-height:100svh;display:flex;flex-direction:column;justify-content:center;
+  padding:6svh clamp(22px,6vw,90px);max-width:1180px;margin:0 auto;
+}
+.eyebrow{
+  font-family:var(--fm);font-size:12px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--amber);font-weight:700;margin-bottom:18px;
+}
+h1{
+  font-family:var(--fd);font-weight:700;font-size:clamp(38px,6.2vw,80px);
+  line-height:1.02;letter-spacing:-.025em;margin:0 0 22px;
+}
+h1 em{font-style:normal;color:var(--amber)}
+.sub{font-size:clamp(16px,1.5vw,21px);line-height:1.55;color:var(--ink2);max-width:44em}
+.sub b{color:var(--ink);font-weight:600}
+.byline{
+  font-family:var(--fm);font-size:13px;color:var(--ink3);margin:22px 0 0;
+  padding-left:13px;border-left:2px solid var(--amber);line-height:1.55;
+}
+.byline b{color:var(--ink);font-weight:500}
+.metastrip{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
+.chip{
+  font-family:var(--fm);font-size:12px;padding:7px 12px;border:1px solid var(--line);
+  border-radius:999px;background:var(--panel);color:var(--ink2);text-decoration:none;
+}
+.chip b{color:var(--ink)}
+/* the anchors sit INSIDE .chip, so a.chip never matched and they rendered in
+   default browser blue with an underline */
+.chip a,.chip a:link,.chip a:visited{color:inherit;text-decoration:none}
+.chip a b{color:var(--blue)}
+.chip:has(a):hover{border-color:var(--blue)}
+.chip:has(a):hover a{color:var(--blue)}
+.toc{
+  margin-top:40px;display:grid;gap:12px;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));max-width:1000px;
+}
+.toc>div{border-left:2px solid var(--line);padding:2px 14px 2px 13px}
+.toc h4{font-family:var(--fd);font-size:15px;font-weight:600;margin:0 0 6px;letter-spacing:-.01em}
+.toc p{font-size:13.5px;line-height:1.5;color:var(--ink3);margin:0}
+.toc .a1 h4{color:var(--blue)} .toc .a2 h4{color:var(--amber)}
+.toc .a3 h4{color:var(--purple)} .toc .a4 h4{color:var(--teal)}
+.scrollcue{
+  margin-top:46px;font-family:var(--fm);font-size:12px;color:var(--ink3);
+  letter-spacing:.1em;text-transform:uppercase;
+}
+
+/* ---------------- the sticky art stage ---------------- */
+#stage{position:sticky;top:0;height:var(--sh);width:100%;z-index:0;pointer-events:none}
+#art{
+  position:absolute;top:50%;left:var(--dx);transform:translateY(-50%);
+  width:var(--artR);pointer-events:auto;
+}
+.scene{
+  position:absolute;top:50%;left:0;width:100%;transform:translateY(-50%);
+  opacity:0;visibility:hidden;
+  transition:opacity .34s ease,visibility 0s linear .34s;
+}
+.scene.on{opacity:1;visibility:visible;transition:opacity .34s ease,visibility 0s linear 0s}
+
+/* the figures build themselves in as you arrive, which is most of what made the
+   reference feel alive. Delay is set per element by the engine. */
+@keyframes figIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.scene.on svg>*{animation:figIn .52s cubic-bezier(.22,.61,.36,1) backwards}
+.scene svg>defs,.scene svg>rect[fill^='url'],.scene svg>rect[filter]{animation:none!important}
+@media(prefers-reduced-motion:reduce){ .scene.on svg>*{animation:none} }
+
+/* ---------------- beats ---------------- */
+#beats{position:relative;z-index:2;pointer-events:none}
+.beat{min-height:118svh;display:flex;align-items:center;pointer-events:none}
+.stack{margin-left:calc(var(--dx) + var(--artR) + var(--gapC));width:var(--txtw);pointer-events:auto}
+.card{
+  background:var(--panel);border:1px solid var(--line);border-radius:12px;
+  padding:20px 22px 19px;box-shadow:0 10px 34px rgba(20,25,34,.09),0 2px 6px rgba(20,25,34,.05);
+  font-size:var(--cardfs);line-height:1.6;color:var(--ink2);
+}
+.num{
+  font-family:var(--fm);font-size:10.5px;letter-spacing:.16em;color:var(--amber);
+  font-weight:700;display:block;margin-bottom:8px;
+}
+.a1 .num{color:var(--blue)} .a3 .num{color:var(--purple)} .a4 .num{color:var(--teal)}
+.sec{color:var(--ink3);font-weight:400;margin-left:8px;letter-spacing:.08em}
+h3{
+  font-family:var(--fd);font-size:calc(var(--cardfs) + 4px);line-height:1.22;margin:0 0 11px;
+  color:var(--ink);letter-spacing:-.015em;font-weight:600;
+}
+.card p{margin:0 0 10px}
+.card p:last-child{margin-bottom:0}
+.card b{color:var(--ink);font-weight:600}
+.k{font-family:var(--fm);font-size:.88em;color:var(--ink);background:rgba(31,37,48,.05);
+   border-radius:4px;padding:.06em .3em}
+.note{font-size:.9em;color:var(--ink3);border-left:2px solid var(--line);padding-left:11px;margin-top:12px}
+.meas{
+  font-family:var(--fm);font-size:.86em;background:rgba(180,85,26,.07);
+  border:1px solid rgba(180,85,26,.2);border-radius:7px;padding:9px 11px;margin-top:12px;
+  color:var(--ink2);line-height:1.55;
+}
+.try{
+  font-size:.9em;background:rgba(28,110,140,.06);border:1px solid rgba(28,110,140,.2);
+  border-radius:7px;padding:9px 11px;margin-top:12px;color:var(--ink2);
+}
+.warnc{
+  font-size:.9em;background:rgba(163,45,45,.06);border:1px solid rgba(163,45,45,.2);
+  border-radius:7px;padding:9px 11px;margin-top:12px;color:var(--ink2);
+}
+
+/* ---------------- act dividers ---------------- */
+.actdiv{position:relative;z-index:2;pointer-events:none;padding:14svh 0 6svh}
+.actdiv .stack{pointer-events:auto;width:auto;max-width:640px}
+.actdiv .an{font-family:var(--fm);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink3);margin:0 0 8px}
+.actdiv h2{font-family:var(--fd);font-weight:700;font-size:clamp(28px,3.4vw,44px);line-height:1.04;letter-spacing:-.025em;margin:0 0 10px}
+.actdiv p{color:var(--ink3);font-size:14.5px;margin:0}
+.actdiv.a1 h2{color:var(--blue)} .actdiv.a2 h2{color:var(--amber)}
+.actdiv.a3 h2{color:var(--purple)} .actdiv.a4 h2{color:var(--teal)}
+
+/* ---------------- rail and act label ---------------- */
+.railwrap{position:fixed;left:0;top:0;height:100svh;width:5px;z-index:5;pointer-events:none}
+#rail{position:absolute;left:0;top:0;width:100%;background:var(--amber);height:0}
+#actlab{
+  position:fixed;left:14px;bottom:16px;z-index:6;font-family:var(--fm);font-size:11px;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);pointer-events:none;
+  background:rgba(244,241,234,.82);padding:4px 8px;border-radius:5px;
+}
+
+/* ---------------- outro ---------------- */
+.outro{
+  position:relative;z-index:2;background:var(--bg);
+  padding:12svh clamp(22px,6vw,90px) 16svh;max-width:1180px;margin:0 auto;
+}
+.outro h2{font-family:var(--fd);font-size:clamp(26px,3vw,38px);letter-spacing:-.02em;margin:0 0 16px}
+.outro p{font-size:16px;line-height:1.6;color:var(--ink2);max-width:44em;margin:0 0 12px}
+.outro a{color:var(--blue)}
+
+/* ---------------- narrow screens: art rides above its card ---------------- */
+@media(max-width:1080px){
+  :root{--artR:min(92vw,640px);--txtw:auto}
+  #stage{position:sticky;top:0;height:auto;padding:10px 0 0;background:var(--bg);
+         border-bottom:1px solid var(--line2);z-index:4}
+  #art{position:relative;top:auto;left:auto;transform:none;width:100%;
+       padding:0 clamp(14px,4vw,22px);margin:0 auto}
+  .scene{position:relative;top:auto;transform:none;display:none}
+  .scene.on{display:block}
+  .beat{min-height:0;display:block;padding:0 clamp(14px,4vw,22px) 40px}
+  .stack{margin-left:0;width:auto}
+  .actdiv{padding:8svh clamp(14px,4vw,22px) 3svh}
+  .railwrap{display:none}
+}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  html{scroll-behavior:auto}
+}
+
+
+/* ======================= 3D figures ======================= */
+.k3 { background: var(--bg); border-radius: 12px; overflow: hidden; }
+.k3ov text { font-family: 'JetBrains Mono', monospace; }
+.scene .ctl { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:14px; }
+.scene .ctl label { font: 500 11px/1 'JetBrains Mono',monospace; letter-spacing:.1em;
+  text-transform:uppercase; color: var(--ink3); display:flex; align-items:center; gap:8px; }
+.scene .ctl input[type=range] { width: 132px; accent-color: var(--blue); }
+.scene .ctl output { font: 500 12px/1 'JetBrains Mono',monospace; color: var(--ink);
+  min-width: 52px; }
+.scene .seg { display:inline-flex; border:1px solid var(--line); border-radius:999px;
+  overflow:hidden; }
+.scene .seg button { font: 500 11.5px/1 'JetBrains Mono',monospace; padding:7px 13px;
+  border:0; background:transparent; color:var(--ink3); cursor:pointer; }
+.scene .seg button[aria-pressed=true] { background: var(--blue); color:#fff; }
+/* The overlay is rebuilt on every animation frame, so the figure entrance
+   stagger would restart it at opacity 0 forever. It is live readout, not a
+   figure element, so it must never animate. */
+.k3ov, .k3ov * { animation: none !important; opacity: 1; }
+
+/* furniture for the three.js figures, matched to KIT.head in the SVG ones */
+.k3head { margin: 0 0 16px; }
+.k3head i { display: block; width: 34px; height: 3px; border-radius: 1.5px;
+  background: var(--amber); margin-bottom: 14px; }
+.k3head h4 { font: 700 27px/1.15 'Sora', system-ui, sans-serif; letter-spacing: -.022em;
+  color: var(--ink); margin: 0; }
+.k3head p { font: 400 13px/1.4 'JetBrains Mono', monospace; color: var(--ink3);
+  margin: 8px 0 0; }
+
+.k3note { margin-top: 14px; padding: 11px 16px; border-radius: 9px;
+  font: 500 13.5px/1.45 'JetBrains Mono', monospace;
+  background: rgba(180,85,26,.09); border: 1px solid rgba(180,85,26,.45); color: var(--amber); }
+.k3note.blue { background: rgba(28,110,140,.08); border-color: rgba(28,110,140,.45); color: var(--blue); }
+.k3note.teal { background: rgba(15,110,86,.08); border-color: rgba(15,110,86,.45); color: var(--teal); }
+.k3note.red  { background: rgba(163,45,45,.07);  border-color: rgba(163,45,45,.45);  color: var(--red); }
+
+.k3cap { display:flex; gap:10px; margin-top:10px; }
+.k3cap span { flex:1; font: 500 10.5px/1 'JetBrains Mono', monospace; letter-spacing:.14em;
+  text-transform: uppercase; color: var(--ink3); }
+.k3cap span:last-child { text-align: right; }
+
+/* the readout strip under a 3D view */
+.k3read { display:flex; flex-wrap:wrap; gap:7px; margin-top:12px; }
+.k3read b { font: 500 12px/1 'JetBrains Mono', monospace; color:#fff; background: var(--ink);
+  padding:7px 11px; border-radius:999px; font-weight:500; }
+.k3read b.off { background: transparent; color: var(--ink3); border:1px solid var(--line); }
+.k3read b.hot { background: var(--red); }
+.k3read b.ok  { background: var(--teal); }
+
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="eyebrow">a visual guide &nbsp;&middot;&nbsp; paper results, live 3D figures</div>
+  <h1>Robostral Navigate,<br>taken <em>apart</em></h1>
+  <p class="sub">Most navigation systems that work well lean on depth sensors, LiDAR, camera rigs or
+  a map built in advance. Every one of those narrows the set of robots you can run on. Robostral
+  Navigate takes a <b>single RGB camera</b> and predicts where to go by <b>pointing at a pixel</b>
+  in the frame it is already looking at.</p>
+  <p class="sub" style="margin-top:14px">I worked on this one, and this is my attempt to lay the
+  paper out visually. The 3D figures are real scenes rather than diagrams, so when a figure claims
+  the image coordinate survives a change of camera, you can move the camera and check.</p>
+
+  <div class="metastrip">
+    <span class="chip"><a href="https://arxiv.org/abs/2607.20785">arXiv <b>2607.20785</b></a></span>
+    <span class="chip"><a href="https://mistral.ai/news/robostral-navigate">project page</a></span>
+    <span class="chip">R2R-CE SR <b>77.4</b></span>
+    <span class="chip">RxR-CE SR <b>75.1</b></span>
+  </div>
+  <div class="toc">
+    <div class="a1"><h4>The problem</h4>
+      <p>What every extra sensor costs you, why a metric waypoint does not survive a change of
+      robot, and what it means to point at a pixel instead.</p></div>
+    <div class="a2"><h4>How it moves</h4>
+      <p>A big model thinking slowly on top of a small one acting fast, the five numbers it emits,
+      the fallback for when the goal is behind you, and one policy on two very different bodies.</p></div>
+    <div class="a3"><h4>How it learns</h4>
+      <p>Two and a half million simulated trajectories, an attention mask that turns quadratic
+      training into linear, and the reinforcement learning pass that fixes what imitation cannot.</p></div>
+    <div class="a4"><h4>Does it hold up</h4>
+      <p>Fifteen baselines, the gap to systems that get depth for free, what reinforcement learning
+      actually bought, and the one number where it still comes second.</p></div>
+  </div>
+  <div class="scrollcue"><i></i> scroll &nbsp;&middot;&nbsp; the figure on the right is live</div>
+</div>
+
+
+<div id="stage"><div id="art"></div></div>
+<div class="railwrap"><div id="rail"></div></div>
+<div id="actlab"></div>
+
+<div id="beats">
+<!-- ==================== 1. THE PROBLEM ==================== -->
+<div class="actdiv a1"><div class="stack">
+  <h2>The problem</h2>
+  <p>Navigation systems get good by adding sensors. Every sensor you add is a robot you can no
+  longer run on.</p>
+</div></div>
+
+<div class="beat a1" data-s="S_SENSORS" data-act="1" data-sec="§1" data-title="The sensor tax">
+  <div class="stack"><div class="card">
+    <span class="num">01<span class="sec">§1</span></span>
+    <h3>Every extra sensor is a robot you lose</h3>
+    <p>The strongest published navigators lean on depth cameras, LiDAR, multi-camera rigs, or a map
+    of the building made in advance. Each one buys accuracy. Each one also narrows the set of
+    hardware the policy can run on, raises the cost per unit, and adds a calibration step that has
+    to happen in every new environment.</p>
+    <p>That trade is invisible in a benchmark table, because a benchmark does not charge you for
+    the rig. It shows up the moment you try to put the same policy on a different robot.</p>
+    <div class="try">Add sensors and watch the set of compatible platforms shrink.</div>
+  </div></div>
+</div>
+
+<div class="beat a1" data-s="S_RECIPE" data-act="1" data-sec="§1" data-title="The scalability lens">
+  <div class="stack"><div class="card">
+    <span class="num">02<span class="sec">§1</span></span>
+    <h3>Optimise for the recipe, not the score</h3>
+    <p>The paper sets itself a different target from the start. Not the most accurate navigator, but
+    the most <b>scalable recipe</b> for one: minimise what you assume about sensors, generalise
+    across robot bodies, and train efficiently enough that iteration is cheap.</p>
+    <p>Three constraints, and every design decision downstream is traceable to one of them. It is
+    worth holding onto them, because the parts that look strange later are strange for a reason.</p>
+  </div></div>
+</div>
+
+<div class="beat a1" data-s="S_METRIC" data-act="1" data-sec="§1" data-title="Metric waypoints do not travel">
+  <div class="stack"><div class="card">
+    <span class="num">03<span class="sec">§1</span></span>
+    <h3>A distance in metres belongs to one robot</h3>
+    <p>The conventional output is a metric displacement: go forward this many metres, turn this many
+    degrees. That number is entangled with the body that produced it. It assumes a camera at a
+    particular height and pitch, a particular field of view, and a scale calibrated to that machine.</p>
+    <p>Move it to a robot half the height with a wider lens and the geometry underneath the number
+    has changed, even though the instruction and the room have not.</p>
+  </div></div>
+</div>
+
+<div class="beat a1" data-s="S_POINT" data-act="1" data-sec="§2.2" data-title="Point at a pixel">
+  <div class="stack"><div class="card">
+    <span class="num">04<span class="sec">§2.2</span></span>
+    <h3>So point at the picture instead</h3>
+    <p>Robostral Navigate outputs an <b>image coordinate</b>. Given the instruction and the frames so
+    far, it names the pixel <span class="k">(u, v)</span> of the furthest waypoint along the route
+    that is still visible in the current view, plus the heading change it wants on arrival.</p>
+    <p>The coordinate lives in the image, not in the world. Two robots looking at the same doorway
+    from different heights disagree about how many metres away it is, and agree completely about
+    which part of the picture it occupies.</p>
+    <div class="try">Left is the room. Right is what the robot's camera sees. The crosshair is not
+    drawn on, it is the world waypoint projected through that camera. Drag the robot along the
+    route.</div>
+  </div></div>
+</div>
+
+<div class="beat a1" data-s="S_UV" data-act="1" data-sec="§2.2" data-title="Five numbers">
+  <div class="stack"><div class="card">
+    <span class="num">05<span class="sec">§2.2</span></span>
+    <h3>Five numbers, most of the time</h3>
+    <p>When the destination is visible the model predicts all five at once: the two image
+    coordinates, a metric displacement, and the heading change. The paper writes this as
+    <span class="k">a<sub>vis</sub> = (u, v, &Delta;x, &Delta;y, &Delta;&theta;)</span>.</p>
+    <p>Pointing is the mode that matters. The metric pair rides along as a co-training task, which
+    is worth doing precisely because the model so rarely has to fall back on it.</p>
+  </div></div>
+</div>
+
+<div class="beat a1" data-s="S_FALLBACK" data-act="1" data-sec="§2.2" data-title="When the goal is behind you">
+  <div class="stack"><div class="card">
+    <span class="num">06<span class="sec">§2.2</span></span>
+    <h3>You cannot point at something behind you</h3>
+    <p>Pointing has one hole in it. If the next place to go is outside the current field of view, no
+    pixel in this frame refers to it. Turning around is the obvious case.</p>
+    <p>So the model drops the image coordinates and emits only the metric displacement,
+    <span class="k">a<sub>invis</sub> = (&Delta;x, &Delta;y, &Delta;&theta;)</span>. The fallback is
+    not a fifth wheel, it is the thing that guarantees the robot can always make progress. It also
+    explains why the metric pair is trained on every step rather than only the hard ones.</p>
+    <div class="try">Turn the robot until the waypoint leaves the frame and watch the output change
+    shape.</div>
+  </div></div>
+</div>
+
+<!-- ==================== 2. HOW IT MOVES ==================== -->
+<div class="actdiv a2"><div class="stack">
+  <h2>How it moves</h2>
+  <p>A large model that thinks slowly, sitting on top of a small one that acts quickly.</p>
+</div></div>
+
+<div class="beat a2" data-s="S_STACK" data-act="2" data-sec="§2" data-title="Two models in series">
+  <div class="stack"><div class="card">
+    <span class="num">07<span class="sec">§2</span></span>
+    <h3>Split the job, then run the halves at different speeds</h3>
+    <p>Navigation is really two problems. Read the instruction, understand the room and plan a rough
+    path. Then turn that rough path into motion that does not hit anything.</p>
+    <p>They want different machines. The first gets an 8B vision-language model, because it needs
+    reasoning. The second gets a 121M diffusion policy, because geometry at that scale does not.
+    They run in series at different rates, and the rate ladder is the interesting part.</p>
+  </div></div>
+</div>
+
+<div class="beat a2" data-s="S_RATES" data-act="2" data-sec="§2.1" data-title="The rate ladder">
+  <div class="stack"><div class="card">
+    <span class="num">08<span class="sec">§2.1</span></span>
+    <h3>Half a hertz of thinking, a hundred hertz of moving</h3>
+    <p>The vision-language model emits a waypoint twice a second. The diffusion policy expands that
+    into a dense trajectory at ten hertz. A motion controller, the only part that is specific to the
+    robot you bought, turns that into motor commands at a hundred hertz.</p>
+    <p>Each layer down is cheaper, faster and dumber than the one above it. Nothing expensive runs
+    at the frequency the actuators need.</p>
+  </div></div>
+</div>
+
+<div class="beat a2" data-s="S_TOKENS" data-act="2" data-sec="§2.1" data-title="What goes in">
+  <div class="stack"><div class="card">
+    <span class="num">09<span class="sec">§2.1</span></span>
+    <h3>Grounding first, navigation as an extension of it</h3>
+    <p>The model starts from a dense 8B vision-language model already built for spatial grounding:
+    pointing, counting, locating objects. The paper's framing is that navigation is a short step from
+    there. Once a model can say where a thing is in an image, teaching it to move toward that thing
+    is not a new capability so much as a new use of an existing one.</p>
+    <p>Frames go through a vision encoder into visual tokens, which are appended to the tokenised
+    instruction. The history is what lets it know where it has already been.</p>
+  </div></div>
+</div>
+
+<div class="beat a2" data-s="S_CHUNK" data-act="2" data-sec="§2.3" data-title="Turning a point into motion">
+  <div class="stack"><div class="card">
+    <span class="num">10<span class="sec">§2.3</span></span>
+    <h3>The small model has to cover for the big one being slow</h3>
+    <p>The diffusion policy takes the waypoint, the robot's height and radius, and two frames: the
+    one the vision-language model actually looked at, and the one from right now. Those are not the
+    same frame, because inference took time and the robot kept moving.</p>
+    <p>Handing it both is how the system stays honest about its own latency. Out comes a chunk of
+    thirty relative moves covering the next second.</p>
+  </div></div>
+</div>
+
+<div class="beat a2" data-s="S_RANDOM" data-act="2" data-sec="§2.4" data-title="Randomise the body">
+  <div class="stack"><div class="card">
+    <span class="num">11<span class="sec">§2.4</span></span>
+    <h3>Never let it learn one body</h3>
+    <p>Pointing gets you most of the way to cross-robot transfer. The training data closes the rest
+    of the gap by refusing to hold the body fixed. Robot height, robot radius, how far up the robot
+    the camera sits, and how far down it is tilted are all sampled per trajectory.</p>
+    <p>The policy never sees a consistent viewpoint, so it cannot come to depend on one.</p>
+    <div class="try">Change the body and watch the same world waypoint land on a different pixel.
+    That variation is the training signal.</div>
+  </div></div>
+</div>
+
+<div class="beat a2" data-s="S_ROBOTS" data-act="2" data-sec="§2.4" data-title="Two robots, one set of weights">
+  <div class="stack"><div class="card">
+    <span class="num">12<span class="sec">§2.4</span></span>
+    <h3>Same weights on two machines that share nothing</h3>
+    <p>The deployment test is a Galaxea R1 and a Hiwonder JetAuto. They differ in morphology, camera
+    height, camera configuration and base geometry. Both run the <b>same</b> vision-language model
+    and the <b>same</b> diffusion policy. Only the low-level controller changes.</p>
+    <p>Worth being precise about the scope: the abstract argues the approach extends to wheeled,
+    legged and aerial platforms, and the demonstration is two wheeled ones.</p>
+  </div></div>
+</div>
+
+<!-- ==================== 3. HOW IT LEARNS ==================== -->
+<div class="actdiv a3"><div class="stack">
+  <h2>How it learns</h2>
+  <p>All of it in simulation, then an attention mask that makes the training bill affordable.</p>
+</div></div>
+
+<div class="beat a3" data-s="S_SIM" data-act="3" data-sec="§3.1" data-title="Two and a half million routes">
+  <div class="stack"><div class="card">
+    <span class="num">13<span class="sec">§3.1</span></span>
+    <h3>No real-world data collection at all</h3>
+    <p>Roughly 2.4 million expert trajectories across 350 thousand simulated scenes. Offices,
+    homes, commercial spaces and outdoors, varied deliberately in layout complexity, object density,
+    lighting and architectural style.</p>
+    <p>Collecting that on real hardware is not a budget problem, it is an impossibility. Which is the
+    point: the recipe is built so that the expensive ingredient is compute, not fieldwork.</p>
+  </div></div>
+</div>
+
+<div class="beat a3" data-s="S_FPS" data-act="3" data-sec="§3.1" data-title="Sampling starts and goals">
+  <div class="stack"><div class="card">
+    <span class="num">14<span class="sec">§3.1</span></span>
+    <h3>Spread the endpoints out on purpose</h3>
+    <p>Start and goal pairs come from farthest point sampling over the navigable area, which is a
+    cheap way to stop a generator from producing a thousand variations of the same short hop across
+    one room. Trajectories come out at a range of lengths, and some of them cross floors.</p>
+    <div class="try">Watch the sampler pick endpoints. Each new pick is pushed away from everything
+    already chosen.</div>
+  </div></div>
+</div>
+
+<div class="beat a3" data-s="S_NAIVE" data-act="3" data-sec="§3.2" data-title="The quadratic bill">
+  <div class="stack"><div class="card">
+    <span class="num">15<span class="sec">§3.2</span></span>
+    <h3>Train it the obvious way and you pay twice for everything</h3>
+    <p>Treat each timestep as its own training sample and a trajectory of length T becomes T
+    separate sequences. The first holds one frame, the last holds all of them, and every frame in
+    between is encoded again in every sequence that follows it.</p>
+    <p>Total tokens grow with the square of the episode length. Nothing about that is wrong, it is
+    just enormously wasteful, and it gets worse exactly where you want to work hardest, on the long
+    episodes.</p>
+    <div class="try">Drag the episode length and watch the two bills separate.</div>
+  </div></div>
+</div>
+
+<div class="beat a3" data-s="S_PACK" data-act="3" data-sec="§3.2" data-title="One sequence per episode">
+  <div class="stack"><div class="card">
+    <span class="num">16<span class="sec">§3.2</span></span>
+    <h3>Encode the episode once</h3>
+    <p>Instead, lay the whole episode out flat: the instruction, then observations interleaved with
+    the actions taken after them. Every frame is encoded exactly once, and the losses for all
+    timesteps come out of a single forward pass.</p>
+    <p>Token cost drops from quadratic to linear. This is the same trick used for amortising a shared
+    context across independent questions, pushed onto the nested structure of a trajectory, where
+    each step's history is a prefix of the next one's.</p>
+  </div></div>
+</div>
+
+<div class="beat a3" data-s="S_LEAK" data-act="3" data-sec="§3.2" data-title="The leak that creates">
+  <div class="stack"><div class="card">
+    <span class="num">17<span class="sec">§3.2</span></span>
+    <h3>Flattening it opens a hole</h3>
+    <p>The actions are now sitting in the context. Ordinary causal attention lets the model at time
+    t read the ground-truth actions from every earlier step, and at deployment those do not exist.</p>
+    <p>Worse, they are unusually informative here. Because each waypoint is the furthest visible
+    point along the route, consecutive ground-truth actions are strongly related, so a model allowed
+    to see them will learn to extrapolate from them rather than look at the room. It would train
+    beautifully and fail on a robot.</p>
+  </div></div>
+</div>
+
+<div class="beat a3" data-s="S_TREE" data-act="3" data-sec="§3.2" data-title="The prefix tree mask">
+  <div class="stack"><div class="card">
+    <span class="num">18<span class="sec">§3.2</span></span>
+    <h3>Close it with the mask, not the data</h3>
+    <p>A prefix tree merges the shared start of many sequences into one trunk and keeps each
+    sequence's tail in its own branch. Encode that as an attention rule and the leak closes: a token
+    may attend to an earlier token only if that token is in the <b>trunk</b>, or in the
+    <b>same branch</b> as itself.</p>
+    <p>Observations are trunk, so everyone sees the whole visual history. Actions are branch, so no
+    step can read another step's answer. The paper's claim is the strong one, that this gives
+    provably the same training signal as the per-timestep samples it replaces.</p>
+    <div class="try">Toggle the rule and watch which cells the mask opens.</div>
+  </div></div>
+</div>
+
+<div class="beat a3" data-s="S_22X" data-act="3" data-sec="§3.2" data-title="What it bought">
+  <div class="stack"><div class="card">
+    <span class="num">19<span class="sec">§3.2</span></span>
+    <h3>Twenty two times fewer tokens, and nothing given up</h3>
+    <p>No prediction target is discarded. The saving is pure redundancy removal, and it turns a
+    training run measured in months into one measured in days.</p>
+    <p>The effect is largest on RxR-CE, where instructions and trajectories are both considerably
+    longer than R2R-CE. The quadratic term is the one that hurts, so the benchmark with the longest
+    episodes is the one this rescues.</p>
+  </div></div>
+</div>
+
+<div class="beat a3" data-s="S_EXPOSURE" data-act="3" data-sec="§3.3" data-title="Where imitation runs out">
+  <div class="stack"><div class="card">
+    <span class="num">20<span class="sec">§3.3</span></span>
+    <h3>Copying an expert teaches you nothing about being lost</h3>
+    <p>Supervised training is behavioural cloning, and it inherits the usual two problems. Small
+    errors compound until the agent is somewhere its training data never went, and once there it has
+    no idea what to do.</p>
+    <p>The specific gap here is sharp. The training trajectories are shortest paths. A shortest path
+    never contains a wrong turn, never backtracks and never pauses to work out where it is, so a
+    model trained only on them has never once seen a recovery.</p>
+  </div></div>
+</div>
+
+<div class="beat a3" data-s="S_CISPO" data-act="3" data-sec="§3.3" data-title="Reward the stop">
+  <div class="stack"><div class="card">
+    <span class="num">21<span class="sec">§3.3</span></span>
+    <h3>A reward that stops caring once you are close</h3>
+    <p>Online reinforcement learning with CISPO, on top of the supervised model. The reward is the
+    negative geodesic distance to the goal, clipped so it flattens out two metres away.</p>
+    <p>The clip is doing real work. Without it an agent can farm reward by shuffling around near the
+    target forever. With it, once you are close, the only thing left to gain is ending the episode,
+    so the model learns to actually emit the stop.</p>
+    <div class="try">Drag the agent's final distance and watch where the reward stops responding.</div>
+  </div></div>
+</div>
+
+<div class="beat a3" data-s="S_HARD" data-act="3" data-sec="§3.3" data-title="Train on the failures">
+  <div class="stack"><div class="card">
+    <span class="num">22<span class="sec">§3.3</span></span>
+    <h3>Only the episodes it already fails</h3>
+    <p>Rather than roll out everything, they run the supervised policy over the task pool and keep
+    the 35 thousand it cannot reliably solve: the tangled layouts, the ambiguous instructions, the
+    long ones. Everything the model already handles is dropped, so no compute is spent confirming
+    what already works.</p>
+    <p>Tasks are then packed by scene, so consecutive rollouts share a building. That accident of
+    batching turns out to be an implicit visual curriculum, and it beats shuffling.</p>
+  </div></div>
+</div>
+
+<div class="beat a3" data-s="S_SYSTEMS" data-act="3" data-sec="§3.3" data-title="Three workloads, one cluster">
+  <div class="stack"><div class="card">
+    <span class="num">23<span class="sec">§3.3</span></span>
+    <h3>The hard part is not the algorithm</h3>
+    <p>Online RL for a model this size means three GPU-bound systems running at once and waiting on
+    each other: a simulator rendering hundreds of parallel environments, an inference engine
+    generating the actions, and the training ranks applying updates.</p>
+    <p>The simulator is the awkward one, because rendering competes for the same memory and compute
+    as the learning. The paper is candid that most of the difficulty here was balancing those three
+    so that nothing sat idle.</p>
+  </div></div>
+</div>
+
+<!-- ==================== 4. DOES IT HOLD UP ==================== -->
+<div class="actdiv a4"><div class="stack">
+  <h2>Does it hold up</h2>
+  <p>Two benchmarks, fifteen baselines, and one number that does not go their way.</p>
+</div></div>
+
+<div class="beat a4" data-s="S_METRICS" data-act="4" data-sec="§4" data-title="Four metrics">
+  <div class="stack"><div class="card">
+    <span class="num">24<span class="sec">§4</span></span>
+    <h3>What the columns mean</h3>
+    <p>Navigation error is how far from the goal it stopped. Success rate is the fraction of
+    episodes that ended within three metres. Oracle success is the fraction that ever came within
+    three metres, whether or not the agent realised.</p>
+    <p>The gap between those last two is a measure of one specific failure: passing the goal and not
+    stopping. Success weighted by path length then scales success by how direct the route was, so
+    wandering into the right answer scores worse than walking to it.</p>
+  </div></div>
+</div>
+
+<div class="beat a4" data-s="S_TABLE" data-act="4" data-sec="§4.1" data-title="The table">
+  <div class="stack"><div class="card">
+    <span class="num">25<span class="sec">§4.1</span></span>
+    <h3>Fifteen systems, sorted honestly</h3>
+    <p>Every published comparison in the paper's table, split by whether the system gets a single RGB
+    camera or is allowed depth, LiDAR or several cameras. Pick a metric and a benchmark.</p>
+    <div class="try">Switch benchmark and metric. The sensing class stays colour coded, so you can
+    see where the single-camera systems sit.</div>
+  </div></div>
+</div>
+
+<div class="beat a4" data-s="S_SENSORGAP" data-act="4" data-sec="§4.1" data-title="The headline">
+  <div class="stack"><div class="card">
+    <span class="num">26<span class="sec">§4.1</span></span>
+    <h3>It beats the rigs without the rig</h3>
+    <p>On R2R-CE validation unseen it is first on every metric in the table. The margin over the
+    best other single-camera system is large. The margin over the best system that gets depth or
+    multiple cameras is smaller but it is the one that matters, because that comparison is the whole
+    argument: the extra sensing was not buying what it appeared to be buying.</p>
+  </div></div>
+</div>
+
+<div class="beat a4" data-s="S_RLGAIN" data-act="4" data-sec="§4.1" data-title="What RL bought">
+  <div class="stack"><div class="card">
+    <span class="num">27<span class="sec">§4.1</span></span>
+    <h3>The last four points came from reinforcement learning</h3>
+    <p>The supervised model was already respectable. Reinforcement learning moved it several points
+    on both splits of R2R-CE and again on RxR-CE, and the paper attributes the shift specifically to
+    exploration and recovery, the behaviours shortest-path imitation cannot teach.</p>
+    <p>Peak validation during the run was slightly higher than the reported checkpoint on the seen
+    split, which is worth noticing rather than glossing over.</p>
+  </div></div>
+</div>
+
+<div class="beat a4" data-s="S_RXR" data-act="4" data-sec="§4.1" data-title="The number that does not go their way">
+  <div class="stack"><div class="card">
+    <span class="num">28<span class="sec">§4.1</span></span>
+    <h3>On the harder benchmark it comes second on success</h3>
+    <p>RxR-CE has longer instructions and longer routes. Robostral Navigate takes the state of the
+    art among single-camera systems, and beats the best depth-assisted model on path efficiency and
+    on navigation error.</p>
+    <p>On raw success rate against that same depth-assisted model, it does not win. The paper says
+    competitive, and competitive is the right word. It is worth stating plainly, because the rest of
+    the results are strong enough not to need the rounding.</p>
+  </div></div>
+</div>
+
+<div class="beat a4" data-s="S_LIMITS" data-act="4" data-sec="§5" data-title="What this does not show">
+  <div class="stack"><div class="card">
+    <span class="num">29<span class="sec">§5</span></span>
+    <h3>Read the scope before the score</h3>
+    <p>Three things the numbers do not cover. Evaluation uses a pathfinder between the predicted
+    waypoints, so the benchmark measures the waypoints rather than the full stack that runs on the
+    robot. The cross-embodiment claim is demonstrated on two wheeled platforms. And all training is
+    simulated, so the real-world evidence is the two deployments, not the benchmark rows.</p>
+    <p>None of that undoes the result. It just means the result is about the recipe, which is what
+    the paper set out to argue in the first place.</p>
+  </div></div>
+</div>
+
+<div class="beat a4" data-s="S_END" data-act="4" data-sec="§5" data-title="Where it lands">
+  <div class="stack"><div class="card">
+    <span class="num">30<span class="sec">§5</span></span>
+    <h3>The whole thing in one line</h3>
+    <p>Drop the sensor assumptions to one RGB camera, move the output into image space so it is not
+    tied to a body, make the training cheap enough to iterate, then spend the savings on
+    reinforcement learning. The claim is not that pointing is a clever trick. It is that a recipe
+    built for scale can beat one built for a leaderboard, on the leaderboard.</p>
+  </div></div>
+</div>
+
+</div>
+
+
+<div class="outro">
+  <h2>Notes</h2>
+  <p>Every number here is parsed straight out of the paper,
+  <a href="https://arxiv.org/abs/2607.20785">arXiv 2607.20785</a>, rather than typed in by hand.
+  Where the paper does not report something, the beat says so instead of guessing.</p>
+  <p>The 3D scenes are generated, not recordings. They are built to be dimensionally honest about
+  the thing being explained, and the image coordinates in them come from projecting a world point
+  through the camera you are looking through, but they are not frames from a real robot.</p>
+  <p>If a figure here disagrees with the paper, the paper is right. Tell me and I will fix it.</p>
+</div>
+
+
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+window.THREE = THREE;
+document.dispatchEvent(new Event('three:ready'));
+</script>
+<script>
+window.RN = {"meta":{"arxiv":"2607.20785","title":"Robostral Navigate","webpage":"https://mistral.ai/news/robostral-navigate"},"table1":[{"model":"NaVid","ours":false,"single_camera":true,"group":"single","r2r":{"NE":5.47,"OS":49.0,"SR":37.0,"SPL":35.0},"rxr":{"NE":5.72,"SR":45.7,"SPL":38.2},"short":"NaVid"},{"model":"Uni-NaVid","ours":false,"single_camera":true,"group":"single","r2r":{"NE":5.58,"OS":53.5,"SR":47.0,"SPL":42.7},"rxr":{"NE":6.24,"SR":48.7,"SPL":40.9},"short":"Uni-NaVid"},{"model":"NaVILA","ours":false,"single_camera":true,"group":"single","r2r":{"NE":5.22,"OS":62.5,"SR":54.0,"SPL":49.0},"rxr":{"NE":6.77,"SR":49.3,"SPL":44.0},"short":"NaVILA"},{"model":"InternVLA-N1","ours":false,"single_camera":true,"group":"single","r2r":{"NE":4.89,"OS":60.6,"SR":55.4,"SPL":52.1},"rxr":{"NE":6.41,"SR":49.5,"SPL":41.8},"short":"InternVLA-N1"},{"model":"Qwen-VLA-Base","ours":false,"single_camera":true,"group":"single","r2r":{"NE":5.2,"OS":61.7,"SR":53.8,"SPL":49.4},"rxr":{"NE":6.4,"SR":45.1,"SPL":45.8},"short":"Qwen-VLA-Base"},{"model":"StreamVLN","ours":false,"single_camera":true,"group":"single","r2r":{"NE":4.98,"OS":64.2,"SR":56.9,"SPL":51.9},"rxr":{"NE":6.22,"SR":52.9,"SPL":46.0},"short":"StreamVLN"},{"model":"Qwen-VLA-Instruct","ours":false,"single_camera":true,"group":"single","r2r":{"NE":5.1,"OS":69.0,"SR":57.5,"SPL":51.2},"rxr":{"NE":5.8,"SR":59.6,"SPL":47.8},"short":"Qwen-VLA-Instruct"},{"model":"Qwen-RobotNav-4B","ours":false,"single_camera":true,"group":"single","r2r":{"NE":4.22,"OS":73.6,"SR":66.9,"SPL":60.5},"rxr":{"NE":4.15,"SR":71.3,"SPL":61.5},"short":"Qwen-RobotNav-4B"},{"model":"Qwen-RobotNav-8B","ours":false,"single_camera":true,"group":"single","r2r":{"NE":4.36,"OS":72.7,"SR":65.7,"SPL":59.6},"rxr":{"NE":4.16,"SR":73.4,"SPL":63.5},"short":"Qwen-RobotNav-8B"},{"model":"NavFoM","ours":false,"single_camera":false,"group":"depth","r2r":{"NE":4.61,"OS":72.1,"SR":61.7,"SPL":55.3},"rxr":{"NE":4.74,"SR":64.4,"SPL":56.2},"short":"NavFoM"},{"model":"ABot-N0","ours":false,"single_camera":false,"group":"depth","r2r":{"NE":3.78,"OS":70.8,"SR":66.4,"SPL":63.9},"rxr":{"NE":3.83,"SR":69.3,"SPL":60.0},"short":"ABot-N0"},{"model":"OmniNav","ours":false,"single_camera":false,"group":"depth","r2r":{"NE":3.74,"OS":74.6,"SR":69.5,"SPL":66.1},"rxr":{"NE":3.77,"SR":73.6,"SPL":62.0},"short":"OmniNav"},{"model":"Qwen-RobotNav-4B","ours":false,"single_camera":false,"group":"depth","r2r":{"NE":3.8,"OS":77.2,"SR":69.5,"SPL":63.6},"rxr":{"NE":3.8,"SR":75.2,"SPL":65.0},"short":"Qwen-RobotNav-4B"},{"model":"Qwen-RobotNav-8B","ours":false,"single_camera":false,"group":"depth","r2r":{"NE":3.73,"OS":72.7,"SR":72.1,"SPL":66.6},"rxr":{"NE":3.58,"SR":76.5,"SPL":65.7},"short":"Qwen-RobotNav-8B"},{"model":"Robostral Navigate (ours)","ours":true,"single_camera":true,"group":"ours","r2r":{"NE":3.2,"OS":81.3,"SR":77.4,"SPL":74.2},"rxr":{"NE":3.47,"SR":75.1,"SPL":68.7},"short":"Robostral Navigate"}],"ours":{"model":"Robostral Navigate (ours)","ours":true,"single_camera":true,"group":"ours","r2r":{"NE":3.2,"OS":81.3,"SR":77.4,"SPL":74.2},"rxr":{"NE":3.47,"SR":75.1,"SPL":68.7}},"facts":{"vlm_params_b":8,"policy_params_m":121,"trajectories_m":2.4,"scenes_k":350,"token_saving_x":22,"hz_vlm":0.5,"hz_policy":10,"hz_motor":100,"chunk_steps":30,"invisible_pct":10,"hard_tasks_k":35,"reward_clip_m":2,"success_radius_m":3,"height_min":0.4,"height_max":1.8,"radius_min":0.15,"radius_max":0.45,"cam_h_min":70,"cam_h_max":100,"pitch_min":0,"pitch_max":25},"rl":{"r2r_sft_seen":75.96,"r2r_sft_unseen":73.4,"r2r_rl_seen":79.43,"r2r_rl_unseen":77.43,"r2r_peak_seen":80.46,"r2r_peak_unseen":77.43,"rxr_sft":71.2,"rxr_rl":75.1,"r2r_gain_seen":3.47,"r2r_gain_unseen":4.03,"rxr_gain":3.9},"headline":{"r2r_sr":77.4,"r2r_spl":74.2,"r2r_ne":3.2,"r2r_os":81.3,"rxr_sr":75.1,"rxr_spl":68.7,"rxr_ne":3.47,"best_single_model":"Qwen-RobotNav-4B","best_single_sr":66.9,"gain_vs_single":10.5,"best_depth_model":"Qwen-RobotNav-8B","best_depth_sr":72.1,"gain_vs_depth":5.3},"metrics":{"NE":"Geodesic distance in metres between where the agent stopped and the goal. Lower is better.","SR":"Share of episodes where the agent stopped within 3 m of the goal.","OS":"Share of episodes that came within 3 m of the goal at any point, whether or not the agent stopped there.","SPL":"Success weighted by path length. Scales success by shortest-path length over actual path length, so detours are penalised."}};
+
+</script>
+<script>
+/* One drawing vocabulary for all 34 figures.
+
+   The previous attempt let every figure invent its own layout and the page read
+   as thirty-four unrelated dashboards. Everything here draws into a fixed
+   640 x 520 SVG board using the same handful of primitives, so the figures share
+   a visual language by construction. */
+(function () {
+  var W = 640, H = 520;
+  var NS = 'http://www.w3.org/2000/svg';
+
+  var C = {
+    ink: '#141922', ink2: '#39404f', ink3: '#5d6474',
+    line: 'rgba(31,37,48,.14)', line2: 'rgba(31,37,48,.08)',
+    panel: '#ffffff', bg: '#f4f1ea',
+    blue: '#1c6e8c', teal: '#0f6e56', amber: '#b4551a',
+    purple: '#6b3fa8', red: '#a32d2d'
+  };
+  var TINT = {
+    blue: 'rgba(28,110,140,.08)', teal: 'rgba(15,110,86,.08)',
+    amber: 'rgba(180,85,26,.09)', purple: 'rgba(107,63,168,.08)',
+    red: 'rgba(163,45,45,.07)', ink: 'rgba(31,37,48,.05)'
+  };
+
+  function n(tag, a) {
+    var e = document.createElementNS(NS, tag);
+    for (var k in a) if (a.hasOwnProperty(k) && a[k] != null) e.setAttribute(k, a[k]);
+    return e;
+  }
+
+  /* ---------- board ---------- */
+  function board(root, opts) {
+    opts = opts || {};
+    var svg = n('svg', {
+      viewBox: '0 0 ' + W + ' ' + H,
+      width: '100%', role: 'img',
+      'aria-label': opts.alt || 'figure'
+    });
+    svg.style.display = 'block';
+    var ids = defs(svg);
+    // engineering grid behind everything, then a grain wash over the top
+    var bg = n('rect', { x: -40, y: -120, width: W + 200, height: H + 320,
+      fill: 'url(#' + ids.gd + ')', 'pointer-events': 'none' });
+    bg.style.animation = 'none';   // texture is not content, never animate it
+    bg.setAttribute('data-deco', '1');
+    svg.appendChild(bg);
+    svg._deco = bg;
+    svg._grainAfter = true;
+    root.appendChild(svg);
+    // Trim the board to whatever the scene actually drew. A fixed height left a
+    // dead half-screen under the shorter figures.
+    requestAnimationFrame(function () {
+      try {
+        // place the honesty line under whatever was drawn, then fit the board
+        if (svg._foot) {
+          if (svg._deco) svg._deco.setAttribute('display', 'none');
+          var fb = svg.getBBox();
+          if (svg._deco) svg._deco.removeAttribute('display');
+          wrap(svg._foot, 92).forEach(function (ln, i) {
+            var tn = n('text', {
+              x: 0, y: fb.y + fb.height + 26 + i * 14,
+              'font-family': "'IBM Plex Sans',system-ui,sans-serif",
+              'font-size': 11.5, fill: C.ink3
+            });
+            tn.textContent = ln;
+            svg.appendChild(tn);
+          });
+          svg._foot = null;
+        }
+        // The decorative grid spans far beyond the artwork, and getBBox counts it,
+        // so the fit was sizing to the grid and leaving the drawing small in the
+        // top left. Hide the deco while measuring.
+        if (svg._deco) svg._deco.setAttribute('display', 'none');
+        var bb = svg.getBBox(), pad = 10;
+        var x0 = Math.min(0, bb.x - pad), y0 = Math.min(0, bb.y - pad);
+        var x1 = Math.max(W, bb.x + bb.width + pad);
+        var y1 = bb.y + bb.height + pad;
+        // The panel is about as tall as the viewport. Left alone, a short figure
+        // sat in the top left with a third of the panel dead beneath it, which
+        // every reviewer flagged on every figure. Pad up to a floor and split the
+        // slack, so the drawing sits centred in the space it is given.
+        var FLOOR = 660, ch = y1 - y0;
+        if (ch < FLOOR) {
+          var slack = FLOOR - ch;
+          // reviewers measured bottom padding at 1.6 to 1.85x the top, so the
+          // drawing read as sitting high. Give the top the larger share.
+          y0 -= slack * 0.56;
+          y1 += slack * 0.44;
+        }
+        if (svg._deco) {
+          svg._deco.removeAttribute('display');
+          svg._deco.setAttribute('x', x0 - 20);
+          svg._deco.setAttribute('y', y0 - 20);
+          svg._deco.setAttribute('width', (x1 - x0) + 40);
+          svg._deco.setAttribute('height', (y1 - y0) + 40);
+        }
+        svg.setAttribute('viewBox', x0 + ' ' + y0 + ' ' + (x1 - x0) + ' ' + (y1 - y0));
+        if (svg._grainAfter) {
+          svg._grainAfter = false;
+          var gn = n('rect', { x: x0, y: y0, width: x1 - x0, height: y1 - y0,
+            fill: 'url(#' + svg._ids.gr + ')', opacity: .05,
+            'mix-blend-mode': 'multiply', 'pointer-events': 'none' });
+          gn.style.animation = 'none';
+          svg.appendChild(gn);
+        }
+      } catch (e) {}
+    });
+    return svg;
+  }
+
+
+  /* ---------- one defs block per board: depth, texture, sheen ----------
+     The palette and type are fixed by the reference, so all the craft has to
+     come from surface: a real cast shadow instead of a hairline, a paper grain
+     over the whole board, a faint engineering grid behind it, and a slight
+     sheen down every filled bar. */
+  var NOISE = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAAAAACPAi4CAAAMdElEQVR42hWWBaKjABBDOSruLsW9QHEvWuCo+/cGM5PMS4BcGXCKbYjHRpllJj3mSwgOMeAOJiWzLGQ6Z7QsSVj393PsTerrPp3e5famhFkrlWsGMOpTVvdOMtFJEtn27iv4qDX+Juy36A/DTWvbGEtLPNedq9AvxXWhSw/foDy3HxHfB2AYB+43EgZprSpf4hyosA1CWZ0SVM0p8Nfx+2W0zJXhT4WtRkZSJmy02nkKx/BG17yBGkHiMzSqrWpoh3NPs7R+4K+ihd78vZaCGY6RVjURUQ75rBQRhjhpMWwksJPHy8NZBIh6nx9RgVcdVF7yKRD5jyN8I8bYZ0PINX/MePs9fmhu0iwM64fyvpSdCkojB9LhsANwqY66jOVs1h+mgct9hfsiIXmXo8MI0yPxG47KnTMxoX+pCGZC2iFDYYfKORIxj1dDANfNLLOS7XlFFRygEPwYp79xyz08me2WpjRWuAhRwaISdPe8/QTbdTXawLApch/NbKDWwaKjz/gx/QdkQkYesQFOU5dW+vxW3jL2faQHdmkEkxqu23DYv0JwJx+GPAMq9CzA3e+O+r0xk5KLIJWgH3FFrH0l7+M4BDOjTzjZqWeLesuiGDlsxJhv3PsaEBW8tjGVgbnqPkIB5uUgmFAStOTQU803xmMOfyt+tHyM9ouMFo1Pm/S+cFE75/KdBuHopb9B0FSAsp7b2YrtKxk+8yqZj9eGJjz1k9VFJXHHjfjYTOT347ZksIh+zwukhmPzOUdRuJ3GAFB00VQMFp6lUqMPHRBK9/jjn56PTBkBG/dMB+63dW+0nJvBBJOHtG4zM9zDCRPu1gHnmgl5wG1EnnFCH7YPT2uFoR9o1rXFqnEgHdPVLFhdnS0MfprtZuTNiUz+iHXoQRJAYJBlExVY+IlTkERc7jz6YLnFW4dSxcs/e0Obg+pPJPrL1S9HhbTFzvf2cqV594QkAeKoDUJz/fsyT3kbOTkE/uOyB8qBp7u1WOIKuGFQ7WsLQa6y0baUMStALSifWj2jLBS4f+TEDgqjDtH0zmY8q+cZbsxhtMBF/fLM2OyqCOHywLSPJldvVSO5/jJTEft98J5RAWc0T93GRrWvBcU3MDQX+j2bM//bt9uzvmDwOrxtf50jR4r10jDrg2Ei/aHxp5MQkgcM8XprDlkFah7vcvD8rPDxPi1q6qMa550W8nizccHQhl0rNwW9ui88CbIPiDpKsswNgIuXi8E4WKdc7UypZDWnKkG+srGkHI0hRFTr7WsgRiCj7qkEB5nyZD7zKyNT/Ad2C3DQ28vhQhcVihCPljCx6QfSQs9Uc6MvvO48QWRxM3ugNBlFeE6tZOTvLzASIxuT7DnAtyweRZn3jxVZK/mU3xCugjfe5s/5RiZkYasTt5m3toDmGweri730uwrVt+3eGk9fHJDX7DgwX6S10vD7aJ27i2iVK1uuHWvgisXhPUaUKoqfV6qXGyGncWavyGm6xCbHxRbQHyg0Ls6THLAcjKC/zK6rC/vyCdnZH9Xg+9vhSc+h/uLQwFbNit2tE27Labf0Qaj/nBh3IwFR81yHnJOOznDYmkgapyPX05GIZ+1GXfDVf2Bc+2n+u750o6Q9QedSBUEWlQABK7v6VinWqDGpedv0ygvh7ErnTfwO+fJvDVTz406O9jtTeoPAWMH+Lhm1Z7Fkm/IErPdSfgM8Sep7LJ7oqaxbKIxPKjLYOOJjyoGYcRJPJ9M2tr9YHZ1ZqJWyMNVn9AMvOHBjwjxuJNQr58TRp61AXxASGFsQTzj2Nx1vZDq59wBHIQKi+yzTLuLTrqcm8406/3pgi4okJgpIyb5+13fu9gbzMPqq2FuW47uir850M2I4rADqd6Ym3SHMf49p2AajJ009AoqP3S3XHrTyQaoYZlHrssP4y25igJam3tEIjrb7RQ4CE3xc5hn0TW0954UGNYHg4Q8gWPkDmunKnXkb9EL767TVk6HDQFWHaqWN7WFqK3P3xzdy4RD6Jq9KNE++gkRJoYUXwH32H68Q9u8tBGazhJ7H9smsEokMr08preBbbxZssmNd0t2XSTN3/LIkIzMhciKq4g3cDDT9pMjXG1RtwXqjhNrPO+IPdxsiwT7j6BqXBQjMGiF8eCtXsS8sEo77iXlBGCUXcOVj0OB+Rge8KUevWPIRz+Xa/0INp5P5Yj6wI83DjmFoFKFsIECLh735rNIEIqIPGVgFMZnesc+8d6c3mz39nRni/4V3P0D1n/vzK3rbCQGrZLUS/Vr/4Xwua8mM2TMSJw4EJuEelDnmu21/10k99Dl4d2uqp/LSucxf/uXWF0Lw4E6zZemPGqs2iHTZqX1GxZivEVhLRms+DZW9+KSc1cR6jEknuBqbIDAD04GFEPN1R7I5CbLKISylXcdCQLns1bGGRixAVsbWw7gzYCvu+Q6mvj7gns7BTfq9M2Xj9XfIl1Z3OpgMDV/0xUgK38rvjeNdeQsaA0ipeCJjRuJ6eGpb22NnpedjuZsYrq0/2qLARD0iZ1DPvNzc4MjmSQ0yY5y3OL7r8QDE+IU01YQc/lizesJHDjZi6mKmSodlL/cOlgrk3xju8+jHqph5cGKm+q7ls+HWV7wMAAtfqhf6hFZXE2NmknT9PA9cpSqVZK8QvppyjBafQM1lYUScmny28Wq+Hk2iURh0XABdhNy1XEYO1cw78GkJQQY5af/bJ+/0+uO2Uht4BMaNuH1/bzWlZVeV1pHB1p9htyCAfuU3RcwluUIvrUvAtTJPOt+/ykgTRTq3PyktEcPZaLmdG28dQt7VTd4JWCO43N3hAXqiVul5eG4fNONkpJYYPbzFIHtPBenLmHytNSUUCF5bX1jN1jmP+kFtbPDKwxdPhYCuJJ0cRCv0J8f1/FCU0odT3QaXago7EzFba47i6OsPWPwKF/Z3TJajPiKfsJZQ1vwCbPP2ZCotG78aC6L8g0Xre5UiWeA+bkOqkXKaBSVl0K+0PuoveX1ecQBrkQfb+LiZb+BhTY8QcZoqJdCIoByx8xy5xvJFzBhT3GNwQMjnQ8yFysCKJTN1862Uwg1/aLbHTSwCAXSyjeKODCIJxGPpYaO8VKTy19uu+t3OEQ4ix4pwu6lzkAAOF8+trfwbp7et/iIpBd5MAV6++tls3GqwVV+kFOEVSEqVp2a1Y2DmcihQz4RQ6XEXDsY/JC9c0hd8OfLD1zdAVbZDRS8ojEjMxKfmbwtsfxdTNH4/c6/0/SSD3hN0nskzKD7m62cHz7PsvK4mhyinACcMz+rnyGRjaY33UvYXlnfNV5iUoOOaOt2YeEg2fvu9FFBsLq8tuwA2wZB4ZXEeeCGwMjdjit+kxdauwZJpCWqvF42WtAqK3rphvhHuOJb5fJHrcEmQa45YUvS7wDgUxN0MYO+EWfyIWZpwOS8MUI9D5tMH6fBXl1K/W4LMFHGrPS65Kc0d//yxNEdjZ01Max9XywIIfRFwifprddrtJLYqW+zBmgw+O8H6VQgJU7fE/ShZmNuKO6B5pyQOYx6KvhQjj9YC8BewVwX/rXHFKWNKZ+SmKAtWhpLir6Lafn7RvPiU3FleHQ4UxdhJnGuqVRvtT75fqgAhy3m8ckdCfvgq9gSN+R4t0Xs8FuLwy3IZTQmR78AnAm27PuFTJYvZr7SkDx36TBMKML6sKZVkmU5Bgj/0LkjSxJuJqdT7lsIUP7SlT3kycD1z9258GMpuZNzy+8fLC+bPGZjSXS5suv6bLymYSF8nT7CxTu+jQmk0pxqy+/MY6gCBL87fg5rtpGCmijVKmqwj7htoYELotkzZ0fwngZFsYMMr9hJknujubuJcvfFKMgk10zI87Rs9yk4zX0cubIZPf0Y8YG3PpH4wJT4nKh6a4S2EG4RldRP6JDvxmfYSxqEch7usdHl6S3ZJTuQDestox6LieMAjvNHuLfYxGdlOxjZ0A1NCboO7tMUPsaHYwf+cpCxc23ojzgt5om9Lxgw/9pNDtEUAUD9p2XejNPhRexsUvJpmaCYwTNbWDIW1+qkzDnvVM7JzJac050WXn1Pkgt6qA9iIF6BXF0mCeLtDIObALCovj8sCfavuOFY0130l8VMbvfOUhbsjPRccHNRnTRA98NFzsAkIMeWAfxyry2rOdSCF0A+FJ/sAWoj+7JZg/VX+mmU8lmnjNEvk+8/uNIXxdr9PFg0TACIthJ6sgRSkFZJ3rLqqZx770ASXbl2AXkmrHPr5lg0p7KqN+xNj228oXITXqr0Hv/wHAuT5faRi3FkAAAAASUVORK5CYII=';
+  var UID = 0;
+  function defs(svg) {
+    var id = 'k' + (++UID);
+    var d = n('defs', {});
+
+    // one shadow pass, not two: the second was barely visible and doubled the cost
+    var f = n('filter', { id: id + 'sh', x: '-14%', y: '-14%', width: '130%', height: '140%' });
+    f.appendChild(n('feDropShadow', {
+      dx: 0, dy: 5, stdDeviation: 7, 'flood-color': '#141922', 'flood-opacity': .13 }));
+    d.appendChild(f);
+
+    // feTurbulence rasterises a full panel filter per board and is by far the
+    // most expensive thing here. A static tiled noise image is visually the same
+    // and effectively free.
+    var grain = n('pattern', { id: id + 'gr', width: 64, height: 64,
+      patternUnits: 'userSpaceOnUse' });
+    grain.appendChild(n('image', { href: NOISE, x: 0, y: 0, width: 64, height: 64 }));
+    d.appendChild(grain);
+
+    var grid = n('pattern', { id: id + 'gd', width: 28, height: 28,
+      patternUnits: 'userSpaceOnUse' });
+    grid.appendChild(n('circle', { cx: 1, cy: 1, r: 1, fill: 'rgba(31,37,48,.13)' }));
+    d.appendChild(grid);
+
+    var sheen = n('linearGradient', { id: id + 'sn', x1: 0, y1: 0, x2: 0, y2: 1 });
+    sheen.appendChild(n('stop', { offset: 0, 'stop-color': '#fff', 'stop-opacity': .26 }));
+    sheen.appendChild(n('stop', { offset: 1, 'stop-color': '#fff', 'stop-opacity': 0 }));
+    d.appendChild(sheen);
+
+    svg.appendChild(d);
+    svg._ids = { sh: id + 'sh', gr: id + 'gr', gd: id + 'gd', sn: id + 'sn' };
+    return svg._ids;
+  }
+
+  /* ---------- primitives ---------- */
+
+  /** white card with a hairline border */
+  function panel(p, x, y, w, h, o) {
+    o = o || {};
+    var g = n('g', {});
+    var r = o.r == null ? 10 : o.r;
+    var svg = p.ownerSVGElement || p;
+    var ids = (svg && svg._ids) || {};
+    var base = n('rect', {
+      x: x, y: y, width: w, height: h, rx: r,
+      fill: o.fill || C.panel, stroke: o.stroke || C.line, 'stroke-width': 1
+    });
+    if (o.flat !== true && ids.sh) base.setAttribute('filter', 'url(#' + ids.sh + ')');
+    g.appendChild(base);
+    // a one pixel lit edge along the top, which is what stops a flat rect
+    // reading as a flat rect
+    if (o.flat !== true) {
+      g.appendChild(n('path', {
+        d: 'M' + (x + r) + ' ' + (y + .75) + ' H' + (x + w - r),
+        stroke: 'rgba(255,255,255,.85)', 'stroke-width': 1.2, fill: 'none'
+      }));
+    }
+    p.appendChild(g);
+    return g;
+  }
+
+  /** small uppercase mono label, the caption voice of the whole guide */
+  function label(p, x, y, s, o) {
+    o = o || {};
+    var t = n('text', {
+      x: x, y: y, 'font-family': "'JetBrains Mono',monospace",
+      'font-size': o.size || 10.5, 'letter-spacing': '.14em',
+      fill: o.color || C.ink3, 'text-anchor': o.anchor || 'start'
+    });
+    t.textContent = String(s).toUpperCase();
+    p.appendChild(t);
+    return t;
+  }
+
+  /** mono body line, for prompts, tokens and data */
+  function mono(p, x, y, s, o) {
+    o = o || {};
+    var t = n('text', {
+      x: x, y: y, 'font-family': "'JetBrains Mono',monospace",
+      'font-size': o.size || 13, fill: o.color || C.ink2,
+      'text-anchor': o.anchor || 'start', 'font-weight': o.weight || 400
+    });
+    t.textContent = s;
+    p.appendChild(t);
+    return t;
+  }
+
+  /** sans line, used sparingly, the cards carry the prose */
+  function text(p, x, y, s, o) {
+    o = o || {};
+    var t = n('text', {
+      x: x, y: y, 'font-family': "'IBM Plex Sans',system-ui,sans-serif",
+      'font-size': o.size || 14, fill: o.color || C.ink2,
+      'text-anchor': o.anchor || 'start', 'font-weight': o.weight || 400
+    });
+    t.textContent = s;
+    p.appendChild(t);
+    return t;
+  }
+
+  /** the big display numeral, one per figure at most */
+  function big(p, x, y, s, o) {
+    o = o || {};
+    var t = n('text', {
+      x: x, y: y, 'font-family': "'Sora',system-ui,sans-serif",
+      'font-size': o.size || 62, 'font-weight': 700, 'letter-spacing': '-.03em',
+      fill: o.color || C.ink, 'text-anchor': o.anchor || 'start'
+    });
+    t.textContent = s;
+    p.appendChild(t);
+    return t;
+  }
+
+  /** pill, for a category or a state */
+  function chip(p, x, y, s, o) {
+    o = o || {};
+    var pad = 9, size = o.size || 11.5;
+    var w = o.w || (String(s).length * size * 0.62 + pad * 2);
+    var g = n('g', {});
+    g.appendChild(n('rect', {
+      x: x, y: y, width: w, height: o.h || 23, rx: 11.5,
+      fill: o.fill || 'none', stroke: o.stroke || C.line, 'stroke-width': 1
+    }));
+    var t = n('text', {
+      x: x + w / 2, y: y + (o.h || 23) / 2 + size * 0.36,
+      'font-family': "'JetBrains Mono',monospace", 'font-size': size,
+      fill: o.color || C.ink3, 'text-anchor': 'middle'
+    });
+    t.textContent = s;
+    g.appendChild(t);
+    p.appendChild(g);
+    g._w = w;
+    // width was estimated from character count and under-measured, so long
+    // labels ran outside the pill. Measure once laid out and resize.
+    requestAnimationFrame(function () {
+      try {
+        var real = t.getComputedTextLength();
+        if (real + pad * 2 > w - 1) {
+          var nw = real + pad * 2;
+          g.firstChild.setAttribute('width', nw);
+          t.setAttribute('x', x + nw / 2);
+          g._w = nw;
+        }
+      } catch (e) {}
+    });
+    return g;
+  }
+
+  /** horizontal proportional bar on a track */
+  function bar(p, x, y, w, h, frac, o) {
+    o = o || {};
+    var g = n('g', {});
+    var svg2 = p.ownerSVGElement || p;
+    var ids2 = (svg2 && svg2._ids) || {};
+    g.appendChild(n('rect', { x: x, y: y, width: w, height: h, rx: h / 2,
+      fill: o.track || TINT.ink }));
+    g.appendChild(n('path', {
+      d: 'M' + (x + h / 2) + ' ' + (y + .6) + ' H' + (x + w - h / 2),
+      stroke: 'rgba(31,37,48,.10)', 'stroke-width': 1.1, fill: 'none' }));
+    var fw = Math.max(0, Math.min(1, frac)) * w;
+    var f = n('rect', { x: x, y: y, width: fw, height: h, rx: h / 2,
+      fill: o.color || C.blue });
+    g.appendChild(f);
+    if (h >= 9 && ids2.sn) {
+      g.appendChild(n('rect', { x: x, y: y, width: fw, height: h / 2, rx: h / 2,
+        fill: 'url(#' + ids2.sn + ')', 'pointer-events': 'none' }));
+    }
+    p.appendChild(g);
+    g._fill = f;
+    return g;
+  }
+
+  /** connector with an arrow head */
+  function arrow(p, x1, y1, x2, y2, o) {
+    o = o || {};
+    var col = o.color || C.line;
+    var g = n('g', {});
+    var d;
+    if (o.curve) {
+      var mx = (x1 + x2) / 2;
+      d = 'M' + x1 + ' ' + y1 + ' C' + mx + ' ' + y1 + ' ' + mx + ' ' + y2 + ' ' + x2 + ' ' + y2;
+    } else {
+      d = 'M' + x1 + ' ' + y1 + ' L' + x2 + ' ' + y2;
+    }
+    g.appendChild(n('path', { d: d, fill: 'none', stroke: col,
+      'stroke-width': o.w || 1.2, 'stroke-dasharray': o.dash || null }));
+    if (o.head !== false) {
+      var a = Math.atan2(y2 - y1, x2 - (o.curve ? (x1 + x2) / 2 : x1));
+      var s = o.headSize || 6;
+      g.appendChild(n('path', {
+        d: 'M' + x2 + ' ' + y2 +
+           ' L' + (x2 - s * Math.cos(a - 0.42)) + ' ' + (y2 - s * Math.sin(a - 0.42)) +
+           ' L' + (x2 - s * Math.cos(a + 0.42)) + ' ' + (y2 - s * Math.sin(a + 0.42)) + ' Z',
+        fill: col
+      }));
+    }
+    p.appendChild(g);
+    return g;
+  }
+
+  /** dark code slab, matching the reference's .codecard */
+  function code(p, x, y, w, lines, o) {
+    o = o || {};
+    var lh = o.lh || 17, padY = 14, padX = 14;
+    var h = lines.length * lh + padY * 2;
+    var g = n('g', {});
+    g.appendChild(n('rect', { x: x, y: y, width: w, height: h, rx: 10, fill: '#151a23' }));
+    lines.forEach(function (ln, i) {
+      var t = n('text', {
+        x: x + padX, y: y + padY + lh * (i + 0.72),
+        'font-family': "'JetBrains Mono',monospace", 'font-size': o.size || 12.5,
+        fill: ln.c || '#c8cfdb'
+      });
+      t.textContent = ln.t == null ? ln : ln.t;
+      g.appendChild(t);
+    });
+    p.appendChild(g);
+    g._h = h;
+    return g;
+  }
+
+  /** the yes / no verdict, the recurring motif of the whole guide */
+  function verdict(p, x, y, yes, o) {
+    o = o || {};
+    var g = n('g', {});
+    var col = yes ? C.red : C.teal;
+    big(g, x, y, yes ? 'yes' : 'no', { size: o.size || 58, color: col });
+    label(g, x, y + 28, yes ? 'flagged' : 'not flagged', { color: col, size: 10.5 });
+    p.appendChild(g);
+    return g;
+  }
+
+  /** wrap a string to a width in characters, returning lines */
+  function wrap(s, cols) {
+    var words = String(s).split(/\s+/), out = [], cur = '';
+    words.forEach(function (w) {
+      if ((cur + ' ' + w).trim().length > cols) { out.push(cur.trim()); cur = w; }
+      else cur += ' ' + w;
+    });
+    if (cur.trim()) out.push(cur.trim());
+    return out;
+  }
+
+  /** a block of mono text, wrapped */
+  function para(p, x, y, s, cols, o) {
+    o = o || {};
+    var lines = wrap(s, cols), lh = o.lh || 18;
+    lines.forEach(function (ln, i) {
+      mono(p, x, y + i * lh, ln, { size: o.size || 13, color: o.color });
+    });
+    return { h: lines.length * lh, lines: lines.length };
+  }
+
+  /** the honesty line every schematic figure carries, placed after layout */
+  function foot(svg, s) { svg._foot = s; }
+
+  /** interactive switch row, returns the group and wires selection */
+  function switcher(p, x, y, items, onPick, o) {
+    o = o || {};
+    var g = n('g', {}), cx = x, btns = [];
+    items.forEach(function (it, i) {
+      var b = chip(g, cx, y, it, { size: o.size || 11.5, h: 25 });
+      b.style.cursor = 'pointer';
+      b.setAttribute('tabindex', '0');
+      b.setAttribute('role', 'button');
+      b.setAttribute('aria-label', it);
+      var pick = function () {
+        btns.forEach(function (o2, j) {
+          var on = j === i;
+          o2.firstChild.setAttribute('fill', on ? TINT[o.tint || 'blue'] : 'none');
+          o2.firstChild.setAttribute('stroke', on ? C[o.tint || 'blue'] : C.line);
+          o2.lastChild.setAttribute('fill', on ? C[o.tint || 'blue'] : C.ink3);
+        });
+        onPick(i);
+      };
+      b.addEventListener('click', pick);
+      b.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); }
+      });
+      btns.push(b);
+      cx += b._w + 7;
+    });
+    p.appendChild(g);
+    // pills settle at their measured width, so re-flow the row afterwards
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        var rx = x;
+        btns.forEach(function (b2) {
+          var cur = parseFloat(b2.firstChild.getAttribute('x'));
+          b2.setAttribute('transform', 'translate(' + (rx - cur) + ',0)');
+          rx += b2._w + 7;
+        });
+      });
+    });
+    if (btns.length) btns[0].dispatchEvent(new Event('click'));
+    return { g: g, btns: btns, pick: function (i) { btns[i].dispatchEvent(new Event('click')); } };
+  }
+
+
+  /* ---------- figure furniture, the thing that was missing ----------
+     The reference gives every art panel its own headline, a mono subtitle and a
+     tinted payoff box. Ours were bare diagrams with a small label, which is why
+     they read as sparse. These draw ABOVE y=0 so existing layouts do not shift. */
+
+  function head(p, title, sub) {
+    p.appendChild(n('rect', { x: 0, y: -78, width: 34, height: 3, rx: 1.5, fill: C.amber }));
+    var t1 = n('text', {
+      x: 0, y: -46, 'font-family': "'Sora',system-ui,sans-serif",
+      'font-size': 27, 'font-weight': 700, 'letter-spacing': '-.022em', fill: C.ink
+    });
+    t1.textContent = title;
+    p.appendChild(t1);
+    if (sub) {
+      var t2 = n('text', {
+        x: 0, y: -22, 'font-family': "'JetBrains Mono',monospace",
+        'font-size': 13, fill: C.ink3
+      });
+      t2.textContent = sub;
+      p.appendChild(t2);
+    }
+  }
+
+  /** the tinted box that carries a figure's punchline */
+  function callout(p, x, y, w, s, o) {
+    o = o || {};
+    var col = o.color || C.amber, tint = o.tint || TINT.amber;
+    var lines = wrap(s, o.cols || 62), lh = 19;
+    var h = lines.length * lh + 22;
+    p.appendChild(n('rect', { x: x, y: y, width: w, height: h, rx: 9,
+      fill: tint, stroke: col, 'stroke-opacity': .45 }));
+    lines.forEach(function (ln, i) {
+      var tn = n('text', {
+        x: x + 16, y: y + 22 + i * lh, 'font-family': "'JetBrains Mono',monospace",
+        'font-size': o.size || 13.5, fill: col, 'font-weight': 500
+      });
+      tn.textContent = ln;
+      p.appendChild(tn);
+    });
+    return h;
+  }
+
+  /** one sans sentence of narration under the headline */
+  function lede(p, y, s, cols) {
+    var lines = wrap(s, cols || 74), lh = 21;
+    lines.forEach(function (ln, i) {
+      var tn = n('text', {
+        x: 0, y: y + i * lh, 'font-family': "'IBM Plex Sans',system-ui,sans-serif",
+        'font-size': 14.5, fill: C.ink2
+      });
+      tn.textContent = ln;
+      p.appendChild(tn);
+    });
+    return lines.length * lh;
+  }
+
+  /** a placeholder photograph, rendered rather than drawn as outline clip art */
+  function photo(p, x, y, w, h, which, o) {
+    o = o || {};
+    var src = (window.SS_TILES || {})[which || 'blocks'];
+    var g = n('g', {});
+    var cid = 'ph' + (++UID);
+    var d = n('defs', {});
+    var cp = n('clipPath', { id: cid });
+    cp.appendChild(n('rect', { x: x, y: y, width: w, height: h, rx: o.r == null ? 8 : o.r }));
+    d.appendChild(cp);
+    g.appendChild(d);
+    if (src) {
+      g.appendChild(n('image', { href: src, x: x, y: y, width: w, height: h,
+        preserveAspectRatio: 'xMidYMid slice', 'clip-path': 'url(#' + cid + ')' }));
+    }
+    g.appendChild(n('rect', { x: x, y: y, width: w, height: h, rx: o.r == null ? 8 : o.r,
+      fill: 'none', stroke: 'rgba(31,37,48,.22)' }));
+    p.appendChild(g);
+    return g;
+  }
+
+  window.KIT = {
+    W: W, H: H, C: C, TINT: TINT, n: n,
+    board: board, panel: panel, label: label, mono: mono, text: text, big: big,
+    chip: chip, bar: bar, arrow: arrow, code: code, verdict: verdict,
+    wrap: wrap, para: para, foot: foot, switcher: switcher,
+    head: head, callout: callout, lede: lede, photo: photo
+  };
+})();
+
+/* The 3D half of the drawing kit.
+
+   Robostral Navigate points at a pixel. Any figure that merely draws a dot on a
+   photograph is asserting that idea rather than showing it. So the guide builds
+   a small indoor world, puts a camera on a robot inside it, and derives the
+   image coordinate by actually projecting the world waypoint through that
+   camera. Move the camera and the pixel moves, because it is the same maths the
+   model is trained against.
+
+   One WebGL context is shared by every 3D figure. The scroll engine only ticks
+   the scene you are looking at, so the canvas is simply re-parented on activate. */
+(function () {
+  var C = {
+    bg: 0xf4f1ea, paper: 0xece7dc, ink: 0x141922, ink3: 0x5d6474,
+    blue: 0x1c6e8c, teal: 0x0f6e56, amber: 0xb4551a,
+    purple: 0x6b3fa8, red: 0xa32d2d, wall: 0xe4ded1, floor: 0xdcd5c6
+  };
+
+  /* ---------- module loading ---------- */
+  var waiting = [];
+  function ready(cb) {
+    if (window.THREE) cb(window.THREE);
+    else waiting.push(cb);
+  }
+  document.addEventListener('three:ready', function () {
+    var q = waiting.splice(0);
+    q.forEach(function (f) { try { f(window.THREE); } catch (e) { console.error(e); } });
+  });
+
+  /* ---------- one renderer for the whole page ---------- */
+  var R = null;
+  function renderer(THREE) {
+    if (R) return R;
+    R = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'low-power' });
+    R.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+    R.setClearColor(C.bg, 1);
+    R.outputColorSpace = THREE.SRGBColorSpace;
+    R.domElement.style.display = 'block';
+    R.domElement.style.width = '100%';
+    R.domElement.style.borderRadius = '12px';
+    return R;
+  }
+
+  /* deterministic noise, so a "randomly generated" scene is the same every visit */
+  function rng(seed) {
+    var s = seed >>> 0;
+    return function () {
+      s = (s * 1664525 + 1013904223) >>> 0;
+      return s / 4294967296;
+    };
+  }
+
+  /* ---------- materials ---------- */
+  function mats(THREE) {
+    function lam(c, o) {
+      o = o || {};
+      return new THREE.MeshLambertMaterial({
+        color: c, transparent: o.op != null, opacity: o.op == null ? 1 : o.op,
+        side: o.side || THREE.FrontSide
+      });
+    }
+    return {
+      floor: lam(C.floor), wall: lam(C.wall), ink: lam(C.ink),
+      blue: lam(C.blue), teal: lam(C.teal), amber: lam(C.amber),
+      purple: lam(C.purple), red: lam(C.red), paper: lam(C.paper),
+      lam: lam
+    };
+  }
+
+  /* ---------- the indoor world ----------
+     A plan of rooms off a central corridor, with doorway gaps, furniture in the
+     page palette, and a route through it. Generated from a seed so the figure is
+     reproducible but nothing is hand-placed. */
+  function world(THREE, seed) {
+    var M = mats(THREE), rand = rng(seed || 7);
+    var g = new THREE.Group();
+    var W = 26, D = 18, WALL_H = 2.6, T = 0.16;
+
+    var floor = new THREE.Mesh(new THREE.BoxGeometry(W, 0.12, D), M.floor);
+    floor.position.y = -0.06;
+    g.add(floor);
+
+    // faint tile lines, which is what stops a big flat plane reading as a void
+    var grid = new THREE.GridHelper(W, W, 0xb9b0a0, 0xc9c1b2);
+    grid.position.y = 0.008;
+    grid.material.transparent = true;
+    grid.material.opacity = 0.5;
+    g.add(grid);
+
+    var walls = [];
+    function wall(x, z, w, d) {
+      var m = new THREE.Mesh(new THREE.BoxGeometry(w, WALL_H, d), M.wall);
+      m.position.set(x, WALL_H / 2, z);
+      g.add(m);
+      walls.push(m);
+      // a darker cap line so walls read as built rather than as fog
+      var cap = new THREE.Mesh(new THREE.BoxGeometry(w + 0.02, 0.05, d + 0.02), M.lam(0xc2b9a8));
+      cap.position.set(x, WALL_H, z);
+      g.add(cap);
+      return m;
+    }
+
+    // perimeter, left open at the far end so the corridor reads as continuing
+    wall(0, -D / 2, W, T);
+    wall(-W / 2, 0, T, D);
+    wall(W / 2, 0, T, D);
+    wall(-W / 4 - 2, D / 2, W / 2 - 4, T);
+    wall(W / 4 + 2, D / 2, W / 2 - 4, T);
+
+    // two interior partitions forming a corridor down the middle, with doorways
+    [-3.2, 3.2].forEach(function (z, i) {
+      var sgn = i ? 1 : -1;
+      wall(-8.5, z, 9, T);
+      wall(4.0, z, 8, T);
+      // a stub that makes the doorway read as a doorway
+      wall(-3.4, z + sgn * 1.1, T, 2.2);
+    });
+
+    // furniture, in the accent palette so the 3D matches the 2D figures
+    function box(x, z, w, h, d, m, rot) {
+      var e = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m);
+      e.position.set(x, h / 2, z);
+      if (rot) e.rotation.y = rot;
+      g.add(e);
+      return e;
+    }
+    var props = [];
+    // desks along the top rooms
+    for (var i = 0; i < 5; i++) {
+      props.push(box(-10 + i * 3.4, -6.2 - rand() * 0.6, 2.0, 0.74, 1.1, M.lam(0xb9ac93)));
+    }
+    // lockers
+    props.push(box(-11.4, -1.0, 0.9, 2.0, 4.0, M.lam(0x6f7787)));
+    // the orange couch, the landmark in every one of these episodes
+    props.push(box(10.4, 1.1, 1.3, 0.78, 3.0, M.amber));
+    // planters
+    [[-6.4, 6.1], [1.2, 6.3], [11.0, -5.4], [-2.6, 2.5], [4.8, -2.5]].forEach(function (p) {
+      props.push(box(p[0], p[1], 0.7, 0.9, 0.7, M.teal));
+    });
+    // columns down the corridor
+    for (var k = -1; k <= 2; k++) {
+      var cm = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.28, WALL_H, 12), M.lam(0xd2caba));
+      cm.position.set(k * 6.2, WALL_H / 2, 0);
+      g.add(cm);
+    }
+
+    return { group: g, W: W, D: D, mats: M, props: props, walls: walls };
+  }
+
+  /* ---------- a robot, parameterised the way the paper randomises it ---------- */
+  function robot(THREE, opts) {
+    opts = opts || {};
+    var M = mats(THREE);
+    var h = opts.height == null ? 1.1 : opts.height;
+    var r = opts.radius == null ? 0.28 : opts.radius;
+    var camFrac = opts.camFrac == null ? 0.9 : opts.camFrac;
+    var col = opts.color == null ? C.blue : opts.color;
+
+    var g = new THREE.Group();
+    var base = new THREE.Mesh(new THREE.CylinderGeometry(r, r * 1.04, h * 0.16, 24), M.lam(0x3b4250));
+    base.position.y = h * 0.08;
+    g.add(base);
+    var mast = new THREE.Mesh(new THREE.CylinderGeometry(r * 0.42, r * 0.5, h * 0.78, 16), M.lam(col));
+    mast.position.y = h * 0.16 + h * 0.39;
+    g.add(mast);
+    var head = new THREE.Mesh(new THREE.BoxGeometry(r * 1.5, h * 0.13, r * 1.0), M.lam(0x2a303c));
+    head.position.y = h * camFrac;
+    g.add(head);
+    // the lens, so it is obvious which way the thing is looking
+    var lens = new THREE.Mesh(new THREE.CylinderGeometry(h * 0.035, h * 0.035, 0.05, 14), M.lam(0x11151c));
+    lens.rotation.x = Math.PI / 2;
+    lens.position.set(0, h * camFrac, r * 0.52);
+    g.add(lens);
+    // fake contact shadow, far cheaper than a shadow map and reads better on paper
+    var sh = new THREE.Mesh(new THREE.CircleGeometry(r * 1.7, 24),
+      new THREE.MeshBasicMaterial({ color: 0x8d8676, transparent: true, opacity: 0.26 }));
+    sh.rotation.x = -Math.PI / 2;
+    sh.position.y = 0.012;
+    g.add(sh);
+
+    // A real onboard camera cannot see its own chassis, and ours was rendering
+    // the inside of the robot's head. Park the body on its own layer; the
+    // third-person camera opts in, the onboard camera never does.
+    var layer = opts.layer == null ? 1 : opts.layer;
+    g.traverse(function (o) { o.layers.set(layer); });
+    g.userData = { h: h, r: r, camY: h * camFrac, layer: layer };
+    return g;
+  }
+
+  /** a third-person camera, which unlike the onboard one may see robot bodies */
+  function thirdPerson(THREE, fov, layers) {
+    var c = new THREE.PerspectiveCamera(fov == null ? 42 : fov, 1, 0.1, 250);
+    (layers || [1]).forEach(function (l) { c.layers.enable(l); });
+    return c;
+  }
+
+  /** where the onboard camera sits, given the robot group and a pitch in degrees */
+  function camPose(THREE, rob, pitchDeg, cam) {
+    var p = new THREE.Vector3();
+    rob.getWorldPosition(p);
+    cam.position.set(p.x, rob.userData.camY, p.z);
+    var yaw = rob.rotation.y;
+    var pitch = -(pitchDeg || 0) * Math.PI / 180;
+    var look = new THREE.Vector3(
+      p.x + Math.sin(yaw) * Math.cos(pitch),
+      rob.userData.camY + Math.sin(pitch),
+      p.z + Math.cos(yaw) * Math.cos(pitch)
+    );
+    cam.lookAt(look);
+    cam.updateMatrixWorld();
+  }
+
+  /** project a world point into a camera, returning normalised image coords */
+  function project(THREE, pt, cam) {
+    var v = pt.clone().project(cam);
+    var fwd = new THREE.Vector3();
+    cam.getWorldDirection(fwd);
+    var rel = pt.clone().sub(cam.position);
+    return {
+      u: (v.x + 1) / 2,
+      v: (1 - v.y) / 2,
+      visible: rel.dot(fwd) > 0 && v.x >= -1 && v.x <= 1 && v.y >= -1 && v.y <= 1,
+      depth: rel.length()
+    };
+  }
+
+  /* ---------- a marker for the waypoint, in world space ---------- */
+  function waypoint(THREE, color) {
+    var g = new THREE.Group();
+    var col = color == null ? C.red : color;
+    var ring = new THREE.Mesh(new THREE.RingGeometry(0.26, 0.32, 28),
+      new THREE.MeshBasicMaterial({ color: col, side: THREE.DoubleSide }));
+    ring.rotation.x = -Math.PI / 2;
+    ring.position.y = 0.02;
+    g.add(ring);
+    var post = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.7, 8),
+      new THREE.MeshBasicMaterial({ color: col }));
+    post.position.y = 0.35;
+    g.add(post);
+    g.userData.pulse = ring;
+    return g;
+  }
+
+  /** a route drawn as a tube on the floor */
+  function route(THREE, pts, color) {
+    var curve = new THREE.CatmullRomCurve3(pts);
+    var geo = new THREE.TubeGeometry(curve, Math.max(24, pts.length * 8), 0.045, 8, false);
+    var m = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: color == null ? C.blue : color }));
+    m.userData.curve = curve;
+    return m;
+  }
+
+  /* ---------- mount ----------
+     `build(ctx)` runs once, when THREE has loaded and the holder has a size.
+     It returns an object with an optional `frame(t, ctx)`. Everything else,
+     resizing, viewport splitting and re-parenting the shared canvas, is here. */
+  function mount(host, opts, build) {
+    opts = opts || {};
+    var holder = document.createElement('div');
+    holder.className = 'k3';
+    holder.style.position = 'relative';
+    holder.style.width = '100%';
+    holder.style.aspectRatio = opts.aspect || '16 / 10';
+    host.appendChild(holder);
+
+    // inside the holder, which is the positioned ancestor, so inset:0 lines the
+    // overlay up with the canvas rather than with the whole scene column
+    var overlay = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    overlay.setAttribute('class', 'k3ov');
+    overlay.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;pointer-events:none';
+    holder.appendChild(overlay);
+
+    var ctx = null, live = false, scratch = null;
+
+    ready(function (THREE) {
+      var rd = renderer(THREE);
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color(C.bg);
+
+      var hemi = new THREE.HemisphereLight(0xffffff, 0xcfc6b4, 2.1);
+      scene.add(hemi);
+      var dir = new THREE.DirectionalLight(0xfff6e8, 2.0);
+      dir.position.set(6, 12, 8);
+      scene.add(dir);
+      var fill = new THREE.DirectionalLight(0xdce7f0, 0.7);
+      fill.position.set(-8, 6, -6);
+      scene.add(fill);
+
+      ctx = {
+        THREE: THREE, scene: scene, renderer: rd, holder: holder,
+        overlay: overlay, C: C, mats: mats(THREE),
+        world: world, robot: robot, camPose: camPose, project: project,
+        waypoint: waypoint, route: route, rng: rng, thirdPerson: thirdPerson,
+        w: 1, h: 1
+      };
+      try { scratch = build(ctx) || {}; }
+      catch (e) { console.error('k3 build', e); scratch = {}; }
+      if (live) attach();
+    });
+
+    function size() {
+      if (!ctx) return;
+      var r = holder.getBoundingClientRect();
+      ctx.w = Math.max(1, Math.round(r.width));
+      ctx.h = Math.max(1, Math.round(r.height));
+      ctx.renderer.setSize(ctx.w, ctx.h, false);
+      overlay.setAttribute('viewBox', '0 0 ' + ctx.w + ' ' + ctx.h);
+      if (scratch && scratch.resize) { try { scratch.resize(ctx); } catch (e) {} }
+    }
+
+    function attach() {
+      if (!ctx) return;
+      // the canvas must sit under the overlay, so insert it first rather than append
+      if (ctx.renderer.domElement.parentNode !== holder) {
+        holder.insertBefore(ctx.renderer.domElement, holder.firstChild);
+      }
+      size();
+    }
+
+    var ro = window.ResizeObserver ? new ResizeObserver(function () { if (live) size(); }) : null;
+    if (ro) ro.observe(holder);
+
+    return {
+      start: function () { live = true; attach(); },
+      stop: function () { live = false; },
+      tick: function (t) {
+        if (!live || !ctx || !scratch) return;
+        if (scratch.frame) scratch.frame(t, ctx);
+        else ctx.renderer.render(ctx.scene, scratch.camera);
+      },
+      ctx: function () { return ctx; }
+    };
+  }
+
+  /** render two cameras side by side into the one canvas: the world, and what
+      the robot sees. WebGL viewport coordinates start at the bottom left. */
+  function split(ctx, camA, camB, gap) {
+    var g = gap == null ? 8 : gap;
+    var w = ctx.w, h = ctx.h;
+    var half = Math.floor((w - g) / 2);
+    var r = ctx.renderer;
+    r.setScissorTest(true);
+    r.setViewport(0, 0, half, h);
+    r.setScissor(0, 0, half, h);
+    camA.aspect = half / h; camA.updateProjectionMatrix();
+    r.render(ctx.scene, camA);
+    r.setViewport(half + g, 0, w - half - g, h);
+    r.setScissor(half + g, 0, w - half - g, h);
+    camB.aspect = (w - half - g) / h; camB.updateProjectionMatrix();
+    r.render(ctx.scene, camB);
+    r.setScissorTest(false);
+    return { half: half, gap: g, rightX: half + g, rightW: w - half - g };
+  }
+
+  /* ---------- overlay drawing, shared so every 3D figure marks a waypoint the
+     same way. A thin dark ring vanishes against furniture, so every stroke gets
+     a paper-coloured halo underneath it. ---------- */
+  function sv(tag, attrs) {
+    var e = document.createElementNS('http://www.w3.org/2000/svg', tag);
+    for (var k in attrs) if (attrs[k] != null) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+  function haloed(ov, tag, attrs) {
+    var under = sv(tag, attrs);
+    under.setAttribute('stroke', '#f4f1ea');
+    under.setAttribute('stroke-width', (parseFloat(attrs['stroke-width'] || 2) + 2.8));
+    under.setAttribute('stroke-opacity', '.92');
+    ov.appendChild(under);
+    ov.appendChild(sv(tag, attrs));
+  }
+  /** an open crosshair, open in the middle so it frames the target rather than
+      covering it */
+  function reticle(ov, x, y, opts) {
+    opts = opts || {};
+    var col = opts.color || '#a32d2d', r = opts.r || 16, w = opts.w || 2.4;
+    haloed(ov, 'circle', { cx: x, cy: y, r: r, fill: 'none', stroke: col, 'stroke-width': w });
+    [[-1, 0], [1, 0], [0, -1], [0, 1]].forEach(function (d) {
+      haloed(ov, 'line', {
+        x1: x + d[0] * (r + 6), y1: y + d[1] * (r + 6),
+        x2: x + d[0] * (r + 15), y2: y + d[1] * (r + 15),
+        stroke: col, 'stroke-width': w });
+    });
+    if (opts.label) {
+      var tw = opts.label.length * 7.4 + 16;
+      var lx = Math.max(4, Math.min(x + r + 12, (opts.maxX || 1e5) - tw));
+      var ly = y - r - 26;
+      if (ly < 4) ly = y + r + 8;
+      ov.appendChild(sv('rect', { x: lx, y: ly, width: tw, height: 22, rx: 5,
+        fill: col, opacity: .95 }));
+      var t = sv('text', { x: lx + 8, y: ly + 15.5, fill: '#fff', 'font-size': 12.5,
+        'font-weight': 600 });
+      t.textContent = opts.label;
+      ov.appendChild(t);
+    }
+  }
+  /** the small uppercase caption in the corner of a viewport */
+  function vlabel(ov, x, y, txt) {
+    var t = sv('text', { x: x, y: y, fill: '#39404f', 'font-size': 11,
+      'letter-spacing': '.14em', 'font-weight': 500,
+      stroke: '#f4f1ea', 'stroke-width': 3.4, 'paint-order': 'stroke' });
+    t.textContent = String(txt).toUpperCase();
+    ov.appendChild(t);
+  }
+  /** a tinted banner across the foot of a viewport, for a state message */
+  function banner(ov, x, y, w, txt, col) {
+    col = col || '#a32d2d';
+    ov.appendChild(sv('rect', { x: x, y: y, width: w, height: 38, rx: 8,
+      fill: '#f4f1ea', opacity: .93 }));
+    ov.appendChild(sv('rect', { x: x, y: y, width: w, height: 38, rx: 8,
+      fill: 'none', stroke: col, 'stroke-width': 1.5 }));
+    var t = sv('text', { x: x + 13, y: y + 24, fill: col, 'font-size': 13, 'font-weight': 600 });
+    t.textContent = txt;
+    ov.appendChild(t);
+  }
+  /** a faint guide line pair through the reticle, for the randomisation figure */
+  function crossGuides(ov, x, y, x0, x1, h, col) {
+    [[x0, y, x1, y], [x, 0, x, h]].forEach(function (l) {
+      ov.appendChild(sv('line', { x1: l[0], y1: l[1], x2: l[2], y2: l[3],
+        stroke: col || '#a32d2d', 'stroke-width': 1, 'stroke-dasharray': '3 6', opacity: .55 }));
+    });
+  }
+
+  /* ---------- HTML furniture, so a 3D figure carries the same headline,
+     subtitle and payoff box as an SVG one ---------- */
+  function el(tag, cls, txt) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (txt != null) e.textContent = txt;
+    return e;
+  }
+  function head(host, title, sub) {
+    var w = el('div', 'k3head');
+    w.appendChild(el('i'));
+    w.appendChild(el('h4', null, title));
+    if (sub) w.appendChild(el('p', null, sub));
+    host.appendChild(w);
+    return w;
+  }
+  function note(host, txt, tone) {
+    var e = el('div', 'k3note' + (tone ? ' ' + tone : ''), txt);
+    host.appendChild(e);
+    return e;
+  }
+  /** a labelled slider row; returns a function to read the value */
+  function slider(row, label, min, max, step, val, fmt, onInput) {
+    var l = el('label', null, label);
+    var i = document.createElement('input');
+    i.type = 'range'; i.min = min; i.max = max; i.step = step; i.value = val;
+    var o = document.createElement('output');
+    function show() { o.textContent = fmt(parseFloat(i.value)); }
+    i.addEventListener('input', function () { show(); onInput(parseFloat(i.value)); });
+    show();
+    l.appendChild(i); l.appendChild(o);
+    row.appendChild(l);
+    return function () { return parseFloat(i.value); };
+  }
+  /** a segmented control; calls onPick(index) and starts on `start` */
+  function seg(row, items, onPick, start) {
+    var g = el('div', 'seg');
+    var btns = items.map(function (it, i) {
+      var b = el('button', null, it);
+      b.type = 'button';
+      b.setAttribute('aria-pressed', 'false');
+      b.addEventListener('click', function () {
+        btns.forEach(function (o, j) { o.setAttribute('aria-pressed', j === i ? 'true' : 'false'); });
+        onPick(i);
+      });
+      g.appendChild(b);
+      return b;
+    });
+    row.appendChild(g);
+    btns[start || 0].click();
+    return btns;
+  }
+  function ctl(host) {
+    var r = el('div', 'ctl');
+    host.appendChild(r);
+    return r;
+  }
+
+  window.K3 = {
+    C: C, ready: ready, mount: mount, split: split,
+    head: head, note: note, slider: slider, seg: seg, ctl: ctl, el: el,
+    world: world, robot: robot, camPose: camPose, project: project,
+    waypoint: waypoint, route: route, rng: rng, mats: mats,
+    thirdPerson: thirdPerson,
+    sv: sv, reticle: reticle, vlabel: vlabel, banner: banner,
+    crossGuides: crossGuides
+  };
+})();
+
+window.SCENES = window.SCENES || {};
+/* ---- s1_problem ---- */
+/* The problem. Why sensors are the bottleneck, and what pointing replaces. */
+window.SCENES = window.SCENES || {};
+
+(function () {
+  var K = window.KIT, C = K.C, T = K.TINT, K3 = window.K3;
+
+  /* ---- 01 the sensor tax ---- */
+  window.SCENES.S_SENSORS = function (root, api) {
+    var RN = api.RN, s = K.board(root, { alt: 'Sensing requirements and what each one costs.' });
+    K.head(s, 'Every sensor is a robot you lose', 'add a requirement, read what it costs you');
+
+    var TIERS = [
+      { k: 'rgb', name: 'one RGB camera', chips: ['rgb'],
+        cost: ['nothing to calibrate', 'runs on anything with a webcam'] },
+      { k: 'depth', name: 'plus depth', chips: ['rgb', 'depth'],
+        cost: ['needs a depth sensor on every unit', 'fails on glass, dark and sunlight'] },
+      { k: 'rig', name: 'plus a camera rig', chips: ['rgb', 'depth', 'cam x4'],
+        cost: ['fixed extrinsics per platform', 'recalibrate whenever the body changes'] },
+      { k: 'map', name: 'plus a prebuilt map', chips: ['rgb', 'depth', 'cam x4', 'map'],
+        cost: ['survey every building first', 'stale the moment furniture moves'] }
+    ];
+
+    K.label(s, 0, 12, 'what the system is allowed to assume');
+    var body = K.n('g', {}); s.appendChild(body);
+    var n_single = (RN.table1 || []).filter(function (r) { return r.group === 'single'; }).length;
+    var n_depth = (RN.table1 || []).filter(function (r) { return r.group === 'depth'; }).length;
+
+    K.switcher(s, 0, 24, ['rgb', '+depth', '+rig', '+map'], function (i) { draw(i); },
+      { tint: 'amber' });
+
+    function draw(i) {
+      body.innerHTML = '';
+      var t = TIERS[i];
+      K.panel(body, 0, 74, 640, 138);
+      var cx = 20;
+      t.chips.forEach(function (c, j) {
+        var on = j === t.chips.length - 1;
+        var g = K.chip(body, cx, 100, c, {
+          size: 12, h: 27,
+          fill: on ? T.amber : T.ink,
+          stroke: on ? C.amber : C.line,
+          color: on ? C.amber : C.ink3
+        });
+        cx += g._w + 8;
+        if (j < t.chips.length - 1) {
+          K.mono(body, cx - 3, 118, '+', { size: 13, color: C.ink3 });
+          cx += 12;
+        }
+      });
+      K.mono(body, 20, 168, t.name, { size: 14, color: C.ink, weight: 500 });
+      K.mono(body, 20, 190, 'sensing budget: ' + t.chips.length +
+        (t.chips.length === 1 ? ' modality' : ' modalities'), { size: 12, color: C.ink3 });
+
+      K.label(body, 0, 244, 'what it costs you');
+      t.cost.forEach(function (line, j) {
+        K.panel(body, 0, 258 + j * 56, 640, 46, { flat: true, fill: i === 0 ? T.teal : T.red,
+          stroke: i === 0 ? C.teal : C.red });
+        K.mono(body, 18, 286 + j * 56, line, { size: 13, color: i === 0 ? C.teal : C.red });
+      });
+
+      K.callout(body, 0, 384, 640,
+        'Of the ' + (n_single + n_depth) + ' published systems the paper compares against, ' +
+        n_single + ' work from a single RGB camera and ' + n_depth +
+        ' require depth, LiDAR or several cameras.',
+        { cols: 66 });
+    }
+    draw(0);
+    K.foot(s, 'The three costs are the ones named in the introduction: fewer compatible robots, ' +
+      'higher cost per unit, and environment-specific calibration.');
+  };
+
+  /* ---- 02 the three constraints ---- */
+  window.SCENES.S_RECIPE = function (root, api) {
+    var s = K.board(root, { alt: 'The three constraints the paper optimises for.' });
+    K.head(s, 'Optimise the recipe', 'three constraints, and every later decision traces to one');
+
+    var ITEMS = [
+      { c: C.blue, k: 'minimise sensing', t: 'one monocular RGB stream, the sensor every platform already has',
+        to: 'points at a pixel instead of measuring a distance' },
+      { c: C.teal, k: 'generalise across bodies', t: 'no dependence on a particular height, lens or base',
+        to: 'image-space output plus randomised bodies in training' },
+      { c: C.amber, k: 'train efficiently', t: 'iteration speed is a first-class design constraint',
+        to: 'prefix-tree packing, then RL with the compute it saved' }
+    ];
+
+    ITEMS.forEach(function (it, i) {
+      var y = 20 + i * 132;
+      K.panel(s, 0, y, 640, 112, { stroke: it.c, fill: 'rgba(255,255,255,.86)' });
+      K.n('rect', {});
+      s.appendChild(K.n('rect', { x: 0, y: y, width: 5, height: 112, rx: 2.5, fill: it.c }));
+      K.big(s, 22, y + 52, String(i + 1), { size: 40, color: it.c });
+      K.mono(s, 64, y + 34, it.k, { size: 14, color: it.c, weight: 500 });
+      K.para(s, 64, y + 58, it.t, 62, { size: 12.5, color: C.ink2 });
+      K.mono(s, 64, y + 94, '→ ' + it.to, { size: 12, color: C.ink3 });
+    });
+
+    K.callout(s, 0, 424, 640,
+      'The paper is explicit that it is chasing a scalable recipe rather than a leaderboard ' +
+      'position. The odd-looking choices later are all downstream of that.', { cols: 66 });
+  };
+
+  /* ---- 03 a metric waypoint belongs to one body ---- */
+  window.SCENES.S_METRIC = function (root, api) {
+    var RN = api.RN, f = RN.facts, s = K.board(root, { alt: 'The same command on two different bodies.' });
+    K.head(s, 'A distance in metres belongs to one robot',
+      'same command, two bodies, two different meanings');
+
+    K.label(s, 0, 14, 'the command');
+    K.code(s, 0, 26, 300, [
+      { t: 'forward  Δx = 1.4 m', c: '#9fd0e6' },
+      { t: 'lateral  Δy = 0.0 m', c: '#9fd0e6' },
+      { t: 'turn     Δθ = 22°', c: '#9fd0e6' }
+    ]);
+
+    var BODIES = [
+      { n: 'tall, narrow lens', h: f.height_max, r: f.radius_min, pitch: f.pitch_min, c: C.blue },
+      { n: 'short, wide lens', h: f.height_min, r: f.radius_max, pitch: f.pitch_max, c: C.purple }
+    ];
+
+    BODIES.forEach(function (b, i) {
+      var x = i * 330, y = 150;
+      K.panel(s, x, y, 310, 216, { stroke: b.c, fill: i ? T.purple : T.blue });
+      K.label(s, x + 18, y + 28, b.n, { color: b.c });
+      // a little elevation drawing of the body, to scale against 1.8 m
+      var gx = x + 42, gy = y + 190, scale = 74 / f.height_max;
+      s.appendChild(K.n('line', { x1: x + 18, y1: gy, x2: x + 290, y2: gy,
+        stroke: C.line, 'stroke-width': 1 }));
+      var hh = b.h * scale;
+      s.appendChild(K.n('rect', { x: gx - b.r * scale * 26, y: gy - hh,
+        width: b.r * scale * 52, height: hh, rx: 3, fill: b.c, opacity: .82 }));
+      s.appendChild(K.n('circle', { cx: gx, cy: gy - hh - 5, r: 4.5, fill: C.ink }));
+      K.mono(s, x + 18, y + 76, b.h.toFixed(1) + ' m tall', { size: 12, color: b.c });
+      K.mono(s, x + 18, y + 94, 'radius ' + b.r.toFixed(2) + ' m', { size: 12, color: b.c });
+      K.mono(s, x + 18, y + 112, 'pitch ' + b.pitch + '°', { size: 12, color: b.c });
+      K.mono(s, x + 108, y + 208, i ? 'clips the doorway frame' : 'clears it', { size: 12.5, color: b.c });
+    });
+
+    K.callout(s, 0, 392, 640,
+      'The number did not change. The geometry it was measured against did. That is the ' +
+      'coupling image-space output is there to break.', { cols: 66 });
+    K.foot(s, 'Body ranges are the ones the paper randomises over in section 2.4. The two ' +
+      'silhouettes are the ends of those ranges, not measured platforms.');
+  };
+
+  /* ---- 04 THE HERO: pointing, derived by projection ---- */
+  window.SCENES.S_POINT = function (root, api) {
+    K3.head(root, 'Point at the picture',
+      'left, the room. right, the camera. the crosshair is projected, not drawn on.');
+
+    var read = K3.el('div', 'k3read');
+    var uvB = K3.el('b', null, 'u, v'), thB = K3.el('b', null, 'Δθ'),
+        dB = K3.el('b', 'off', 'range');
+    [uvB, thB, dB].forEach(function (b) { read.appendChild(b); });
+
+    var state = { p: 0.12 };
+
+    var h = K3.mount(root, { aspect: '16 / 9' }, function (ctx) {
+      var THREE = ctx.THREE;
+      var w = ctx.world(THREE, 11);
+      ctx.scene.add(w.group);
+
+      // straight down the corridor, so the onboard view has depth and a
+      // landmark at the end rather than a wall 40 cm from the lens
+      var PATH = [
+        new THREE.Vector3(-11.2, 0.05, 1.4), new THREE.Vector3(-6.4, 0.05, 0.6),
+        new THREE.Vector3(-1.4, 0.05, -0.4), new THREE.Vector3(3.6, 0.05, 0.2),
+        new THREE.Vector3(7.8, 0.05, 0.9), new THREE.Vector3(10.0, 0.05, 1.1)
+      ];
+      var line = ctx.route(THREE, PATH, ctx.C.blue);
+      ctx.scene.add(line);
+      var curve = line.userData.curve;
+
+      var rob = ctx.robot(THREE, { height: 1.15, radius: 0.3, camFrac: 0.9 });
+      ctx.scene.add(rob);
+      var wp = ctx.waypoint(THREE, ctx.C.red);
+      ctx.scene.add(wp);
+
+      var camA = ctx.thirdPerson(THREE, 42, [1, 2]);
+      var camB = new THREE.PerspectiveCamera(58, 1, 0.05, 200);
+
+      var target = new THREE.Vector3();
+      var pos = new THREE.Vector3(), ahead = new THREE.Vector3();
+
+      function place(p) {
+        curve.getPointAt(Math.min(0.995, p), pos);
+        curve.getPointAt(Math.min(0.999, p + 0.02), ahead);
+        rob.position.set(pos.x, 0, pos.z);
+        rob.rotation.y = Math.atan2(ahead.x - pos.x, ahead.z - pos.z);
+        // the paper's rule: the furthest point along the route still in view
+        var best = null;
+        for (var q = 0.99; q > p; q -= 0.012) {
+          curve.getPointAt(q, target);
+          ctx.camPose(THREE, rob, 8, camB);
+          var pr = ctx.project(THREE, new THREE.Vector3(target.x, 0.35, target.z), camB);
+          if (pr.visible) { best = { q: q, x: target.x, z: target.z, pr: pr }; break; }
+        }
+        if (!best) {
+          curve.getPointAt(Math.min(0.999, p + 0.05), target);
+          ctx.camPose(THREE, rob, 8, camB);
+          best = { q: p + 0.05, x: target.x, z: target.z,
+                   pr: ctx.project(THREE, new THREE.Vector3(target.x, 0.35, target.z), camB) };
+        }
+        wp.position.set(best.x, 0, best.z);
+        return best;
+      }
+
+      return {
+        camera: camA,
+        frame: function (t, c) {
+          var best = place(state.p);
+          // slow orbit so the room reads as a room
+          var a = 0.55 + Math.sin(t * 0.06) * 0.22;
+          camA.position.set(Math.sin(a) * 19, 15.5, Math.cos(a) * 19);
+          camA.lookAt(0, 0, 0);
+          camA.updateMatrixWorld();
+          ctx.camPose(THREE, rob, 8, camB);
+          wp.userData.pulse.scale.setScalar(1 + Math.sin(t * 3) * 0.11);
+
+          var vp = window.K3.split(c, camA, camB, 10);
+
+          // the reticle, positioned from the projection rather than by hand
+          var ov = c.overlay; ov.innerHTML = '';
+          var pr = best.pr;
+          window.K3.vlabel(ov, 12, 22, 'the room');
+          window.K3.vlabel(ov, vp.rightX + 12, 22, 'what the camera sees');
+          if (pr.visible) {
+            window.K3.reticle(ov, vp.rightX + pr.u * vp.rightW, pr.v * c.h, {
+              label: '(' + pr.u.toFixed(3) + ', ' + pr.v.toFixed(3) + ')',
+              maxX: vp.rightX + vp.rightW - 6 });
+          }
+
+          uvB.textContent = 'u ' + pr.u.toFixed(3) + '   v ' + pr.v.toFixed(3);
+          uvB.className = pr.visible ? '' : 'off';
+          var yaw = Math.atan2(best.x - rob.position.x, best.z - rob.position.z) - rob.rotation.y;
+          while (yaw > Math.PI) yaw -= 2 * Math.PI;
+          while (yaw < -Math.PI) yaw += 2 * Math.PI;
+          thB.textContent = 'Δθ ' + (yaw * 180 / Math.PI).toFixed(0) + '°';
+          dB.textContent = pr.depth.toFixed(1) + ' m away';
+        }
+      };
+    });
+
+    root.appendChild(read);
+    var row = K3.ctl(root);
+    K3.slider(row, 'along the route', 0, 0.94, 0.005, state.p,
+      function (v) { return (v * 100).toFixed(0) + '%'; },
+      function (v) { state.p = v; });
+    K3.note(root, 'The image coordinate is computed, not placed. It is the world waypoint ' +
+      'projected through the camera on the right.', 'blue');
+    return h;
+  };
+
+  /* ---- 05 the five quantities ---- */
+  window.SCENES.S_UV = function (root, api) {
+    var RN = api.RN, f = RN.facts;
+    var s = K.board(root, { alt: 'The five quantities predicted when the goal is visible.' });
+    K.head(s, 'Five numbers, most of the time', 'a_vis when the destination is in frame');
+
+    K.label(s, 0, 14, 'predicted jointly');
+    var FIELDS = [
+      { k: 'u', d: 'image column of the waypoint', c: C.red, kind: 'point' },
+      { k: 'v', d: 'image row of the waypoint', c: C.red, kind: 'point' },
+      { k: 'Δx', d: 'forward displacement, metres', c: C.ink3, kind: 'metric' },
+      { k: 'Δy', d: 'lateral displacement, metres', c: C.ink3, kind: 'metric' },
+      { k: 'Δθ', d: 'heading change on arrival', c: C.blue, kind: 'both' }
+    ];
+    FIELDS.forEach(function (fl, i) {
+      var y = 30 + i * 62;
+      K.panel(s, 0, y, 640, 50, { flat: i > 1 && i < 4,
+        fill: fl.kind === 'point' ? T.red : (fl.kind === 'both' ? T.blue : '#fff'),
+        stroke: fl.kind === 'metric' ? C.line : fl.c });
+      K.mono(s, 20, y + 32, fl.k, { size: 20, color: fl.c, weight: 700 });
+      K.mono(s, 74, y + 31, fl.d, { size: 13, color: C.ink2 });
+      K.chip(s, 470, y + 13, fl.kind === 'point' ? 'pointing' :
+        (fl.kind === 'both' ? 'both modes' : 'fallback'), {
+        size: 10.5, h: 24, color: fl.c, stroke: fl.c === C.ink3 ? C.line : fl.c });
+    });
+
+    K.callout(s, 0, 356, 640,
+      'Pointing is the preferred mode. The metric pair is trained on every step as a co-training ' +
+      'task, which is affordable precisely because only about ' + f.invisible_pct +
+      '% of the data actually needs it.', { cols: 66, color: C.blue, tint: T.blue });
+    K.foot(s, 'Equation 1 in section 2.2. The model also emits STOP when the instruction is done.');
+  };
+
+  /* ---- 06 the fallback, shown by turning away ---- */
+  window.SCENES.S_FALLBACK = function (root, api) {
+    var f = api.RN.facts;
+    K3.head(root, 'You cannot point at what is behind you',
+      'turn past the edge of the frame and the output changes shape');
+
+    var read = K3.el('div', 'k3read');
+    var mode = K3.el('b', null, 'pointing'), out = K3.el('b', 'off', 'a_vis');
+    read.appendChild(mode); read.appendChild(out);
+
+    var state = { yaw: 0 };
+
+    var h = K3.mount(root, { aspect: '16 / 9' }, function (ctx) {
+      var THREE = ctx.THREE;
+      var w = ctx.world(THREE, 4);
+      ctx.scene.add(w.group);
+      var rob = ctx.robot(THREE, { height: 1.15, radius: 0.3, color: ctx.C.purple });
+      rob.position.set(-5.2, 0, 0.6);
+      ctx.scene.add(rob);
+      var GOAL = new THREE.Vector3(10.2, 0, 1.1);
+      var wp = ctx.waypoint(THREE, ctx.C.red);
+      wp.position.copy(GOAL);
+      ctx.scene.add(wp);
+
+      var camA = ctx.thirdPerson(THREE, 44, [1, 2]);
+      var camB = new THREE.PerspectiveCamera(58, 1, 0.05, 200);
+      var base = Math.atan2(GOAL.x - rob.position.x, GOAL.z - rob.position.z);
+
+      return {
+        camera: camA,
+        frame: function (t, c) {
+          rob.rotation.y = base + state.yaw * Math.PI / 180;
+          ctx.camPose(THREE, rob, 6, camB);
+          var pr = ctx.project(THREE, new THREE.Vector3(GOAL.x, 0.35, GOAL.z), camB);
+
+          camA.position.set(-4, 15, 17);
+          camA.lookAt(2, 0, 2);
+          camA.updateMatrixWorld();
+          wp.userData.pulse.scale.setScalar(1 + Math.sin(t * 3) * 0.11);
+
+          var vp = window.K3.split(c, camA, camB, 10);
+          var ov = c.overlay; ov.innerHTML = '';
+          window.K3.vlabel(ov, 12, 22, 'the room');
+          window.K3.vlabel(ov, vp.rightX + 12, 22, 'what the camera sees');
+          if (pr.visible) {
+            window.K3.reticle(ov, vp.rightX + pr.u * vp.rightW, pr.v * c.h,
+              { label: 'a_vis  (u, v, Δx, Δy, Δθ)', maxX: vp.rightX + vp.rightW - 6 });
+          } else {
+            window.K3.banner(ov, vp.rightX + 14, c.h - 54, vp.rightW - 28,
+              'no pixel in this frame refers to the goal');
+          }
+
+          mode.textContent = pr.visible ? 'pointing mode' : 'displacement fallback';
+          mode.className = pr.visible ? 'ok' : 'hot';
+          out.textContent = pr.visible
+            ? 'a_vis = (u, v, Δx, Δy, Δθ)'
+            : 'a_invis = (Δx, Δy, Δθ)';
+          out.className = pr.visible ? 'off' : 'hot';
+        }
+      };
+    });
+
+    root.appendChild(read);
+    var row = K3.ctl(root);
+    K3.slider(row, 'turn the robot', -180, 180, 1, 0,
+      function (v) { return v.toFixed(0) + '°'; },
+      function (v) { state.yaw = v; });
+    K3.note(root, 'About ' + f.invisible_pct + '% of the training data has no visible ' +
+      'destination. The fallback is what guarantees the robot can always make progress.', 'red');
+    return h;
+  };
+})();
+/* ---- s2_moves ---- */
+/* How it moves. The two-model stack, the rate ladder, and cross-robot transfer. */
+window.SCENES = window.SCENES || {};
+
+(function () {
+  var K = window.KIT, C = K.C, T = K.TINT, K3 = window.K3;
+
+  /* ---- 07 two models in series ---- */
+  window.SCENES.S_STACK = function (root, api) {
+    var f = api.RN.facts;
+    var s = K.board(root, { alt: 'A large reasoning model in series with a small geometric one.' });
+    K.head(s, 'Split the job, then size each half',
+      'reasoning is expensive, geometry is not');
+
+    var ROWS = [
+      { c: C.blue, name: 'Robostral Navigate', sz: f.vlm_params_b + 'B', kind: 'vision-language model',
+        job: 'read the instruction, understand the room, choose the next waypoint',
+        why: 'needs reasoning, so it gets the parameters' },
+      { c: C.teal, name: 'diffusion policy', sz: f.policy_params_m + 'M', kind: 'diffusion transformer',
+        job: 'turn one waypoint into a dense, obstacle-free trajectory',
+        why: 'geometry at this scale does not need a large model' },
+      { c: C.ink3, name: 'motion controller', sz: 'varies', kind: 'platform specific',
+        job: 'track that trajectory with actuator commands',
+        why: 'the only piece that changes when you change robot' }
+    ];
+
+    ROWS.forEach(function (r, i) {
+      var y = 12 + i * 146;
+      K.panel(s, 0, y, 640, 118, { stroke: r.c === C.ink3 ? C.line : r.c,
+        fill: r.c === C.ink3 ? '#fff' : (i ? T.teal : T.blue) });
+      K.big(s, 20, y + 54, r.sz, { size: r.sz.length > 4 ? 26 : 34, color: r.c });
+      K.mono(s, 20, y + 78, r.kind, { size: 11.5, color: C.ink3 });
+      K.mono(s, 168, y + 32, r.name, { size: 15, color: r.c, weight: 500 });
+      K.para(s, 168, y + 56, r.job, 54, { size: 12.5, color: C.ink2 });
+      K.mono(s, 168, y + 100, r.why, { size: 11.5, color: C.ink3 });
+      if (i < 2) K.arrow(s, 320, y + 118, 320, y + 158, { color: C.line, w: 1.6, headSize: 7 });
+    });
+
+    K.callout(s, 0, 456, 640,
+      'Nothing expensive runs at the frequency the motors need. That is the whole reason for ' +
+      'the split.', { cols: 66 });
+  };
+
+  /* ---- 08 the rate ladder, animated ---- */
+  window.SCENES.S_RATES = function (root, api) {
+    var f = api.RN.facts;
+    var s = K.board(root, { alt: 'Three components running at half a hertz, ten hertz and a hundred hertz.' });
+    K.head(s, 'Half a hertz of thinking',
+      'each layer down is cheaper, faster and simpler');
+
+    var LANES = [
+      { hz: f.hz_vlm, c: C.blue, n: 'waypoint', who: 'vision-language model' },
+      { hz: f.hz_policy, c: C.teal, n: 'trajectory', who: 'diffusion policy' },
+      { hz: f.hz_motor, c: C.amber, n: 'motor command', who: 'controller' }
+    ];
+    var X0 = 130, XW = 490, ticks = [];
+
+    LANES.forEach(function (L, i) {
+      var y = 46 + i * 118;
+      K.mono(s, 0, y - 12, L.who, { size: 12.5, color: L.c, weight: 500 });
+      K.mono(s, 0, y + 16, L.hz + ' Hz', { size: 20, color: L.c, weight: 700 });
+      K.mono(s, 0, y + 38, L.n, { size: 11, color: C.ink3 });
+      s.appendChild(K.n('rect', { x: X0, y: y - 4, width: XW, height: 46, rx: 8,
+        fill: i === 0 ? T.blue : (i === 1 ? T.teal : T.amber) }));
+      // one second of wall clock, drawn to scale, capped so 100 Hz stays legible
+      var n = Math.min(50, Math.round(L.hz));
+      var g = K.n('g', {}); s.appendChild(g);
+      for (var k = 0; k < n; k++) {
+        var x = X0 + 12 + (XW - 24) * (n === 1 ? 0.5 : k / (n - (n > 1 ? 1 : 0)));
+        g.appendChild(K.n('rect', { x: x - 1.4, y: y + 4, width: 2.8, height: 30, rx: 1.4,
+          fill: L.c, opacity: .9 }));
+      }
+      if (L.hz > 50) K.mono(s, X0 + 12, y + 60, 'drawn at 50 of ' + L.hz + ' for legibility',
+        { size: 10.5, color: C.ink3 });
+      ticks.push({ g: g, hz: L.hz, y: y, c: L.c });
+    });
+
+    K.mono(s, X0, 402, '|', { size: 11, color: C.ink3 });
+    s.appendChild(K.n('line', { x1: X0, y1: 396, x2: X0 + XW, y2: 396, stroke: C.line }));
+    K.mono(s, X0, 416, 'one second', { size: 11.5, color: C.ink3 });
+    var head = K.n('rect', { x: X0, y: 30, width: 2, height: 356, fill: C.red, opacity: .55 });
+    s.appendChild(head);
+
+    K.callout(s, 0, 438, 640,
+      'The vision-language model emits two waypoints per second. Everything between that and the ' +
+      'actuators exists to fill in the gap.', { cols: 66 });
+
+    return {
+      tick: function (t) {
+        var p = (t * 0.35) % 1;
+        head.setAttribute('x', X0 + (XW) * p);
+      }
+    };
+  };
+
+  /* ---- 09 what goes into the model ---- */
+  window.SCENES.S_TOKENS = function (root, api) {
+    var s = K.board(root, { alt: 'Instruction tokens and a history of frames become one sequence.' });
+    K.head(s, 'Grounding first', 'navigation as an extension of pointing at things');
+
+    K.label(s, 0, 14, 'input sequence');
+    K.panel(s, 0, 26, 640, 96);
+    K.mono(s, 18, 52, '"go past the lockers, then right at the couch"', { size: 13, color: C.ink });
+    K.label(s, 18, 72, 'tokenised instruction', { size: 9.5 });
+    var fx = 18;
+    for (var i = 0; i < 6; i++) {
+      var last = i === 5;
+      s.appendChild(K.n('rect', { x: fx, y: 84, width: 46, height: 26, rx: 4,
+        fill: last ? T.blue : T.ink, stroke: last ? C.blue : C.line }));
+      K.mono(s, fx + 8, 101, 'O' + i, { size: 11, color: last ? C.blue : C.ink3 });
+      fx += 54;
+    }
+    K.mono(s, fx + 8, 101, 'frames so far', { size: 11.5, color: C.ink3 });
+
+    K.arrow(s, 320, 128, 320, 158, { color: C.line, w: 1.6 });
+
+    K.panel(s, 0, 164, 640, 92, { stroke: C.blue, fill: T.blue });
+    K.mono(s, 18, 192, 'vision encoder → visual tokens → appended to the instruction',
+      { size: 13, color: C.blue });
+    K.para(s, 18, 214, 'The model is initialised from a dense vision-language model already ' +
+      'trained for spatial grounding: pointing, counting, object localisation.', 62,
+      { size: 12, color: C.ink2 });
+
+    K.label(s, 0, 292, 'why that initialisation');
+    K.panel(s, 0, 304, 640, 86, { flat: true, fill: T.teal, stroke: C.teal });
+    K.para(s, 18, 330, 'Once a model can say where a thing is in an image, moving toward that ' +
+      'thing is a new use of an existing skill rather than a new skill.', 62,
+      { size: 13, color: C.teal });
+
+    K.callout(s, 0, 408, 640,
+      'The frame history is what lets the model know where it has already been, which is how it ' +
+      'tracks progress through a multi-step instruction.', { cols: 66 });
+    K.foot(s, 'The paper does not name the initialisation checkpoint, so neither does this figure.');
+  };
+
+  /* ---- 10 waypoint to motion, and the latency gap ---- */
+  window.SCENES.S_CHUNK = function (root, api) {
+    var f = api.RN.facts;
+    var s = K.board(root, { alt: 'What the diffusion policy consumes and what it emits.' });
+    K.head(s, 'Covering for the big model being slow',
+      'two frames go in, because they are not the same frame');
+
+    K.label(s, 0, 14, 'inputs to the ' + f.policy_params_m + 'M policy');
+    var IN = [
+      ['a', 'the waypoint, pointing or displacement', C.blue],
+      ['h, r', 'robot height and radius', C.teal],
+      ['o_vlm', 'the frame the big model actually looked at', C.purple],
+      ['o_t', 'the frame from right now', C.red]
+    ];
+    IN.forEach(function (row, i) {
+      var y = 28 + i * 52;
+      K.panel(s, 0, y, 640, 42, { flat: true, fill: 'rgba(255,255,255,.9)', stroke: C.line });
+      K.mono(s, 18, y + 27, row[0], { size: 14, color: row[2], weight: 700 });
+      K.mono(s, 96, y + 27, row[1], { size: 12.5, color: C.ink2 });
+    });
+
+    K.label(s, 0, 254, 'why two frames');
+    K.panel(s, 0, 266, 640, 96, { stroke: C.purple, fill: T.purple });
+    s.appendChild(K.n('line', { x1: 24, y1: 316, x2: 610, y2: 316, stroke: C.line }));
+    [['o_vlm', 60, C.purple], ['o_t', 470, C.red]].forEach(function (m) {
+      s.appendChild(K.n('circle', { cx: m[1], cy: 316, r: 5.5, fill: m[2] }));
+      K.mono(s, m[1] - 16, 302, m[0], { size: 12, color: m[2] });
+    });
+    K.arrow(s, 70, 336, 462, 336, { color: C.purple, w: 1.4, dash: '4 4' });
+    K.mono(s, 200, 352, 'the robot kept moving during inference', { size: 12, color: C.purple });
+
+    K.arrow(s, 320, 372, 320, 396, { color: C.line, w: 1.6 });
+    K.panel(s, 0, 402, 640, 62, { stroke: C.teal, fill: T.teal });
+    K.mono(s, 18, 428, f.chunk_steps + ' relative moves (dx, dy, dθ) covering the next second',
+      { size: 13.5, color: C.teal });
+    K.mono(s, 18, 450, 'expanded to ' + f.hz_motor + ' Hz by the platform controller',
+      { size: 11.5, color: C.ink3 });
+
+    K.foot(s, 'Section 2.3. Handing the policy both frames is how the system stays honest about ' +
+      'its own inference latency.');
+  };
+
+  /* ---- 11 randomise the body, watch the pixel move ---- */
+  window.SCENES.S_RANDOM = function (root, api) {
+    var f = api.RN.facts;
+    K3.head(root, 'Never let it learn one body',
+      'the world point is fixed. change the body and the pixel moves.');
+
+    var read = K3.el('div', 'k3read');
+    var uvB = K3.el('b', null, 'u, v'), hB = K3.el('b', 'off', 'camera');
+    read.appendChild(uvB); read.appendChild(hB);
+
+    var st = { h: 1.1, r: 0.28, camFrac: 0.9, pitch: 10 };
+
+    var handle = K3.mount(root, { aspect: '16 / 9' }, function (ctx) {
+      var THREE = ctx.THREE;
+      ctx.scene.add(ctx.world(THREE, 21).group);
+
+      var holder = new THREE.Group();
+      ctx.scene.add(holder);
+      var rob = null;
+      function rebuild() {
+        if (rob) holder.remove(rob);
+        rob = ctx.robot(THREE, { height: st.h, radius: st.r, camFrac: st.camFrac,
+          color: ctx.C.teal });
+        rob.position.set(-2.0, 0, 6.0);
+        rob.rotation.y = Math.atan2(GOAL.x - (-2.0), GOAL.z - 6.0);
+        holder.add(rob);
+      }
+      var GOAL = new THREE.Vector3(10.2, 0, 1.1);
+      rebuild();
+      var wp = ctx.waypoint(THREE, ctx.C.red);
+      wp.position.copy(GOAL);
+      ctx.scene.add(wp);
+
+      var camA = ctx.thirdPerson(THREE, 44, [1, 2]);
+      var camB = new THREE.PerspectiveCamera(58, 1, 0.05, 200);
+
+      return {
+        camera: camA,
+        frame: function (t, c) {
+          if (Math.abs(rob.userData.h - st.h) > 1e-6 ||
+              Math.abs(rob.userData.r - st.r) > 1e-6 ||
+              Math.abs(rob.userData.camY - st.h * st.camFrac) > 1e-6) rebuild();
+          ctx.camPose(THREE, rob, st.pitch, camB);
+          var pr = ctx.project(THREE, new THREE.Vector3(GOAL.x, 0.35, GOAL.z), camB);
+
+          camA.position.set(-13, 13, 16);
+          camA.lookAt(-1, 0.4, 0.6);
+          camA.updateMatrixWorld();
+          wp.userData.pulse.scale.setScalar(1 + Math.sin(t * 3) * 0.1);
+
+          var vp = window.K3.split(c, camA, camB, 10);
+          var ov = c.overlay; ov.innerHTML = '';
+          window.K3.vlabel(ov, 12, 22, 'the room');
+          window.K3.vlabel(ov, vp.rightX + 12, 22, 'what the camera sees');
+          if (pr.visible) {
+            var px = vp.rightX + pr.u * vp.rightW, py = pr.v * c.h;
+            window.K3.crossGuides(ov, px, py, vp.rightX, vp.rightX + vp.rightW, c.h);
+            window.K3.reticle(ov, px, py, { r: 14,
+              label: 'u ' + pr.u.toFixed(2) + '   v ' + pr.v.toFixed(2),
+              maxX: vp.rightX + vp.rightW - 6 });
+          } else {
+            window.K3.banner(ov, vp.rightX + 14, c.h - 54, vp.rightW - 28,
+              'this body cannot see the waypoint at all');
+          }
+
+          uvB.textContent = pr.visible
+            ? 'u ' + pr.u.toFixed(3) + '   v ' + pr.v.toFixed(3) : 'out of frame';
+          uvB.className = pr.visible ? '' : 'hot';
+          hB.textContent = 'camera at ' + (st.h * st.camFrac).toFixed(2) + ' m, pitch ' +
+            st.pitch.toFixed(0) + '°';
+        }
+      };
+    });
+
+    root.appendChild(read);
+    var row = K3.ctl(root);
+    K3.slider(row, 'height', f.height_min, f.height_max, 0.05, st.h,
+      function (v) { return v.toFixed(2) + ' m'; }, function (v) { st.h = v; });
+    K3.slider(row, 'radius', f.radius_min, f.radius_max, 0.01, st.r,
+      function (v) { return v.toFixed(2) + ' m'; }, function (v) { st.r = v; });
+    var row2 = K3.ctl(root);
+    K3.slider(row2, 'camera height', f.cam_h_min, f.cam_h_max, 1, 90,
+      function (v) { return v.toFixed(0) + '%'; }, function (v) { st.camFrac = v / 100; });
+    K3.slider(row2, 'pitch', f.pitch_min, f.pitch_max, 1, st.pitch,
+      function (v) { return v.toFixed(0) + '°'; }, function (v) { st.pitch = v; });
+
+    K3.note(root, 'These are the exact ranges the paper randomises over per trajectory. ' +
+      'The policy never sees a consistent viewpoint, so it cannot come to depend on one.', 'teal');
+    return handle;
+  };
+
+  /* ---- 12 two bodies, one set of weights ---- */
+  window.SCENES.S_ROBOTS = function (root, api) {
+    K3.head(root, 'Two machines that share nothing',
+      'same vision-language model, same diffusion policy, different controller');
+
+    var handle = K3.mount(root, { aspect: '16 / 9' }, function (ctx) {
+      var THREE = ctx.THREE;
+      ctx.scene.add(ctx.world(THREE, 33).group);
+
+      // a tall bimanual-style base and a small wheeled one, at the ends of the
+      // randomisation range rather than as portraits of specific products
+      var tall = ctx.robot(THREE, { height: 1.7, radius: 0.34, camFrac: 0.93, color: ctx.C.blue, layer: 1 });
+      tall.position.set(-6.8, 0, 0.9);
+      ctx.scene.add(tall);
+      var small = ctx.robot(THREE, { height: 0.5, radius: 0.19, camFrac: 0.86, color: ctx.C.amber, layer: 2 });
+      small.position.set(-1.8, 0, -0.6);
+      ctx.scene.add(small);
+
+      var GOAL = new THREE.Vector3(10.2, 0, 1.1);
+      var wp = ctx.waypoint(THREE, ctx.C.red);
+      wp.position.copy(GOAL);
+      ctx.scene.add(wp);
+      tall.rotation.y = Math.atan2(GOAL.x + 6.8, GOAL.z - 0.9);
+      small.rotation.y = Math.atan2(GOAL.x + 1.8, GOAL.z + 0.6);
+      ctx.scene.add(ctx.route(THREE, [
+        new THREE.Vector3(-6.8, .05, 0.9), new THREE.Vector3(0.4, .05, 0.0),
+        new THREE.Vector3(5.0, .05, 0.6), GOAL.clone().setY(.05)], ctx.C.blue));
+
+      var camA = ctx.thirdPerson(THREE, 40, [1, 2]);
+      var camB = new THREE.PerspectiveCamera(58, 1, 0.05, 200);
+      var which = 0;
+      root.__pick = function (i) { which = i; };
+
+      return {
+        camera: camA,
+        frame: function (t, c) {
+          var rob = which ? small : tall;
+          // each robot may see the other, never itself
+          camB.layers.set(0);
+          camB.layers.enable(which ? 1 : 2);
+          ctx.camPose(THREE, rob, 10, camB);
+          var pr = ctx.project(THREE, new THREE.Vector3(GOAL.x, 0.35, GOAL.z), camB);
+          var a = 0.5 + Math.sin(t * 0.07) * 0.2;
+          camA.position.set(Math.sin(a) * 19 - 3, 13, Math.cos(a) * 19 + 3);
+          camA.lookAt(0.5, 0.5, 0.4);
+          camA.updateMatrixWorld();
+          wp.userData.pulse.scale.setScalar(1 + Math.sin(t * 3) * 0.1);
+
+          var vp = window.K3.split(c, camA, camB, 10);
+          var ov = c.overlay; ov.innerHTML = '';
+          window.K3.vlabel(ov, 12, 22, 'the room');
+          window.K3.vlabel(ov, vp.rightX + 12, 22,
+            (which ? 'the short robot' : 'the tall robot') + ' sees');
+          if (pr.visible) {
+            window.K3.reticle(ov, vp.rightX + pr.u * vp.rightW, pr.v * c.h, {
+              label: '(' + pr.u.toFixed(3) + ', ' + pr.v.toFixed(3) + ')',
+              maxX: vp.rightX + vp.rightW - 6 });
+          }
+        }
+      };
+    });
+
+    var row = K3.ctl(root);
+    K3.seg(row, ['look through the tall one', 'look through the short one'],
+      function (i) { if (root.__pick) root.__pick(i); }, 0);
+    K3.note(root, 'The paper deploys on a Galaxea R1 and a Hiwonder JetAuto with identical ' +
+      'weights, changing only the low-level controller. Both are wheeled, so the legged and ' +
+      'aerial part of the claim is an argument rather than a demonstration.');
+    return handle;
+  };
+})();
+/* ---- s3_learns ---- */
+/* How it learns. Simulation, the prefix-tree mask, and the RL pass. */
+window.SCENES = window.SCENES || {};
+
+(function () {
+  var K = window.KIT, C = K.C, T = K.TINT, K3 = window.K3;
+
+  /* ---- 13 the simulated corpus ---- */
+  window.SCENES.S_SIM = function (root, api) {
+    var f = api.RN.facts;
+    K3.head(root, 'All of it in simulation',
+      f.trajectories_m + ' million trajectories across ' + f.scenes_k + ' thousand scenes');
+
+    var handle = K3.mount(root, { aspect: '16 / 9' }, function (ctx) {
+      var THREE = ctx.THREE;
+      var w = ctx.world(THREE, 5);
+      ctx.scene.add(w.group);
+
+      // sample routes across the navigable area, seeded so the figure is stable
+      var rand = ctx.rng(99), routes = [], PAL = [ctx.C.blue, ctx.C.teal, ctx.C.purple, ctx.C.amber];
+      function free() {
+        return new THREE.Vector3((rand() - 0.5) * 22, 0.06, (rand() - 0.5) * 15);
+      }
+      for (var i = 0; i < 34; i++) {
+        var a = free(), b = free();
+        if (a.distanceTo(b) < 9) { i--; continue; }
+        var mid = new THREE.Vector3((a.x + b.x) / 2 + (rand() - 0.5) * 5, 0.06,
+          (a.z + b.z) / 2 + (rand() - 0.5) * 4);
+        var m = ctx.route(THREE, [a, mid, b], PAL[i % PAL.length]);
+        m.material.transparent = true;
+        m.material.opacity = 0;
+        ctx.scene.add(m);
+        routes.push(m);
+      }
+
+      var cam = ctx.thirdPerson(THREE, 38, [1, 2]);
+      return {
+        camera: cam,
+        frame: function (t, c) {
+          var a = t * 0.05;
+          cam.position.set(Math.sin(a) * 5, 30, Math.cos(a) * 5 + 2);
+          cam.lookAt(0, 0, 0);
+          cam.updateMatrixWorld();
+          routes.forEach(function (m, i) {
+            var due = (t * 1.6 - i * 0.28) % 14;
+            m.material.opacity = due > 0 && due < 9 ? Math.min(0.85, due * 1.6) * (due > 7 ? (9 - due) / 2 : 1) : 0;
+          });
+          c.renderer.render(c.scene, cam);
+        }
+      };
+    });
+
+    K3.note(root, 'Offices, homes, commercial spaces and outdoors, varied on layout complexity, ' +
+      'object density, lighting and architectural style. Collecting this on real hardware is not ' +
+      'a budget problem, it is an impossibility.', 'blue');
+    return handle;
+  };
+
+  /* ---- 14 farthest point sampling ---- */
+  window.SCENES.S_FPS = function (root, api) {
+    var s = K.board(root, { alt: 'Farthest point sampling spreading start and goal positions out.' });
+    K.head(s, 'Spread the endpoints on purpose',
+      'each new pick is pushed away from everything already chosen');
+
+    var X = 40, Y = 30, Wd = 560, Hd = 330;
+    K.panel(s, X, Y, Wd, Hd, { fill: 'rgba(255,255,255,.92)' });
+    K.label(s, X, Y - 12, 'navigable area');
+
+    // a fixed cloud of candidate positions, chosen once
+    var seed = 20250831, pts = [];
+    function rnd() { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; }
+    for (var i = 0; i < 260; i++) {
+      var px = X + 18 + rnd() * (Wd - 36), py = Y + 18 + rnd() * (Hd - 36);
+      // carve a corridor so the cloud reads as a floor plan rather than a blob
+      if (Math.abs(py - (Y + Hd * 0.52)) < 16 && rnd() < 0.55) continue;
+      pts.push([px, py]);
+    }
+    var dots = pts.map(function (p) {
+      var c = K.n('circle', { cx: p[0], cy: p[1], r: 2.1, fill: 'rgba(31,37,48,.20)' });
+      s.appendChild(c); return c;
+    });
+
+    var picked = [], marks = K.n('g', {}); s.appendChild(marks);
+    var links = K.n('g', {}); s.appendChild(links);
+    K.label(s, X, Y + Hd + 26, 'picked so far');
+    var counter = K.mono(s, X, Y + Hd + 60, '0', { size: 26, color: C.amber, weight: 700 });
+
+    function step() {
+      if (!picked.length) { picked.push(0); return; }
+      var best = -1, bd = -1;
+      for (var i = 0; i < pts.length; i++) {
+        if (picked.indexOf(i) >= 0) continue;
+        var d = Infinity;
+        for (var j = 0; j < picked.length; j++) {
+          var dx = pts[i][0] - pts[picked[j]][0], dy = pts[i][1] - pts[picked[j]][1];
+          d = Math.min(d, dx * dx + dy * dy);
+        }
+        if (d > bd) { bd = d; best = i; }
+      }
+      if (best >= 0) picked.push(best);
+    }
+
+    function render() {
+      marks.innerHTML = ''; links.innerHTML = '';
+      picked.forEach(function (i, k) {
+        dots[i].setAttribute('r', 0);
+        marks.appendChild(K.n('circle', { cx: pts[i][0], cy: pts[i][1], r: 6.5,
+          fill: k % 2 ? C.teal : C.amber }));
+        marks.appendChild(K.n('circle', { cx: pts[i][0], cy: pts[i][1], r: 12, fill: 'none',
+          stroke: k % 2 ? C.teal : C.amber, 'stroke-opacity': .35 }));
+        if (k % 2 === 1) {
+          var a = pts[picked[k - 1]], b = pts[i];
+          links.appendChild(K.n('path', {
+            d: 'M' + a[0] + ' ' + a[1] + ' Q' + ((a[0] + b[0]) / 2 + 26) + ' ' +
+               ((a[1] + b[1]) / 2 - 22) + ' ' + b[0] + ' ' + b[1],
+            fill: 'none', stroke: C.blue, 'stroke-width': 1.6, 'stroke-opacity': .55 }));
+        }
+      });
+      counter.textContent = String(picked.length);
+    }
+
+    K.callout(s, 0, 448, 640,
+      'Uniform sampling gives you a thousand variations of the same short hop. This gives ' +
+      'trajectories of genuinely different lengths, some of them crossing floors.', { cols: 66 });
+
+    var last = -1;
+    return {
+      tick: function (t) {
+        var n = Math.floor((t * 1.4) % 17);
+        if (n === last) return;
+        if (n < last) { picked = []; dots.forEach(function (d) { d.setAttribute('r', 2.1); }); }
+        while (picked.length < n) step();
+        last = n;
+        render();
+      }
+    };
+  };
+
+  /* ---- 15 the quadratic bill ---- */
+  window.SCENES.S_NAIVE = function (root, api) {
+    var s = K.board(root, { alt: 'Per-timestep training re-encodes every frame.' });
+    K.head(s, 'The obvious way pays twice for everything',
+      'one sample per timestep, each holding the whole history');
+
+    K.label(s, 0, 14, 'per-timestep samples, an episode of 6 steps');
+    var y0 = 30, cell = 18, gap = 3;
+    for (var t = 1; t <= 6; t++) {
+      var y = y0 + (t - 1) * 30;
+      K.mono(s, 0, y + 13, 't=' + t, { size: 11, color: C.ink3 });
+      s.appendChild(K.n('rect', { x: 36, y: y, width: cell, height: cell, rx: 3,
+        fill: C.ink, opacity: .8 }));
+      for (var k = 0; k < t; k++) {
+        s.appendChild(K.n('rect', { x: 36 + (k + 1) * (cell + gap), y: y,
+          width: cell, height: cell, rx: 3, fill: C.blue,
+          opacity: k === t - 1 ? .95 : .30 }));
+      }
+      K.mono(s, 36 + (t + 1) * (cell + gap) + 10, y + 13, t + ' frame' + (t > 1 ? 's' : ''),
+        { size: 10.5, color: C.ink3 });
+    }
+    K.mono(s, 36, y0 + 6 * 30 + 12, 'solid = encoded for the first time, faded = encoded again',
+      { size: 11, color: C.ink3 });
+
+    var totalG = K.n('g', {}); s.appendChild(totalG);
+    K.label(s, 0, 268, 'frame encodings for an episode of length T');
+    K.switcher(s, 0, 282, ['T = 8', 'T = 20', 'T = 43'], function (i) {
+      draw([8, 20, 43][i]);
+    }, { tint: 'red' });
+
+    function draw(Tn) {
+      totalG.innerHTML = '';
+      var naive = Tn * (Tn + 1) / 2, packed = Tn;
+      var mx = naive;
+      [['per timestep', naive, C.red], ['one sequence', packed, C.teal]].forEach(function (r, i) {
+        var y = 330 + i * 60;
+        K.mono(totalG, 0, y + 4, r[0], { size: 12.5, color: r[2] });
+        K.bar(totalG, 0, y + 14, 470, 16, r[1] / mx, { color: r[2] });
+        K.mono(totalG, 486, y + 27, String(r[1]), { size: 15, color: r[2], weight: 700 });
+      });
+      K.mono(totalG, 0, 466, 'ratio ' + (naive / packed).toFixed(1) + '× at T = ' + Tn,
+        { size: 13, color: C.ink2 });
+    }
+    draw(20);
+
+    K.foot(s, 'Counted in frame encodings, which is the term that grows. The paper reports the ' +
+      'measured saving on its own data as 22 times fewer training tokens.');
+  };
+
+  /* ---- 16 pack the episode ---- */
+  window.SCENES.S_PACK = function (root, api) {
+    var s = K.board(root, { alt: 'The whole episode as one flat sequence.' });
+    K.head(s, 'Encode the episode once', 'instruction, then observations interleaved with actions');
+
+    K.label(s, 0, 14, 'one training sequence');
+    var x = 0, y = 30;
+    function blk(w, lab, col, tint) {
+      s.appendChild(K.n('rect', { x: x, y: y, width: w, height: 46, rx: 6,
+        fill: tint, stroke: col }));
+      K.mono(s, x + w / 2, y + 29, lab, { size: 12.5, color: col, anchor: 'middle' });
+      x += w + 6;
+    }
+    blk(64, 'I', C.purple, T.purple);
+    for (var i = 0; i < 5; i++) {
+      blk(72, 'O' + i, C.blue, T.blue);
+      blk(40, 'a' + i, C.amber, T.amber);
+    }
+
+    K.mono(s, 0, 100, 'every frame encoded exactly once, all losses from a single forward pass',
+      { size: 12.5, color: C.ink3 });
+
+    K.label(s, 0, 142, 'what that changes');
+    [['token cost', 'O(T²) → O(T)', C.teal],
+     ['prediction targets', 'unchanged, none discarded', C.teal],
+     ['redundancy removed', 'the repeated prefixes, and only those', C.teal]
+    ].forEach(function (r, j) {
+      var yy = 156 + j * 56;
+      K.panel(s, 0, yy, 640, 46, { flat: true, fill: T.teal, stroke: C.teal });
+      K.mono(s, 18, yy + 28, r[0], { size: 12, color: C.ink3 });
+      K.mono(s, 210, yy + 28, r[1], { size: 13, color: r[2], weight: 500 });
+    });
+
+    K.callout(s, 0, 340, 640,
+      'The idea comes from amortising one shared context across many independent questions. ' +
+      'Here it is pushed onto the nested structure of a trajectory, where each step\'s history ' +
+      'is a prefix of the next one\'s.', { cols: 66, color: C.blue, tint: T.blue });
+  };
+
+  /* ---- 17 the leak ---- */
+  window.SCENES.S_LEAK = function (root, api) {
+    var s = K.board(root, { alt: 'Causal attention lets the model read earlier ground-truth actions.' });
+    K.head(s, 'Flattening it opens a hole', 'the answers are now sitting in the context');
+
+    K.label(s, 0, 14, 'what an ordinary causal mask allows at step 3');
+    var x = 0, y = 28, boxes = [];
+    function blk(w, lab, col, tint, leak) {
+      s.appendChild(K.n('rect', { x: x, y: y, width: w, height: 44, rx: 6,
+        fill: leak ? T.red : tint, stroke: leak ? C.red : col,
+        'stroke-width': leak ? 1.8 : 1 }));
+      K.mono(s, x + w / 2, y + 27, lab, { size: 12.5, color: leak ? C.red : col, anchor: 'middle' });
+      x += w + 6;
+    }
+    blk(60, 'I', C.purple, T.purple);
+    blk(70, 'O0', C.blue, T.blue);
+    blk(40, 'a0', C.amber, T.amber, true);
+    blk(70, 'O1', C.blue, T.blue);
+    blk(40, 'a1', C.amber, T.amber, true);
+    blk(70, 'O2', C.blue, T.blue);
+    blk(40, 'a2', C.ink3, T.ink);
+    K.mono(s, 0, 92, 'the two red blocks are ground truth the model will not have on a robot',
+      { size: 12, color: C.red });
+
+    K.label(s, 0, 134, 'why it matters more here than usual');
+    K.panel(s, 0, 148, 640, 118, { stroke: C.red, fill: T.red });
+    K.para(s, 18, 176, 'Each waypoint is the furthest visible point along the route, so ' +
+      'consecutive ground-truth actions are strongly related to each other. A model allowed to ' +
+      'see them learns to extrapolate the sequence instead of looking at the room.', 62,
+      { size: 13, color: C.red });
+
+    K.panel(s, 0, 286, 640, 92, { flat: true, fill: T.ink, stroke: C.line });
+    K.mono(s, 18, 314, 'trains beautifully', { size: 14, color: C.ink2, weight: 500 });
+    K.mono(s, 18, 340, 'fails on a robot', { size: 14, color: C.red, weight: 500 });
+    K.mono(s, 210, 314, 'because the crutch is in the training data', { size: 12, color: C.ink3 });
+    K.mono(s, 210, 340, 'and it is not in the world', { size: 12, color: C.ink3 });
+
+    K.callout(s, 0, 400, 640,
+      'The fix is not to change the data. It is to change what the model is allowed to look at.',
+      { cols: 66 });
+  };
+
+  /* ---- 18 the prefix-tree attention mask ---- */
+  window.SCENES.S_TREE = function (root, api) {
+    var s = K.board(root, { alt: 'The prefix-tree attention mask compared with a causal one.' });
+    K.head(s, 'Close it with the mask', 'trunk is shared, branches cannot see each other');
+
+    // token layout: I, then per step an observation block and an action block
+    var STEPS = 5, IT = 2, OT = 3, AT = 1;
+    var toks = [];
+    for (var q = 0; q < IT; q++) toks.push({ kind: 'I', branch: -1 });
+    for (var t = 0; t < STEPS; t++) {
+      for (var o = 0; o < OT; o++) toks.push({ kind: 'O', branch: -1, step: t });
+      for (var a = 0; a < AT; a++) toks.push({ kind: 'a', branch: t, step: t });
+    }
+    var N = toks.length, cell = 15, GX = 130, GY = 34;
+
+    K.label(s, GX, GY - 28, 'key  →');
+    K.label(s, 0, GY + 8, 'query');
+    K.label(s, 0, GY + 24, '↓');
+
+    var grid = K.n('g', {}); s.appendChild(grid);
+    var legendG = K.n('g', {}); s.appendChild(legendG);
+
+    function allowedCausal(i, j) { return j < i; }
+    function allowedTree(i, j) {
+      if (j >= i) return false;
+      if (toks[j].branch === -1) return true;              // trunk: instruction and observations
+      return toks[j].branch === toks[i].branch;            // same branch only
+    }
+
+    function draw(mode) {
+      grid.innerHTML = '';
+      var leaks = 0;
+      for (var i = 0; i < N; i++) {
+        for (var j = 0; j < N; j++) {
+          var cz = allowedCausal(i, j), tz = allowedTree(i, j);
+          var on = mode === 0 ? cz : tz;
+          var leak = cz && !tz;
+          if (leak && mode === 0) leaks++;
+          var fill = 'rgba(31,37,48,.045)';
+          if (on) {
+            fill = toks[j].kind === 'a'
+              ? (mode === 0 && leak ? 'rgba(163,45,45,.72)' : 'rgba(180,85,26,.72)')
+              : (toks[j].kind === 'I' ? 'rgba(107,63,168,.55)' : 'rgba(28,110,140,.55)');
+          }
+          grid.appendChild(K.n('rect', {
+            x: GX + j * cell, y: GY + i * cell, width: cell - 1.4, height: cell - 1.4,
+            rx: 2, fill: fill }));
+        }
+      }
+      // axis ticks naming the blocks
+      var px = GX;
+      function tick(n, lab, col) {
+        K.mono(grid, px + n * cell / 2, GY - 6, lab,
+          { size: 9.5, color: col, anchor: 'middle' });
+        px += n * cell;
+      }
+      tick(IT, 'I', C.purple);
+      for (var t2 = 0; t2 < STEPS; t2++) { tick(OT, 'O' + t2, C.blue); tick(AT, 'a' + t2, C.amber); }
+
+      legendG.innerHTML = '';
+      var msg = mode === 0
+        ? leaks + ' cells let a step read another step\'s ground-truth action'
+        : 'no cell reads another step\'s action, and every step still sees every frame';
+      K.panel(legendG, 0, BASE + 46, 640, 60, { flat: true,
+        fill: mode === 0 ? T.red : T.teal, stroke: mode === 0 ? C.red : C.teal });
+      K.mono(legendG, 18, BASE + 82, msg,
+        { size: 13, color: mode === 0 ? C.red : C.teal });
+    }
+
+    // everything below the grid hangs off one baseline, so the switcher cannot
+    // land back on top of the matrix when the token count changes
+    var BASE = GY + N * cell + 10;
+    K.switcher(s, 0, BASE, ['causal', 'prefix tree'],
+      function (i) { draw(i); }, { tint: 'teal' });
+    draw(0);
+
+    K.callout(s, 0, BASE + 122, 640,
+      'The rule: a token may attend to an earlier token only if that token is in the trunk, or ' +
+      'in the same branch. Observations are trunk. Actions are branch.', { cols: 66 });
+    K.foot(s, 'Drawn with ' + STEPS + ' steps and small blocks so the structure is visible. The ' +
+      'paper states this gives provably the same training signal as the per-timestep samples.');
+  };
+
+  /* ---- 19 what it bought ---- */
+  window.SCENES.S_22X = function (root, api) {
+    var f = api.RN.facts;
+    var s = K.board(root, { alt: 'Token saving and the training time it converts to.' });
+    K.head(s, 'Twenty two times fewer tokens', 'and no prediction target given up');
+
+    K.big(s, 0, 92, f.token_saving_x + '×', { size: 96, color: C.teal });
+    K.mono(s, 0, 132, 'fewer training tokens, same targets', { size: 13.5, color: C.ink3 });
+
+    K.panel(s, 0, 156, 640, 96, { stroke: C.teal, fill: T.teal });
+    K.mono(s, 18, 188, 'months', { size: 22, color: C.ink3, weight: 700 });
+    K.arrow(s, 118, 182, 188, 182, { color: C.teal, w: 2, headSize: 8 });
+    K.mono(s, 202, 188, 'days', { size: 22, color: C.teal, weight: 700 });
+    K.mono(s, 18, 220, 'the same run, after the redundant prefixes stop being re-encoded',
+      { size: 12, color: C.ink3 });
+
+    K.label(s, 0, 278, 'where it matters most');
+    K.panel(s, 0, 292, 310, 130, { flat: true, fill: T.ink, stroke: C.line });
+    K.mono(s, 18, 320, 'R2R-CE', { size: 15, color: C.ink, weight: 500 });
+    K.para(s, 18, 344, 'shorter instructions, shorter routes', 34, { size: 12, color: C.ink3 });
+    K.panel(s, 330, 292, 310, 130, { fill: T.amber, stroke: C.amber });
+    K.mono(s, 348, 320, 'RxR-CE', { size: 15, color: C.amber, weight: 500 });
+    K.para(s, 348, 344, 'considerably longer on both, so the quadratic term bites hardest here',
+      34, { size: 12, color: C.amber });
+
+    K.callout(s, 0, 442, 640,
+      'The benchmark with the longest episodes is the one this rescues, which is why the paper ' +
+      'calls the technique vital for RxR-CE specifically.', { cols: 66 });
+  };
+
+  /* ---- 20 where imitation runs out ---- */
+  window.SCENES.S_EXPOSURE = function (root, api) {
+    var s = K.board(root, { alt: 'Shortest-path demonstrations contain no recoveries.' });
+    K.head(s, 'A shortest path never contains a mistake',
+      'so a model trained only on them has never seen one');
+
+    K.label(s, 0, 14, 'what the demonstrations look like');
+    K.panel(s, 0, 26, 640, 132, { flat: true, fill: 'rgba(255,255,255,.9)' });
+    s.appendChild(K.n('path', { d: 'M40 130 C 160 120, 300 70, 590 58', fill: 'none',
+      stroke: C.teal, 'stroke-width': 3 }));
+    s.appendChild(K.n('circle', { cx: 40, cy: 130, r: 6, fill: C.teal }));
+    s.appendChild(K.n('circle', { cx: 590, cy: 58, r: 6, fill: C.teal }));
+    K.mono(s, 40, 152, 'expert, optimal, never wrong', { size: 12, color: C.teal });
+
+    K.label(s, 0, 190, 'what happens on a robot');
+    K.panel(s, 0, 202, 640, 168, { stroke: C.red, fill: T.red });
+    s.appendChild(K.n('path', { d: 'M40 330 C 130 320, 200 290, 250 270', fill: 'none',
+      stroke: C.ink3, 'stroke-width': 3 }));
+    s.appendChild(K.n('path', { d: 'M250 270 C 320 250, 360 300, 420 330 S 520 350, 580 300',
+      fill: 'none', stroke: C.red, 'stroke-width': 3, 'stroke-dasharray': '7 5' }));
+    s.appendChild(K.n('circle', { cx: 250, cy: 270, r: 6, fill: C.red }));
+    K.mono(s, 258, 258, 'a small error', { size: 12, color: C.red });
+    K.mono(s, 400, 368, 'and now it is somewhere the data never went', { size: 12, color: C.red });
+
+    [['exposure bias', 'trained on its own predictions never, only on the expert'],
+     ['covariate shift', 'the states it visits are not the states it learned from']
+    ].forEach(function (r, i) {
+      var y = 392 + i * 46;
+      K.mono(s, 0, y + 16, r[0], { size: 13, color: C.ink, weight: 500 });
+      K.mono(s, 170, y + 16, r[1], { size: 12, color: C.ink3 });
+    });
+
+    K.callout(s, 0, 484, 640,
+      'No amount of extra shortest paths fixes this. Recovery is not in the distribution.',
+      { cols: 66 });
+  };
+
+  /* ---- 21 the reward ---- */
+  window.SCENES.S_CISPO = function (root, api) {
+    var f = api.RN.facts;
+    var s = K.board(root, { alt: 'The clipped distance reward.' });
+    K.head(s, 'A reward that stops caring once you are close',
+      'r = −max(' + f.reward_clip_m + ', distance to goal)');
+
+    var X = 60, Y = 40, Wd = 520, Hd = 240, DMAX = 10;
+    K.panel(s, X, Y, Wd, Hd, { fill: 'rgba(255,255,255,.94)' });
+    function px(d) { return X + (d / DMAX) * Wd; }
+    function py(r) { return Y + Hd - ((r + DMAX) / DMAX) * Hd; }
+
+    var d = 'M';
+    for (var i = 0; i <= 100; i++) {
+      var dd = i / 100 * DMAX, r = -Math.max(f.reward_clip_m, dd);
+      d += (i ? ' L' : '') + px(dd) + ' ' + py(r);
+    }
+    s.appendChild(K.n('path', { d: d, fill: 'none', stroke: C.blue, 'stroke-width': 3 }));
+    s.appendChild(K.n('rect', { x: X, y: Y, width: px(f.reward_clip_m) - X, height: Hd,
+      fill: T.teal }));
+    K.mono(s, X + 10, Y + 26, 'flat inside ' + f.reward_clip_m + ' m', { size: 12, color: C.teal });
+    K.mono(s, X + 10, Y + 44, 'nothing left to gain by shuffling', { size: 11, color: C.teal });
+
+    K.mono(s, X, Y + Hd + 20, '0 m', { size: 11, color: C.ink3 });
+    K.mono(s, X + Wd - 30, Y + Hd + 20, DMAX + ' m', { size: 11, color: C.ink3 });
+    K.label(s, X, Y + Hd + 42, 'geodesic distance from the goal when the episode ends');
+
+    var dot = K.n('circle', { cx: px(6), cy: py(-6), r: 7, fill: C.red });
+    s.appendChild(dot);
+    var lab = K.mono(s, 0, 0, '', { size: 13, color: C.red, weight: 500 });
+
+    K.label(s, 0, 340, 'what the clip is for');
+    K.panel(s, 0, 352, 640, 88, { stroke: C.blue, fill: T.blue });
+    K.para(s, 18, 380, 'Without it, an agent can keep collecting reward by manoeuvring near the ' +
+      'target forever. With it, once you are close the only thing left to gain is ending the ' +
+      'episode, so the model learns to emit STOP.', 62, { size: 13, color: C.blue });
+
+    K.foot(s, 'CISPO with group-relative advantage estimation, on top of the supervised model. ' +
+      'Distance is geodesic, from a path finder, not straight line.');
+
+    return {
+      tick: function (t) {
+        var dd = 0.4 + (1 + Math.sin(t * 0.6)) / 2 * 9.2;
+        var r = -Math.max(f.reward_clip_m, dd);
+        dot.setAttribute('cx', px(dd)); dot.setAttribute('cy', py(r));
+        lab.setAttribute('x', Math.min(px(dd) + 14, X + Wd - 120));
+        lab.setAttribute('y', py(r) - 12);
+        lab.textContent = dd.toFixed(1) + ' m  →  r = ' + r.toFixed(1);
+      }
+    };
+  };
+
+  /* ---- 22 the hard subset ---- */
+  window.SCENES.S_HARD = function (root, api) {
+    var f = api.RN.facts;
+    var s = K.board(root, { alt: 'Curating a hard subset by rolling out the supervised policy.' });
+    K.head(s, 'Only the episodes it already fails',
+      f.hard_tasks_k + ' thousand tasks the supervised policy could not solve');
+
+    K.label(s, 0, 14, 'curation');
+    var STEPS = [
+      ['roll out the supervised policy over the task pool', C.ink3],
+      ['drop everything it already solves reliably', C.ink3],
+      ['keep the tangled layouts, ambiguous instructions, long horizons', C.amber]
+    ];
+    STEPS.forEach(function (r, i) {
+      var y = 28 + i * 58;
+      K.panel(s, 0, y, 640, 48, { flat: i < 2, fill: i === 2 ? T.amber : 'rgba(255,255,255,.9)',
+        stroke: i === 2 ? C.amber : C.line });
+      K.mono(s, 18, y + 20, String(i + 1), { size: 11, color: C.ink3 });
+      K.mono(s, 44, y + 29, r[0], { size: 13, color: r[1] });
+    });
+
+    K.big(s, 0, 268, f.hard_tasks_k + 'k', { size: 62, color: C.amber });
+    K.mono(s, 0, 300, 'tasks kept for reinforcement learning', { size: 12.5, color: C.ink3 });
+
+    K.label(s, 0, 330, 'then packed by scene, not shuffled');
+    var gx = 0;
+    [C.blue, C.blue, C.blue, C.teal, C.teal, C.purple, C.purple, C.purple, C.purple, C.amber]
+      .forEach(function (col, i) {
+        s.appendChild(K.n('rect', { x: gx, y: 344, width: 56, height: 34, rx: 5,
+          fill: col, opacity: .85 }));
+        gx += 62;
+      });
+    K.mono(s, 0, 398, 'consecutive rollouts share a building, which is an implicit visual curriculum',
+      { size: 12, color: C.ink3 });
+
+    K.callout(s, 0, 424, 640,
+      'Empirically the scene-contiguous ordering beats random shuffling. No compute is spent ' +
+      'confirming what the model already does well.', { cols: 66 });
+  };
+
+  /* ---- 23 three workloads ---- */
+  window.SCENES.S_SYSTEMS = function (root, api) {
+    var s = K.board(root, { alt: 'Three GPU-bound workloads sharing one cluster.' });
+    K.head(s, 'The hard part is not the algorithm',
+      'three GPU-bound systems running at once, waiting on each other');
+
+    var W = [
+      { n: 'simulator', d: 'physics and rendering for hundreds of parallel environments',
+        c: C.purple, note: 'the awkward one: rendering competes with learning for the same memory' },
+      { n: 'action generator', d: 'distributed inference producing actions autoregressively',
+        c: C.blue, note: 'must not stall waiting for frames' },
+      { n: 'trainer', d: 'distributed weight updates across the training ranks',
+        c: C.teal, note: 'must not stall waiting for rollouts' }
+    ];
+    W.forEach(function (w, i) {
+      var y = 16 + i * 128;
+      K.panel(s, 0, y, 640, 104, { stroke: w.c, fill: i === 0 ? T.purple : (i === 1 ? T.blue : T.teal) });
+      K.mono(s, 20, y + 32, w.n, { size: 15, color: w.c, weight: 500 });
+      K.para(s, 20, y + 56, w.d, 60, { size: 12.5, color: C.ink2 });
+      K.mono(s, 20, y + 90, w.note, { size: 11.5, color: C.ink3 });
+    });
+
+    // the loop arrows, drawn outside the stack so they read as a cycle
+    K.arrow(s, 620, 120, 620, 144, { color: C.line, w: 1.4 });
+    K.arrow(s, 620, 248, 620, 272, { color: C.line, w: 1.4 });
+
+    K.callout(s, 0, 408, 640,
+      'The paper is candid that most of the difficulty was balancing these three so that nothing ' +
+      'sat idle. That is a systems result, not an algorithmic one.', { cols: 66 });
+  };
+})();
+/* ---- s4_results ---- */
+/* Does it hold up. The benchmark table, the RL delta, and the honest caveats. */
+window.SCENES = window.SCENES || {};
+
+(function () {
+  var K = window.KIT, C = K.C, T = K.TINT;
+
+  function groupColor(g) {
+    return g === 'ours' ? C.red : (g === 'single' ? C.blue : C.ink3);
+  }
+
+  /* ---- 24 the four metrics ---- */
+  window.SCENES.S_METRICS = function (root, api) {
+    var M = api.RN.metrics, f = api.RN.facts, o = api.RN.ours;
+    var s = K.board(root, { alt: 'What the four navigation metrics measure.' });
+    K.head(s, 'What the columns mean', 'two of them measure success, two measure how it got there');
+
+    var ROWS = [
+      { k: 'NE', dir: 'lower', c: C.purple, d: M.NE, v: o.r2r.NE.toFixed(2) + ' m' },
+      { k: 'SR', dir: 'higher', c: C.teal, d: M.SR, v: o.r2r.SR.toFixed(1) + '%' },
+      { k: 'OS', dir: 'higher', c: C.blue, d: M.OS, v: o.r2r.OS.toFixed(1) + '%' },
+      { k: 'SPL', dir: 'higher', c: C.amber, d: M.SPL, v: o.r2r.SPL.toFixed(1) + '%' }
+    ];
+    ROWS.forEach(function (r, i) {
+      var y = 14 + i * 96;
+      K.panel(s, 0, y, 640, 82, { stroke: r.c, fill: 'rgba(255,255,255,.9)' });
+      K.mono(s, 20, y + 34, r.k, { size: 19, color: r.c, weight: 700 });
+      K.mono(s, 20, y + 56, r.dir + ' is better', { size: 10.5, color: C.ink3 });
+      K.para(s, 120, y + 28, r.d, 52, { size: 12, color: C.ink2 });
+      K.mono(s, 620, y + 34, r.v, { size: 17, color: r.c, weight: 700, anchor: 'end' });
+      K.label(s, 620, y + 54, 'ours, r2r-ce', { size: 9, color: C.ink3, anchor: 'end' });
+    });
+
+    K.callout(s, 0, 402, 640,
+      'The gap between oracle success and success rate measures one specific failure: coming ' +
+      'within ' + f.success_radius_m + ' m of the goal and not realising it. Ours is ' +
+      (o.r2r.OS - o.r2r.SR).toFixed(1) + ' points.', { cols: 66, color: C.blue, tint: T.blue });
+  };
+
+  /* ---- 25 the whole table, live ---- */
+  window.SCENES.S_TABLE = function (root, api) {
+    var RN = api.RN, rows = RN.table1.slice();
+    var s = K.board(root, { alt: 'Every baseline in the paper table, sortable by metric.' });
+    K.head(s, 'Fifteen systems', 'colour is the sensing class, not the score');
+
+    var bench = 'r2r', metric = 'SR';
+    var body = K.n('g', {}); s.appendChild(body);
+
+    K.label(s, 0, 12, 'benchmark');
+    var sw1 = K.switcher(s, 0, 24, ['R2R-CE', 'RxR-CE'], function (i) {
+      bench = i ? 'rxr' : 'r2r';
+      if (bench === 'rxr' && metric === 'OS') metric = 'SR';
+      draw();
+    }, { tint: 'blue' });
+    K.label(s, 300, 12, 'metric');
+    K.switcher(s, 300, 24, ['SR', 'SPL', 'NE', 'OS'], function (i) {
+      metric = ['SR', 'SPL', 'NE', 'OS'][i];
+      draw();
+    }, { tint: 'amber' });
+
+    function draw() {
+      body.innerHTML = '';
+      var lower = metric === 'NE';
+      var have = rows.filter(function (r) { return r[bench][metric] != null; });
+      if (bench === 'rxr' && metric === 'OS') {
+        K.panel(body, 0, 90, 640, 70, { flat: true, fill: T.ink, stroke: C.line });
+        K.mono(body, 18, 122, 'The paper does not report oracle success for RxR-CE.',
+          { size: 13, color: C.ink3 });
+        K.mono(body, 18, 144, 'Pick another metric.', { size: 12, color: C.ink3 });
+        return;
+      }
+      have.sort(function (a, b) {
+        return lower ? a[bench][metric] - b[bench][metric] : b[bench][metric] - a[bench][metric];
+      });
+      var mx = Math.max.apply(null, have.map(function (r) { return r[bench][metric]; }));
+      var unit = metric === 'NE' ? ' m' : '%';
+      have.forEach(function (r, i) {
+        var y = 78 + i * 26, col = groupColor(r.group);
+        var frac = lower ? (1 - (r[bench][metric] / mx) * 0.72) : r[bench][metric] / mx;
+        K.mono(body, 0, y + 11, r.short, { size: 11, color: r.ours ? C.red : C.ink2,
+          weight: r.ours ? 700 : 400 });
+        K.bar(body, 208, y + 1, 340, 13, frac, { color: col });
+        K.mono(body, 640, y + 11, r[bench][metric].toFixed(metric === 'NE' ? 2 : 1) + unit,
+          { size: 11.5, color: col, anchor: 'end', weight: r.ours ? 700 : 400 });
+      });
+
+      var ly = 78 + have.length * 26 + 14;
+      [['ours, one RGB camera', C.red], ['one RGB camera', C.blue],
+       ['depth, LiDAR or several cameras', C.ink3]].forEach(function (l, i) {
+        body.appendChild(K.n('rect', { x: i * 210, y: ly, width: 11, height: 11, rx: 3, fill: l[1] }));
+        K.mono(body, i * 210 + 18, ly + 10, l[0], { size: 10.5, color: C.ink3 });
+      });
+      if (lower) K.mono(body, 0, ly + 32, 'bars inverted so longer still means better',
+        { size: 10.5, color: C.ink3 });
+    }
+    draw();
+    K.foot(s, 'Table 1, validation unseen on both benchmarks. Parsed from the paper rather than ' +
+      'retyped, so the ordering here is whatever the numbers say.');
+  };
+
+  /* ---- 26 the headline ---- */
+  window.SCENES.S_SENSORGAP = function (root, api) {
+    var h = api.RN.headline;
+    var s = K.board(root, { alt: 'The margin over the best single-camera and best depth systems.' });
+    K.head(s, 'It beats the rigs without the rig', 'R2R-CE validation unseen, success rate');
+
+    var ROWS = [
+      { n: h.best_single_model, v: h.best_single_sr, c: C.blue, tag: 'best single camera' },
+      { n: h.best_depth_model, v: h.best_depth_sr, c: C.ink3, tag: 'best with depth or multi-camera' },
+      { n: 'Robostral Navigate', v: h.r2r_sr, c: C.red, tag: 'one RGB camera' }
+    ];
+    var mx = 100;
+    ROWS.forEach(function (r, i) {
+      var y = 30 + i * 108;
+      K.mono(s, 0, y, r.n, { size: 14, color: r.c, weight: r.c === C.red ? 700 : 400 });
+      K.label(s, 0, y + 18, r.tag, { size: 9.5 });
+      K.bar(s, 0, y + 30, 520, 26, r.v / mx, { color: r.c });
+      K.mono(s, 640, y + 50, r.v.toFixed(1) + '%', { size: 24, color: r.c, weight: 700,
+        anchor: 'end' });
+    });
+
+    K.label(s, 0, 366, 'the two margins');
+    [[h.gain_vs_single, 'over the best other single-camera system', C.blue],
+     [h.gain_vs_depth, 'over the best system that gets depth or several cameras', C.ink]
+    ].forEach(function (r, i) {
+      var y = 380 + i * 58;
+      K.panel(s, 0, y, 640, 48, { flat: true, fill: i ? T.red : T.blue,
+        stroke: i ? C.red : C.blue });
+      K.mono(s, 18, y + 30, '+' + r[0].toFixed(1), { size: 18, color: i ? C.red : C.blue,
+        weight: 700 });
+      K.mono(s, 84, y + 30, r[1], { size: 12.5, color: i ? C.red : C.blue });
+    });
+
+    K.callout(s, 0, 500, 640,
+      'The second margin is the one that carries the argument. The extra sensing was not buying ' +
+      'what it appeared to be buying.', { cols: 66 });
+  };
+
+  /* ---- 27 what RL bought ---- */
+  window.SCENES.S_RLGAIN = function (root, api) {
+    var rl = api.RN.rl;
+    var s = K.board(root, { alt: 'Success rate before and after the reinforcement learning pass.' });
+    K.head(s, 'The last few points came from RL', 'supervised baseline against the shipped checkpoint');
+
+    var SETS = [
+      { n: 'R2R-CE, seen', a: rl.r2r_sft_seen, b: rl.r2r_rl_seen, g: rl.r2r_gain_seen },
+      { n: 'R2R-CE, unseen', a: rl.r2r_sft_unseen, b: rl.r2r_rl_unseen, g: rl.r2r_gain_unseen },
+      { n: 'RxR-CE, unseen', a: rl.rxr_sft, b: rl.rxr_rl, g: rl.rxr_gain }
+    ];
+    var X0 = 0, XW = 470, lo = 68, hi = 82;
+    function px(v) { return X0 + ((v - lo) / (hi - lo)) * XW; }
+
+    SETS.forEach(function (S, i) {
+      var y = 40 + i * 116;
+      K.mono(s, 0, y - 8, S.n, { size: 13, color: C.ink, weight: 500 });
+      s.appendChild(K.n('line', { x1: X0, y1: y + 22, x2: X0 + XW, y2: y + 22,
+        stroke: C.line, 'stroke-width': 2 }));
+      s.appendChild(K.n('line', { x1: px(S.a), y1: y + 22, x2: px(S.b), y2: y + 22,
+        stroke: C.teal, 'stroke-width': 6 }));
+      s.appendChild(K.n('circle', { cx: px(S.a), cy: y + 22, r: 7, fill: '#fff',
+        stroke: C.ink3, 'stroke-width': 2 }));
+      s.appendChild(K.n('circle', { cx: px(S.b), cy: y + 22, r: 8, fill: C.teal }));
+      K.mono(s, px(S.a), y + 48, S.a.toFixed(2), { size: 11, color: C.ink3, anchor: 'middle' });
+      K.mono(s, px(S.b), y + 48, S.b.toFixed(2), { size: 11.5, color: C.teal, anchor: 'middle',
+        weight: 700 });
+      K.mono(s, 640, y + 28, '+' + S.g.toFixed(2), { size: 20, color: C.teal, weight: 700,
+        anchor: 'end' });
+    });
+
+    K.mono(s, X0, 400, 'supervised', { size: 10.5, color: C.ink3 });
+    K.mono(s, X0 + XW, 400, 'after RL', { size: 10.5, color: C.teal, anchor: 'end' });
+
+    K.panel(s, 0, 414, 640, 74, { flat: true, fill: T.amber, stroke: C.amber });
+    K.mono(s, 18, 442, 'peak during the run: ' + api.RN.rl.r2r_peak_seen.toFixed(2) +
+      '% seen, ' + api.RN.rl.r2r_peak_unseen.toFixed(2) + '% unseen',
+      { size: 13, color: C.amber });
+    K.mono(s, 18, 466, 'higher than the reported checkpoint on the seen split, worth noticing',
+      { size: 11.5, color: C.amber });
+
+    K.foot(s, 'The paper attributes the gain to exploration and recovery, which shortest-path ' +
+      'imitation cannot teach.');
+  };
+
+  /* ---- 28 the one it loses ---- */
+  window.SCENES.S_RXR = function (root, api) {
+    var RN = api.RN, o = RN.ours;
+    var rival = RN.table1.filter(function (r) {
+      return r.group === 'depth' && r.model.indexOf('Qwen-RobotNav-8B') === 0;
+    })[0] || RN.table1.filter(function (r) { return r.group === 'depth'; })
+      .sort(function (a, b) { return b.rxr.SR - a.rxr.SR; })[0];
+    var bestSingle = RN.table1.filter(function (r) { return r.group === 'single'; })
+      .sort(function (a, b) { return b.rxr.SR - a.rxr.SR; })[0];
+
+    var s = K.board(root, { alt: 'RxR-CE, where the model wins and where it does not.' });
+    K.head(s, 'Second on success, first on efficiency',
+      'RxR-CE validation unseen, against the best depth-assisted system');
+
+    var CMP = [
+      { k: 'SR', ours: o.rxr.SR, them: rival.rxr.SR, unit: '%', hi: true },
+      { k: 'SPL', ours: o.rxr.SPL, them: rival.rxr.SPL, unit: '%', hi: true },
+      { k: 'NE', ours: o.rxr.NE, them: rival.rxr.NE, unit: ' m', hi: false }
+    ];
+    K.label(s, 0, 12, 'ours vs ' + rival.short + ', which gets depth');
+    CMP.forEach(function (r, i) {
+      var y = 28 + i * 104;
+      var win = r.hi ? r.ours > r.them : r.ours < r.them;
+      var col = win ? C.teal : C.red;
+      K.panel(s, 0, y, 640, 88, { stroke: col, fill: win ? T.teal : T.red });
+      K.mono(s, 20, y + 34, r.k, { size: 18, color: col, weight: 700 });
+      K.mono(s, 20, y + 58, win ? 'we win' : 'we do not', { size: 11, color: col });
+      K.mono(s, 130, y + 30, 'ours', { size: 11, color: C.ink3 });
+      K.mono(s, 130, y + 56, r.ours.toFixed(r.k === 'NE' ? 2 : 1) + r.unit,
+        { size: 20, color: col, weight: 700 });
+      K.mono(s, 300, y + 30, 'theirs', { size: 11, color: C.ink3 });
+      K.mono(s, 300, y + 56, r.them.toFixed(r.k === 'NE' ? 2 : 1) + r.unit,
+        { size: 20, color: C.ink3, weight: 700 });
+      K.mono(s, 620, y + 52, (r.ours > r.them ? '+' : '') +
+        (r.ours - r.them).toFixed(r.k === 'NE' ? 2 : 1), { size: 17, color: col,
+        weight: 700, anchor: 'end' });
+    });
+
+    K.panel(s, 0, 344, 640, 74, { flat: true, fill: T.blue, stroke: C.blue });
+    K.mono(s, 18, 372, 'among single-camera systems it is first: ' + o.rxr.SR.toFixed(1) +
+      '% against ' + bestSingle.rxr.SR.toFixed(1) + '%', { size: 13, color: C.blue });
+    K.mono(s, 18, 396, 'the loss is only to a model that gets depth', { size: 11.5, color: C.blue });
+
+    K.callout(s, 0, 434, 640,
+      'The paper says competitive, and competitive is the right word. Worth stating plainly, ' +
+      'because the rest of the results do not need the rounding.', { cols: 66 });
+  };
+
+  /* ---- 29 scope ---- */
+  window.SCENES.S_LIMITS = function (root, api) {
+    var s = K.board(root, { alt: 'Three things the benchmark numbers do not cover.' });
+    K.head(s, 'Read the scope before the score', 'three things the numbers do not cover');
+
+    var L = [
+      { t: 'the benchmark measures the waypoints, not the stack',
+        d: 'evaluation runs a Habitat pathfinder between predicted waypoints, so the diffusion ' +
+           'policy and controller that run on the real robot are not what is being scored' },
+      { t: 'cross-embodiment is shown on two wheeled platforms',
+        d: 'the abstract argues the recipe reaches legged and aerial robots. The deployments in ' +
+           'the paper are a Galaxea R1 and a Hiwonder JetAuto, both wheeled' },
+      { t: 'training is entirely simulated',
+        d: 'which is the point of the recipe, but it means the real-world evidence is the two ' +
+           'deployments rather than the benchmark rows' }
+    ];
+    L.forEach(function (l, i) {
+      var y = 14 + i * 148;
+      K.panel(s, 0, y, 640, 126, { stroke: C.amber, fill: T.amber });
+      K.mono(s, 20, y + 34, String(i + 1), { size: 13, color: C.amber, weight: 700 });
+      K.para(s, 46, y + 34, l.t, 56, { size: 13.5, color: C.amber, lh: 19 });
+      K.para(s, 46, y + 74, l.d, 62, { size: 12, color: C.ink2, lh: 17 });
+    });
+
+    K.callout(s, 0, 462, 640,
+      'None of this undoes the result. It means the result is about the recipe, which is what ' +
+      'the paper set out to argue.', { cols: 66, color: C.teal, tint: T.teal });
+  };
+
+  /* ---- 30 the close ---- */
+  window.SCENES.S_END = function (root, api) {
+    var h = api.RN.headline, f = api.RN.facts;
+    var s = K.board(root, { alt: 'The whole recipe in four steps.' });
+    K.head(s, 'The recipe, end to end', 'four decisions, each one traceable to the same objective');
+
+    var STEPS = [
+      ['one RGB camera', 'the sensor every platform already has', C.blue],
+      ['output a pixel', 'so the waypoint is not tied to a body', C.teal],
+      ['pack the episode', f.token_saving_x + '× fewer tokens, months to days', C.purple],
+      ['spend it on RL', 'exploration and recovery, which imitation cannot teach', C.amber]
+    ];
+    STEPS.forEach(function (st, i) {
+      var y = 12 + i * 84;
+      K.panel(s, 0, y, 640, 70, { stroke: st[2], fill: 'rgba(255,255,255,.9)' });
+      s.appendChild(K.n('rect', { x: 0, y: y, width: 5, height: 70, rx: 2.5, fill: st[2] }));
+      K.mono(s, 24, y + 30, st[0], { size: 15, color: st[2], weight: 500 });
+      K.mono(s, 24, y + 52, st[1], { size: 12, color: C.ink3 });
+      if (i < 3) K.arrow(s, 320, y + 70, 320, y + 84, { color: C.line, w: 1.3, headSize: 5 });
+    });
+
+    K.panel(s, 0, 356, 310, 96, { stroke: C.red, fill: T.red });
+    K.big(s, 20, 412, h.r2r_sr.toFixed(1) + '%', { size: 40, color: C.red });
+    K.mono(s, 20, 434, 'R2R-CE success, validation unseen', { size: 11, color: C.red });
+    K.panel(s, 330, 356, 310, 96, { stroke: C.red, fill: T.red });
+    K.big(s, 350, 412, h.rxr_sr.toFixed(1) + '%', { size: 40, color: C.red });
+    K.mono(s, 350, 434, 'RxR-CE success, validation unseen', { size: 11, color: C.red });
+
+    K.callout(s, 0, 472, 640,
+      'The claim is not that pointing is a clever trick. It is that a recipe built for scale can ' +
+      'win on the leaderboard built for something else.', { cols: 66 });
+  };
+})();
+</script>
+<script>
+/* Scroll engine. Each .beat names a scene in data-s; window.SCENES builds it
+   once into the sticky art panel, lazily, then it is only shown or hidden. */
+(function () {
+  var SS = window.RN || {};
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var api = { RN: SS, SS: SS, KIT: window.KIT, K3: window.K3, reduce: reduce };
+  window.RN_API = api;
+
+  var art = document.getElementById('art');
+  var beats = [].slice.call(document.querySelectorAll('.beat'));
+  var rail = document.getElementById('rail');
+  var actlab = document.getElementById('actlab');
+  var SECTION = ['', 'The problem', 'How it moves', 'How it learns', 'Does it hold up'];
+  var built = {}, current = null, ticking = null;
+
+  function make(id) {
+    if (built[id]) return built[id];
+    var host = document.createElement('div');
+    var fn = (window.SCENES || {})[id];
+    var handle = null;
+    if (typeof fn === 'function') {
+      try { handle = fn(host, api) || null; }
+      catch (err) {
+        host.innerHTML = '';
+        if (window.console) console.error('scene ' + id, err);
+      }
+    }
+    // scenes must never be able to drop the class the stage positions with
+    host.classList.add('scene');
+    host.setAttribute('data-scene', id);
+    art.appendChild(host);
+    // stagger the entrance so the figure assembles rather than snapping in
+    requestAnimationFrame(function () {
+      var sv = host.querySelector('svg:not(.k3ov)');
+      if (!sv) return;
+      var kids = sv.children, step = Math.min(26, 620 / Math.max(1, kids.length));
+      for (var i = 0; i < kids.length; i++) {
+        kids[i].style.animationDelay = (i * step).toFixed(0) + 'ms';
+      }
+    });
+    built[id] = { host: host, handle: handle };
+    return built[id];
+  }
+
+  function show(beat) {
+    if (!beat || beat === current) return;
+    var next = make(beat.getAttribute('data-s'));
+    Object.keys(built).forEach(function (k) {
+      built[k].host.classList.toggle('on', built[k] === next);
+    });
+    if (ticking && ticking.stop) { try { ticking.stop(); } catch (e) {} }
+    ticking = (next.handle && next.handle.tick) ? next.handle : null;
+    if (ticking && ticking.start && !reduce) { try { ticking.start(); } catch (e) {} }
+
+    var i = beats.indexOf(beat) + 1;
+    actlab.textContent = SECTION[+(beat.getAttribute('data-act') || 1)] +
+      ' · ' + (beat.getAttribute('data-sec') || '') + ' · ' + i + '/' + beats.length;
+    current = beat;
+  }
+
+  var wide = matchMedia('(min-width: 1080.01px)');
+
+  // Track the CARD, not the 118svh beat container. The container is taller than
+  // the viewport, so its midpoint drifts away from the card you are reading and
+  // the figure changed late, which read as the two columns being out of step.
+  var cards = beats.map(function (b) { return b.querySelector('.stack') || b; });
+
+  function pick() {
+    var band = innerHeight * (wide.matches ? 0.5 : 0.3);
+    var best = null, bd = Infinity;
+    for (var i = 0; i < beats.length; i++) {
+      var r = cards[i].getBoundingClientRect();
+      var d = Math.abs((r.top + r.height / 2) - band);
+      if (d < bd) { bd = d; best = beats[i]; }
+    }
+    if (best) show(best);
+    var doc = document.documentElement;
+    var max = doc.scrollHeight - doc.clientHeight;
+    rail.style.height = (max > 0 ? (doc.scrollTop / max) * 100 : 0).toFixed(2) + '%';
+  }
+
+  var raf = 0;
+  addEventListener('scroll', function () {
+    if (raf) return;
+    raf = requestAnimationFrame(function () { raf = 0; pick(); });
+  }, { passive: true });
+  addEventListener('resize', pick);
+
+  beats.slice(0, 2).forEach(function (b) { make(b.getAttribute('data-s')); });
+  pick();
+
+  if (!reduce) {
+    var t0 = performance.now();
+    (function pump(t) {
+      if (ticking && ticking.tick) { try { ticking.tick((t - t0) / 1000); } catch (e) {} }
+      requestAnimationFrame(pump);
+    })(t0);
+  }
+})();
+
+</script>
+</body>
+</html>

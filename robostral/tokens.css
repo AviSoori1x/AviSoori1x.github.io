@@ -1,0 +1,177 @@
+/* Design system ported from the LingBot visual guide. Values kept verbatim so
+   this reads as the same family of document rather than an interpretation of it. */
+:root{
+  --bg:#f4f1ea; --panel:#fff;
+  --line:rgba(31,37,48,.14); --line2:rgba(31,37,48,.08);
+  --ink:#141922; --ink2:#39404f; --ink3:#5d6474;
+  --blue:#1c6e8c; --teal:#0f6e56; --amber:#b4551a; --purple:#6b3fa8; --red:#a32d2d;
+
+  --fd:'Sora',ui-sans-serif,system-ui,sans-serif;
+  --fb:'IBM Plex Sans',ui-sans-serif,system-ui,-apple-system,sans-serif;
+  --fm:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+
+  --artR:min(54vw,840px); --txtw:400px; --cardfs:15px; --sh:100svh;
+  --gapC:52px;
+  --pageW:calc(var(--artR) + var(--gapC) + var(--txtw));
+  --dx:max(24px, calc((100vw - var(--pageW)) / 2));
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;background:var(--bg)}
+body{
+  margin:0;background:var(--bg);color:var(--ink);font-family:var(--fb);
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+
+/* ---------------- hero ---------------- */
+.hero{
+  min-height:100svh;display:flex;flex-direction:column;justify-content:center;
+  padding:6svh clamp(22px,6vw,90px);max-width:1180px;margin:0 auto;
+}
+.eyebrow{
+  font-family:var(--fm);font-size:12px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--amber);font-weight:700;margin-bottom:18px;
+}
+h1{
+  font-family:var(--fd);font-weight:700;font-size:clamp(38px,6.2vw,80px);
+  line-height:1.02;letter-spacing:-.025em;margin:0 0 22px;
+}
+h1 em{font-style:normal;color:var(--amber)}
+.sub{font-size:clamp(16px,1.5vw,21px);line-height:1.55;color:var(--ink2);max-width:44em}
+.sub b{color:var(--ink);font-weight:600}
+.byline{
+  font-family:var(--fm);font-size:13px;color:var(--ink3);margin:22px 0 0;
+  padding-left:13px;border-left:2px solid var(--amber);line-height:1.55;
+}
+.byline b{color:var(--ink);font-weight:500}
+.metastrip{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
+.chip{
+  font-family:var(--fm);font-size:12px;padding:7px 12px;border:1px solid var(--line);
+  border-radius:999px;background:var(--panel);color:var(--ink2);text-decoration:none;
+}
+.chip b{color:var(--ink)}
+/* the anchors sit INSIDE .chip, so a.chip never matched and they rendered in
+   default browser blue with an underline */
+.chip a,.chip a:link,.chip a:visited{color:inherit;text-decoration:none}
+.chip a b{color:var(--blue)}
+.chip:has(a):hover{border-color:var(--blue)}
+.chip:has(a):hover a{color:var(--blue)}
+.toc{
+  margin-top:40px;display:grid;gap:12px;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));max-width:1000px;
+}
+.toc>div{border-left:2px solid var(--line);padding:2px 14px 2px 13px}
+.toc h4{font-family:var(--fd);font-size:15px;font-weight:600;margin:0 0 6px;letter-spacing:-.01em}
+.toc p{font-size:13.5px;line-height:1.5;color:var(--ink3);margin:0}
+.toc .a1 h4{color:var(--blue)} .toc .a2 h4{color:var(--amber)}
+.toc .a3 h4{color:var(--purple)} .toc .a4 h4{color:var(--teal)}
+.scrollcue{
+  margin-top:46px;font-family:var(--fm);font-size:12px;color:var(--ink3);
+  letter-spacing:.1em;text-transform:uppercase;
+}
+
+/* ---------------- the sticky art stage ---------------- */
+#stage{position:sticky;top:0;height:var(--sh);width:100%;z-index:0;pointer-events:none}
+#art{
+  position:absolute;top:50%;left:var(--dx);transform:translateY(-50%);
+  width:var(--artR);pointer-events:auto;
+}
+.scene{
+  position:absolute;top:50%;left:0;width:100%;transform:translateY(-50%);
+  opacity:0;visibility:hidden;
+  transition:opacity .34s ease,visibility 0s linear .34s;
+}
+.scene.on{opacity:1;visibility:visible;transition:opacity .34s ease,visibility 0s linear 0s}
+
+/* the figures build themselves in as you arrive, which is most of what made the
+   reference feel alive. Delay is set per element by the engine. */
+@keyframes figIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.scene.on svg>*{animation:figIn .52s cubic-bezier(.22,.61,.36,1) backwards}
+.scene svg>defs,.scene svg>rect[fill^='url'],.scene svg>rect[filter]{animation:none!important}
+@media(prefers-reduced-motion:reduce){ .scene.on svg>*{animation:none} }
+
+/* ---------------- beats ---------------- */
+#beats{position:relative;z-index:2;pointer-events:none}
+.beat{min-height:118svh;display:flex;align-items:center;pointer-events:none}
+.stack{margin-left:calc(var(--dx) + var(--artR) + var(--gapC));width:var(--txtw);pointer-events:auto}
+.card{
+  background:var(--panel);border:1px solid var(--line);border-radius:12px;
+  padding:20px 22px 19px;box-shadow:0 10px 34px rgba(20,25,34,.09),0 2px 6px rgba(20,25,34,.05);
+  font-size:var(--cardfs);line-height:1.6;color:var(--ink2);
+}
+.num{
+  font-family:var(--fm);font-size:10.5px;letter-spacing:.16em;color:var(--amber);
+  font-weight:700;display:block;margin-bottom:8px;
+}
+.a1 .num{color:var(--blue)} .a3 .num{color:var(--purple)} .a4 .num{color:var(--teal)}
+.sec{color:var(--ink3);font-weight:400;margin-left:8px;letter-spacing:.08em}
+h3{
+  font-family:var(--fd);font-size:calc(var(--cardfs) + 4px);line-height:1.22;margin:0 0 11px;
+  color:var(--ink);letter-spacing:-.015em;font-weight:600;
+}
+.card p{margin:0 0 10px}
+.card p:last-child{margin-bottom:0}
+.card b{color:var(--ink);font-weight:600}
+.k{font-family:var(--fm);font-size:.88em;color:var(--ink);background:rgba(31,37,48,.05);
+   border-radius:4px;padding:.06em .3em}
+.note{font-size:.9em;color:var(--ink3);border-left:2px solid var(--line);padding-left:11px;margin-top:12px}
+.meas{
+  font-family:var(--fm);font-size:.86em;background:rgba(180,85,26,.07);
+  border:1px solid rgba(180,85,26,.2);border-radius:7px;padding:9px 11px;margin-top:12px;
+  color:var(--ink2);line-height:1.55;
+}
+.try{
+  font-size:.9em;background:rgba(28,110,140,.06);border:1px solid rgba(28,110,140,.2);
+  border-radius:7px;padding:9px 11px;margin-top:12px;color:var(--ink2);
+}
+.warnc{
+  font-size:.9em;background:rgba(163,45,45,.06);border:1px solid rgba(163,45,45,.2);
+  border-radius:7px;padding:9px 11px;margin-top:12px;color:var(--ink2);
+}
+
+/* ---------------- act dividers ---------------- */
+.actdiv{position:relative;z-index:2;pointer-events:none;padding:14svh 0 6svh}
+.actdiv .stack{pointer-events:auto;width:auto;max-width:640px}
+.actdiv .an{font-family:var(--fm);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink3);margin:0 0 8px}
+.actdiv h2{font-family:var(--fd);font-weight:700;font-size:clamp(28px,3.4vw,44px);line-height:1.04;letter-spacing:-.025em;margin:0 0 10px}
+.actdiv p{color:var(--ink3);font-size:14.5px;margin:0}
+.actdiv.a1 h2{color:var(--blue)} .actdiv.a2 h2{color:var(--amber)}
+.actdiv.a3 h2{color:var(--purple)} .actdiv.a4 h2{color:var(--teal)}
+
+/* ---------------- rail and act label ---------------- */
+.railwrap{position:fixed;left:0;top:0;height:100svh;width:5px;z-index:5;pointer-events:none}
+#rail{position:absolute;left:0;top:0;width:100%;background:var(--amber);height:0}
+#actlab{
+  position:fixed;left:14px;bottom:16px;z-index:6;font-family:var(--fm);font-size:11px;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);pointer-events:none;
+  background:rgba(244,241,234,.82);padding:4px 8px;border-radius:5px;
+}
+
+/* ---------------- outro ---------------- */
+.outro{
+  position:relative;z-index:2;background:var(--bg);
+  padding:12svh clamp(22px,6vw,90px) 16svh;max-width:1180px;margin:0 auto;
+}
+.outro h2{font-family:var(--fd);font-size:clamp(26px,3vw,38px);letter-spacing:-.02em;margin:0 0 16px}
+.outro p{font-size:16px;line-height:1.6;color:var(--ink2);max-width:44em;margin:0 0 12px}
+.outro a{color:var(--blue)}
+
+/* ---------------- narrow screens: art rides above its card ---------------- */
+@media(max-width:1080px){
+  :root{--artR:min(92vw,640px);--txtw:auto}
+  #stage{position:sticky;top:0;height:auto;padding:10px 0 0;background:var(--bg);
+         border-bottom:1px solid var(--line2);z-index:4}
+  #art{position:relative;top:auto;left:auto;transform:none;width:100%;
+       padding:0 clamp(14px,4vw,22px);margin:0 auto}
+  .scene{position:relative;top:auto;transform:none;display:none}
+  .scene.on{display:block}
+  .beat{min-height:0;display:block;padding:0 clamp(14px,4vw,22px) 40px}
+  .stack{margin-left:0;width:auto}
+  .actdiv{padding:8svh clamp(14px,4vw,22px) 3svh}
+  .railwrap{display:none}
+}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  html{scroll-behavior:auto}
+}

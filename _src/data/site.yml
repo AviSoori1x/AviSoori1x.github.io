@@ -8,6 +8,8 @@ og_image: images/blogImage.png
 extra_pages:
   - url: /shieldstral_1/
     lastmod: "2026-08-26"
+  - url: /robostral/
+    lastmod: "2026-08-31"
 
 links:
   - label: GitHub
