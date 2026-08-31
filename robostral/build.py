@@ -56,8 +56,8 @@ HERO = """
   a map built in advance. Every one of those narrows the set of robots you can run on. Robostral
   Navigate takes a <b>single RGB camera</b> and predicts where to go by <b>pointing at a pixel</b>
   in the frame it is already looking at.</p>
-  <p class="sub" style="margin-top:14px">I worked on this one, and this is my attempt to lay the
-  paper out visually. The 3D figures are real scenes rather than diagrams, so when a figure claims
+  <p class="sub" style="margin-top:14px">I contributed to the original paper, and this is my
+  attempt to lay it out visually. The 3D figures are real scenes rather than diagrams, so when a figure claims
   the image coordinate survives a change of camera, you can move the camera and check.</p>
 
   <div class="metastrip">

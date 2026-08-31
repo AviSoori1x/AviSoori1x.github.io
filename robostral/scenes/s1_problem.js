@@ -101,45 +101,80 @@ window.SCENES = window.SCENES || {};
 
   /* ---- 03 a metric waypoint belongs to one body ---- */
   window.SCENES.S_METRIC = function (root, api) {
-    var RN = api.RN, f = RN.facts, s = K.board(root, { alt: 'The same command on two different bodies.' });
+    var f = api.RN.facts;
+    var s = K.board(root, { alt: 'The same metric command on two differently shaped robots.' });
     K.head(s, 'A distance in metres belongs to one robot',
-      'same command, two bodies, two different meanings');
+      'the same command, read against two different geometries');
 
     K.label(s, 0, 14, 'the command');
-    K.code(s, 0, 26, 300, [
+    K.code(s, 0, 26, 290, [
       { t: 'forward  Δx = 1.4 m', c: '#9fd0e6' },
       { t: 'lateral  Δy = 0.0 m', c: '#9fd0e6' },
       { t: 'turn     Δθ = 22°', c: '#9fd0e6' }
     ]);
+    K.para(s, 312, 48, 'A displacement in metres silently assumes the machine it was measured ' +
+      'on: how high the camera sits, how far it is tilted, and how wide the base is.', 44,
+      { size: 12.5, color: C.ink2, lh: 19 });
 
+    // two bodies at the ends of the ranges the paper randomises over, drawn to
+    // a shared scale so the comparison is a measurement and not a cartoon
     var BODIES = [
       { n: 'tall, camera level', h: f.height_max, r: f.radius_min, pitch: f.pitch_min, c: C.blue },
-      { n: 'short, camera pitched down', h: f.height_min, r: f.radius_max, pitch: f.pitch_max, c: C.purple }
+      { n: 'short, camera pitched down', h: f.height_min, r: f.radius_max,
+        pitch: f.pitch_max, c: C.purple }
     ];
+    var PW = 310, PX = [0, 330], PY = 152, PH = 250;
+    var GROUND = PY + PH - 42, PPM = 150 / f.height_max;   // pixels per metre
+
+    K.label(s, 0, 140, 'the same command, on two bodies, to scale');
 
     BODIES.forEach(function (b, i) {
-      var x = i * 330, y = 150;
-      K.panel(s, x, y, 310, 216, { stroke: b.c, fill: i ? T.purple : T.blue });
-      K.label(s, x + 18, y + 28, b.n, { color: b.c });
-      // a little elevation drawing of the body, to scale against 1.8 m
-      var gx = x + 42, gy = y + 190, scale = 74 / f.height_max;
-      s.appendChild(K.n('line', { x1: x + 18, y1: gy, x2: x + 290, y2: gy,
-        stroke: C.line, 'stroke-width': 1 }));
-      var hh = b.h * scale;
-      s.appendChild(K.n('rect', { x: gx - b.r * scale * 26, y: gy - hh,
-        width: b.r * scale * 52, height: hh, rx: 3, fill: b.c, opacity: .82 }));
-      s.appendChild(K.n('circle', { cx: gx, cy: gy - hh - 5, r: 4.5, fill: C.ink }));
-      K.mono(s, x + 18, y + 76, b.h.toFixed(1) + ' m tall', { size: 12, color: b.c });
-      K.mono(s, x + 18, y + 94, 'radius ' + b.r.toFixed(2) + ' m', { size: 12, color: b.c });
-      K.mono(s, x + 18, y + 112, 'pitch ' + b.pitch + '°', { size: 12, color: b.c });
-      K.mono(s, x + 108, y + 208, i ? 'clips the doorway frame' : 'clears it', { size: 12.5, color: b.c });
+      var x = PX[i];
+      K.panel(s, x, PY, PW, PH, { stroke: b.c, fill: i ? T.purple : T.blue });
+      K.label(s, x + 18, PY + 26, b.n, { color: b.c });
+
+      // ground line and a 1.8 m reference tick, so both panels read against one scale
+      s.appendChild(K.n('line', { x1: x + 16, y1: GROUND, x2: x + PW - 16, y2: GROUND,
+        stroke: C.line, 'stroke-width': 1.5 }));
+      var refY = GROUND - f.height_max * PPM;
+      s.appendChild(K.n('line', { x1: x + PW - 34, y1: refY, x2: x + PW - 22, y2: refY,
+        stroke: C.ink3, 'stroke-width': 1, 'stroke-dasharray': '3 3' }));
+      K.mono(s, x + PW - 38, refY + 4, f.height_max.toFixed(1) + ' m',
+        { size: 9.5, color: C.ink3, anchor: 'end' });
+
+      var cx = x + 96;
+      var bw = Math.max(9, b.r * 2 * PPM);        // radius is a radius, so double it
+      var bh = b.h * PPM;
+      s.appendChild(K.n('rect', { x: cx - bw / 2, y: GROUND - bh, width: bw, height: bh,
+        rx: 4, fill: b.c, opacity: .26, stroke: b.c }));
+      // the camera, at its randomised fraction of the body height
+      var camY = GROUND - b.h * 0.9 * PPM;
+      s.appendChild(K.n('circle', { cx: cx, cy: camY, r: 5, fill: b.c }));
+      // and where it is looking, which is the part the metres depend on
+      var ang = b.pitch * Math.PI / 180;
+      s.appendChild(K.n('line', { x1: cx + 6, y1: camY,
+        x2: cx + 6 + Math.cos(ang) * 74, y2: camY + Math.sin(ang) * 74,
+        stroke: b.c, 'stroke-width': 1.6, 'stroke-dasharray': '4 3' }));
+      K.mono(s, cx + 14, camY - 10, 'camera', { size: 10, color: b.c });
+
+      var rows = [
+        [b.h.toFixed(1) + ' m', 'body height'],
+        [(b.h * 0.9).toFixed(2) + ' m', 'camera height'],
+        [b.r.toFixed(2) + ' m', 'base radius'],
+        [b.pitch + '°', 'camera pitch']
+      ];
+      rows.forEach(function (r, j) {
+        var ry = PY + 58 + j * 30;
+        K.mono(s, x + 168, ry, r[0], { size: 14, color: b.c, weight: 700 });
+        K.mono(s, x + 168, ry + 14, r[1], { size: 9.5, color: C.ink3 });
+      });
     });
 
-    K.callout(s, 0, 392, 640,
-      'The number did not change. The geometry it was measured against did. That is the ' +
-      'coupling image-space output is there to break.', { cols: 66 });
-    K.foot(s, 'Body ranges are the ones the paper randomises over in section 2.4. The two ' +
-      'silhouettes are the ends of those ranges, not measured platforms.');
+    K.callout(s, 0, PY + PH + 18, 640,
+      'The number did not change. The geometry it was measured against did. Breaking that ' +
+      'coupling is the whole reason the output moves into image space.', { cols: 66 });
+    K.foot(s, 'Both bodies are the ends of the ranges the paper randomises over in section 2.4, ' +
+      'drawn to a common scale. They are not measured platforms.');
   };
 
   /* ---- 04 THE HERO: pointing, derived by projection ---- */
