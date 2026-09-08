@@ -1,6 +1,15 @@
 # `secondary: true` keeps a piece in the collapsed fold rather than the
 # selected list. Used for lighter, seasonal or heavily co-authored marketing posts.
 items:
+  - title: "The Dreaming Robot"
+    publisher: YouTube
+    date: "2026"
+    sort: "2026-09-08"
+    url: https://youtu.be/AVbM6BIqeUs
+    note: >-
+      A twenty minute film on what a world model actually is, meaning a program that answers
+      what happens next if I do this, without doing it. Built on a real arm in simulation with
+      a really trained model.
   - title: "Robostral Navigate, taken apart"
     publisher: avisoori1x
     date: "2026"
