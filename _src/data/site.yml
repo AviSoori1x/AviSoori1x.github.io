@@ -10,6 +10,8 @@ extra_pages:
     lastmod: "2026-08-26"
   - url: /robostral/
     lastmod: "2026-08-31"
+  - url: /mistral_large_4/
+    lastmod: "2026-11-05"
 
 links:
   - label: GitHub

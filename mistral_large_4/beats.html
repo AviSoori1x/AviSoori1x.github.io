@@ -1,0 +1,864 @@
+<!-- ==================== 1. THE MODEL ==================== -->
+<div class="actdiv a1"><div class="stack">
+  <h2>The model</h2>
+  <p>A trillion parameters, 52 billion of them at work on any one token. Before the surprises,
+  here is what was built, what it was fed, and how it was trained.</p>
+</div></div>
+
+<div class="beat a1" data-s="S_SIZE" data-act="1" data-sec="§1" data-title="52B of 1T">
+  <div class="stack"><div class="card">
+    <span class="num">01<span class="sec">§1</span></span>
+    <h3>A trillion parameters, 52 billion at a time</h3>
+    <p>Mistral Large 4 is a mixture-of-experts model with <b>1T parameters in total and 52B
+    active</b>. Each token is routed through a small subset of the expert networks, so only 52B
+    parameters do work on any one token, while the model as a whole holds a trillion.</p>
+    <p>It reads images as well as text, and the paper is plain about what it was built for:
+    reasoning and long-horizon agentic work, where the model acts over many steps and many tool
+    calls. Most of the decisions that follow only make sense against that target.</p>
+    <div class="try">Each square stands for a billion parameters. Send a token through and 52 of
+    them light up. Which ones light is illustrative.</div>
+  </div></div>
+</div>
+
+<div class="beat a1" data-s="S_COMPUTE" data-act="1" data-sec="§2.3" data-title="The run">
+  <div class="stack"><div class="card">
+    <span class="num">02<span class="sec">§2.3</span></span>
+    <h3>3,840 GPUs for 45 days</h3>
+    <p>Pretraining ran on <b>3,840 NVIDIA GB200 GPUs</b> in a Mistral data center near Paris, on
+    an internal stack built on PyTorch and CUDA. It took 45 days, about 4.15 million GPU-hours.
+    The design leans on Blackwell: FP8 tensor cores for low-precision training, the large NVLink
+    domain for wide expert parallelism, and the fast link to the Grace CPU for offloading
+    activations.</p>
+    <p>Two efficiency numbers come with it. <b>MFU was 36%</b>, counted strictly: against peak
+    BF16 throughput, including matrix-multiply and attention FLOPs, excluding recomputation.
+    <b>Goodput was 94.1%</b>, the share of the run that turned into training progress.</p>
+    <div class="try">Switch between the three numbers to see what each one counts.</div>
+  </div></div>
+</div>
+
+<div class="beat a1" data-s="S_LADDER" data-act="1" data-sec="§2.1" data-title="Predicted settings">
+  <div class="stack"><div class="card">
+    <span class="num">03<span class="sec">§2.1</span></span>
+    <h3>Predict the settings, then test the prediction on smaller copies</h3>
+    <p>Rather than search hyperparameters at full scale, the learning rate is predicted. The
+    predictor is log-linear in five inputs: width, depth, training horizon (total tokens, repeats
+    included), expansion rate (total experts over active experts) and batch size. Keeping each
+    input separate means the predictor can be checked for extrapolation along each one.</p>
+    <p>Batch size gets its own predictor, fit on the same dimensions apart from batch size
+    itself, and in practice it depends mostly on horizon and expansion rate. So the batch is predicted first and the learning rate is
+    conditioned on it. A <b>scaling ladder</b> of smaller models then uses the same predictors
+    and multipliers, so it differs from the real model "in scale only".</p>
+    <div class="try">Click an input to see which predictor leans on it.</div>
+  </div></div>
+</div>
+
+<div class="beat a1" data-s="S_MIX" data-act="1" data-sec="§2.2" data-title="Two data phases">
+  <div class="stack"><div class="card">
+    <span class="num">04<span class="sec">§2.2</span></span>
+    <h3>A broad first phase, a sharper second one</h3>
+    <p>The pretraining data is multilingual and natively multimodal: web pages, source code, and
+    scientific and technical documents, almost all of it formatted as interleaved text and image
+    chunks. The first phase, <b>65% of training</b>, is about broad coverage of domains and
+    languages.</p>
+    <p>The second, <b>35%</b>, shifts toward higher-quality, more STEM-heavy data and raises the
+    sequence length from 4K to 40K tokens. Code more than doubles, from 16.9% of the mixture to
+    39.0%, and web pages make room for it, dropping from 56.3% to 32.0%.</p>
+    <div class="try">Switch phases and watch the mixture move.</div>
+  </div></div>
+</div>
+
+<div class="beat a1" data-s="S_IMAGES" data-act="1" data-sec="§2.2" data-title="Images from the start">
+  <div class="stack"><div class="card">
+    <span class="num">05<span class="sec">§2.2</span></span>
+    <h3>Images from the very first step, at almost no cost to text</h3>
+    <p>ML4 is trained from scratch on interleaved image and text data, and with careful dataset
+    design this costs the text side very little. Matched on the number of <i>text</i> tokens seen,
+    text perplexity shows no regret at all. Matched on the total training horizon, where images
+    use up part of the token budget, the regret is modest.</p>
+    <p>The payoff is <b>over an order of magnitude more images</b> than Mistral's previous
+    flagships saw. The systems trick: prefetch images N batches ahead and cache their features
+    from the frozen vision encoder, which keeps <b>99% of text-only MFU</b> and means image
+    features never have to be stored on disk.</p>
+    <div class="try">Toggle the comparison to see why "no regret" and "modest regret" are both
+    true.</div>
+  </div></div>
+</div>
+
+<div class="beat a1" data-s="S_VISION" data-act="1" data-sec="§2.3.2" data-title="The vision encoder">
+  <div class="stack"><div class="card">
+    <span class="num">06<span class="sec">§2.3.2</span></span>
+    <h3>A vision encoder built from scratch, and judged on a small model</h3>
+    <p>The vision encoder has <b>1.6B parameters</b>, trained from scratch with a captioning
+    objective over 8T tokens; the captioner is thrown away afterwards. Images go in at their
+    native aspect ratio, up to 1540 by 1540 pixels. At the output, each 2 by 2 block of patches
+    becomes one: the four embeddings are concatenated and projected, then an MLP maps the result
+    into the language model's embedding space.</p>
+    <p>To judge an encoder, they attach it to a small LLM and run a short SFT of about 20B tokens.
+    Figure 2 does this for a frozen 400M version of their encoder against Perception Encoder
+    ViT-L/14, also 400M and frozen, on ten benchmarks. Theirs finishes ahead on nine. The
+    exception is ChartQA, where Perception Encoder leads from 40% of the SFT run onwards.</p>
+    <div class="try">Step through the patch merger, then switch to the ten-benchmark
+    comparison.</div>
+  </div></div>
+</div>
+
+<div class="beat a1" data-s="S_GRAN" data-act="1" data-sec="§2.3" data-title="Granularity 4">
+  <div class="stack"><div class="card">
+    <span class="num">07<span class="sec">§2.3</span></span>
+    <h3>Cheaper on paper, slower in practice</h3>
+    <p>Granularity is how finely the experts are cut: higher means more, smaller experts. ML4
+    keeps the granularity of 4 used in Mistral Large 3. Going to 8 would reach the same
+    perplexity with <b>about 4.3% fewer FLOPs</b>, give or take 0.5 points.</p>
+    <p>But training at granularity 8 measured <b>about 5% slower</b>. At those central values,
+    doing 4.3% less work at about 5% lower speed roughly cancels out in wall-clock time, and the
+    measured slowdown is what kept the model at 4. It is a small decision, and a clean
+    example of a habit that runs through this paper: the number that decides is the one measured
+    on the real system.</p>
+    <div class="try">Switch granularity and compare the work done with the time it takes.</div>
+  </div></div>
+</div>
+
+<div class="beat a1" data-s="S_BALANCE" data-act="1" data-sec="§2.3" data-title="Load balancing">
+  <div class="stack"><div class="card">
+    <span class="num">08<span class="sec">§2.3</span></span>
+    <h3>Balance the load where the slowdown actually happens</h3>
+    <p>A mixture-of-experts step runs only as fast as its busiest expert. ML4 computes the
+    load-balancing loss over <b>each expert-parallel group</b> rather than over the global batch,
+    which targets the quantity that causes the slowdowns directly: the tokens arriving at each
+    expert. Pretraining comparisons favored this when trading imbalance against validation
+    perplexity.</p>
+    <p>The cost is coupling. The loss now depends on how experts are split across devices, so
+    scaled-down experiments must be careful whenever that split changes. The optimizer is AdamW
+    with both betas at 0.975, coupled and higher than usual, which gave moderate gains.</p>
+    <div class="try">Switch between balancing the global batch and balancing each group. The
+    totals match; the worst device does not.</div>
+  </div></div>
+</div>
+
+<div class="beat a1" data-s="S_RAMP" data-act="1" data-sec="§2.3.1" data-title="Batch ramp-up">
+  <div class="stack"><div class="card">
+    <span class="num">09<span class="sec">§2.3.1</span></span>
+    <h3>Small batches early, big batches late</h3>
+    <p>Early in training, a gradient estimated from part of a batch is already good enough, so the
+    rest of that batch is wasted compute. Later, precise gradients pay. So the batch grows in
+    stages whose token share grows exponentially: the final batch size runs for the last 50% of
+    tokens, the one before it for 25%, and so on, with the learning rate rescaled at each
+    stage.</p>
+    <p>For optimization alone, a ramp from 0.25× to 2× the predicted batch did best. Bigger
+    batches run at higher MFU, so they chose <b>1× to 4×</b> for wall-clock reasons:
+    <b>40M, then 80M, then 160M</b>. Small early batches also act as a regularizer, more so the
+    more often the data repeats.</p>
+    <div class="try">Drag along training to read the batch size at each point.</div>
+  </div></div>
+</div>
+
+<!-- ==================== 2. THE ATTENTION U-TURN ==================== -->
+<div class="actdiv a2"><div class="stack">
+  <h2>The attention U-turn</h2>
+  <p>ML4 was built for agentic work, and its attention was cut down hard to make it cheap to
+  serve. The cuts turned out to hurt exactly that work, so the architecture was changed in the
+  middle of training.</p>
+</div></div>
+
+<div class="beat a2" data-s="S_KVTRICKS" data-act="2" data-sec="§3.1" data-title="Three KV tricks">
+  <div class="stack"><div class="card">
+    <span class="num">10<span class="sec">§3.1</span></span>
+    <h3>Three tricks that cut the KV cache sixteenfold</h3>
+    <p>An agent on a long task carries a long context, and every token of it costs memory in the
+    key-value cache. ML4 began with three ways to shrink that. <b>Sliding windows</b>: three of
+    every four layers look back only 512 tokens. <b>Cross-layer attention (CLA)</b>: every other
+    full-attention layer reuses the KV of the full-attention layer before it.</p>
+    <p><b>YOCO</b>: full-attention layers in the second half of the network read a KV cache made
+    in the first half, which also allows a two-stage prefill that is 1.7× faster at 1M context.
+    Together, <b>16× less KV cache</b> than full attention, and early ablations said the cost in
+    quality was negligible or small.</p>
+    <div class="try">Turn each trick on and watch which layers still keep their own KV.</div>
+  </div></div>
+</div>
+
+<div class="beat a2" data-s="S_PENALTY" data-act="2" data-sec="§3.1" data-title="The agentic penalty">
+  <div class="stack"><div class="card">
+    <span class="num">11<span class="sec">§3.1</span></span>
+    <h3>Nothing looked wrong until the model had to act</h3>
+    <p>As pretraining went on, they ran early SFT cooldowns on intermediate checkpoints.
+    Perplexity and knowledge benchmarks landed where expected. Agentic evaluations did not,
+    above all the long-context ones such as SWE-bench and BrowseComp.</p>
+    <p>Parallel ablations at the same token budget found the cause. SWE-bench Verified, measured
+    after midtraining and SFT, <b>dropped when full attention became sliding windows, and dropped
+    again when CLA was added</b>. Figure 4 follows five attention designs through midtraining
+    and on into SFT. Read off the figure, full attention ends near 66 and the design with all
+    three tricks near 56. YOCO on its own costs almost nothing by the end of SFT, which matters
+    later.</p>
+    <div class="try">Pick a design to trace its curve.</div>
+  </div></div>
+</div>
+
+<div class="beat a2" data-s="S_EQUALLOSS" data-act="2" data-sec="§3.1" data-title="Same loss, different agent">
+  <div class="stack"><div class="card">
+    <span class="num">12<span class="sec">§3.1</span></span>
+    <h3>Same loss, different agent</h3>
+    <p>Figure 5 is the uncomfortable one. Plot each design's perplexity against a knowledge
+    benchmark, MMLU Redux, and the designs fall close to one trend: at equal loss, their knowledge scores barely differ. Plot
+    it against SWE-bench Verified after midtraining and they split apart: at the same
+    perplexity, sliding windows sit about 5 points below full attention.</p>
+    <p>So the number everyone watches during pretraining, language-modeling loss, did not
+    predict agentic ability across architectures. The paper adds that longer training can soften
+    the penalty. The right panel suggests how, if its 0.5× and 2× mark run lengths (our reading;
+    the paper does not define them). The 2× sliding-window run follows its own line, close to
+    the sliding-window line and no higher, but gets further along it. Its best checkpoint (about
+    50.8) draws level with the best of the 0.5× full-attention run (about 50.0).</p>
+    <div class="try">Switch panels: perplexity on the x-axis both times, a different story.</div>
+  </div></div>
+</div>
+
+<div class="beat a2" data-s="S_SURGERY" data-act="2" data-sec="§3.2" data-title="Model surgery">
+  <div class="stack"><div class="card">
+    <span class="num">13<span class="sec">§3.2</span></span>
+    <h3>Change the architecture without starting over</h3>
+    <p>Rather than start again, they operated on an existing checkpoint, before the second phase
+    of pretraining, aiming for something as close to full attention as possible without losing
+    what pretraining had already taught it. Removing a sliding window is easy: let the layer see
+    the whole context instead of the last 512 tokens.</p>
+    <p>Removing KV sharing is harder, because a layer that borrowed its keys and values must now
+    make its own. Each one got KV weights <b>copied from the last long layer that had its own</b>.
+    For CLA that is the long layer just before it, which sees a very similar input. For YOCO it is
+    the long layer at the halfway point, which for most of the second half is much farther
+    away.</p>
+    <div class="try">Pick a layer that used to borrow its KV to see where its new weights come
+    from.</div>
+  </div></div>
+</div>
+
+<div class="beat a2" data-s="S_SURGEVAL" data-act="2" data-sec="§3.2.1" data-title="Testing the surgery">
+  <div class="stack"><div class="card">
+    <span class="num">14<span class="sec">§3.2.1</span></span>
+    <h3>Closing the perplexity gap did not close the agent gap</h3>
+    <p>They tested surgery at 8×10<sup>22</sup> FLOPs, applied either at the start of midtraining
+    or before phase 2 of pretraining, against two references: the original model with all three
+    tricks, and one pretrained with full attention throughout. The phase-2 runs kept the original
+    rotary frequencies or rescaled them 8× with YaRN.</p>
+    <p>Figure 6 shows the trap. Phase 2 after surgery pulled <b>perplexity</b> close to the
+    full-attention baseline, but <b>SWE-bench did not follow</b>. Bigger architectural changes
+    were harder to recover from, so they kept the surgery conservative and added learnable
+    parameters instead.</p>
+    <div class="try">Hover any point for the value read from the figure.</div>
+  </div></div>
+</div>
+
+<div class="beat a2" data-s="S_LEROPE" data-act="2" data-sec="§3.2.1" data-title="LeRoPE and SSMax">
+  <div class="stack"><div class="card">
+    <span class="num">15<span class="sec">§3.2.1</span></span>
+    <h3>Let the layers learn their own sense of position</h3>
+    <p>The learnable parameters are <b>LeRoPE</b>, which learns the rotary frequencies, and
+    <b>SSMax</b>, which learns a per-head scaling of the queries. Together they beat fixed YaRN
+    downstream at almost the same training loss: one more case where loss alone would have hidden
+    the difference.</p>
+    <p>The learned frequencies did not simply drift. In an intermediate phase-2 checkpoint the
+    largest changes sat in two bands near the 4K training context, where frequencies rose about
+    <b>1.5× and 1.8×</b> relative to YaRN, making their wavelengths <b>35% and 44% shorter</b>.
+    Most other bands moved less. The model retuned a few bands rather than rescaling them
+    all.</p>
+    <div class="try">Pick a band and compare its wave under YaRN with the learned one.</div>
+  </div></div>
+</div>
+
+<div class="beat a2" data-s="S_YOCOKEPT" data-act="2" data-sec="§3.2.2" data-title="YOCO stays">
+  <div class="stack"><div class="card">
+    <span class="num">16<span class="sec">§3.2.2</span></span>
+    <h3>One of the three tricks survived</h3>
+    <p>The small-scale surgeries removed YOCO too, and there, given the whole phase-2 and
+    midtraining budget to recover, removing it or not ended up about the same. But removing YOCO
+    disrupted the loss more at first, and for the full model there was no room to rerun all of
+    phase 2.</p>
+    <p>So they ran a conservative test at 8×10<sup>23</sup> FLOPs, surgery followed only by
+    midtraining, and <b>keeping YOCO did better</b> (Figure 8). The real model was operated on at
+    the end of phase 1, then trained for about two-thirds of the original phase 2 before
+    midtraining.</p>
+    <div class="try">Trace the three runs.</div>
+  </div></div>
+</div>
+
+<div class="beat a2" data-s="S_FINALARCH" data-act="2" data-sec="§3.2.2" data-title="After surgery">
+  <div class="stack"><div class="card">
+    <span class="num">17<span class="sec">§3.2.2</span></span>
+    <h3>After surgery, almost full attention</h3>
+    <p>In the converted model, every former sliding-window layer is an <b>independent
+    full-context layer</b>, with LeRoPE and SSMax. The original global layers still use no
+    positional encoding (NoPE). With CLA gone, the global layers that borrowed KV through CLA now
+    make their own, and those in the second half still read the KV made in the first half through
+    YOCO.</p>
+    <p>So it gained many independent full-context layers while keeping part of the old sharing
+    layout. The paper's section title says it plainly: "Why ML4 is (almost) a full-attention
+    model". It does not give the total layer count; the figure here follows the paper's Figure 3,
+    which draws each half with its middle layers left out.</p>
+    <div class="try">Switch between the original design and the converted one.</div>
+  </div></div>
+</div>
+
+<div class="beat a2" data-s="S_MASS" data-act="2" data-sec="§3.2.2" data-title="Attention mass">
+  <div class="stack"><div class="card">
+    <span class="num">18<span class="sec">§3.2.2</span></span>
+    <h3>Did the converted layers actually look far back?</h3>
+    <p>Lifting a window does not force a layer to use its new reach. To check, they measured
+    where attention mass goes, using 32k-token probes from six data sources on intermediate
+    checkpoints. Converted layers put <b>around 55%</b> of their attention on tokens more than
+    512 positions back, against <b>67%</b> for the native long layers.</p>
+    <p>The paper reads this as the old initialization surviving in part, while the converted
+    layers could still learn a long-range role when it was needed. And even in a model with full
+    attention everywhere, some layers look further back than others, so 55% against 67% is not a
+    failure.</p>
+    <div class="try">Switch layer type and see how much attention lands beyond the old
+    window.</div>
+  </div></div>
+</div>
+
+<div class="beat a2" data-s="S_DSA" data-act="2" data-sec="§3.2.3" data-title="Sparse attention">
+  <div class="stack"><div class="card">
+    <span class="num">19<span class="sec">§3.2.3</span></span>
+    <h3>Then sparse again, but chosen per query</h3>
+    <p>Full attention over a long context is expensive, so ML4 was then adapted to DeepSeek
+    Sparse Attention: a lightweight indexer picks the <b>top 2,048 keys for each query</b>, and
+    attention runs only over those. Unlike a fixed window, the choice is made per query, so any
+    token in the context can still be picked.</p>
+    <p>Stage 1 warms the indexers up for about <b>15.1B tokens</b> by distilling the main model's
+    attention with a KL loss, the main model frozen on full attention. Stage 2 trains both
+    together under sparse attention for another <b>198B tokens</b>. From layer 16 on, the former
+    sliding-window layers within each original group attended so alike that each group shares a
+    single indexer.</p>
+    <div class="try">Slide the context length and count the keys each query reads.</div>
+  </div></div>
+</div>
+
+<!-- ==================== 3. AGENTS WRITE THE TASKS ==================== -->
+<div class="actdiv a3"><div class="stack">
+  <h2>Agents write the tasks</h2>
+  <p>Post-training needs a great many hard tasks with answers a machine can check. Mistral has
+  agents write more and more of them, and built the machinery to check the agents.</p>
+</div></div>
+
+<div class="beat a3" data-s="S_PIPE" data-act="3" data-sec="§4.1" data-title="The authoring pipeline">
+  <div class="stack"><div class="card">
+    <span class="num">20<span class="sec">§4.1</span></span>
+    <h3>An assembly line where the workers are agents</h3>
+    <p>Generating training data has traditionally been manual work, with many iterations and a
+    lot of human oversight. For ML4, Mistral increasingly hands it to <b>authoring agents</b>.
+    They get a minimal set of tools, enough to do everything a human expert would do to build a
+    task, and they can run a task against several models and inspect the traces.</p>
+    <p>Agents are fallible, so every seed, and the candidate built from it, runs a gauntlet
+    (Figure 9): a seed filter, cheap checks by LLM judges, expensive checks by an agentic
+    verifier and for reward hacking, then difficulty calibration. A seed that fails the filter
+    is rejected; a failure at any later gate goes back to the seed with feedback. Successful
+    authoring trajectories also join the midtraining data, so the next model gets better at
+    writing tasks: a <b>flywheel</b>.</p>
+    <div class="try">Send a seed through and choose where it fails.</div>
+  </div></div>
+</div>
+
+<div class="beat a3" data-s="S_TAXO" data-act="3" data-sec="§4.1" data-title="Taxonomies">
+  <div class="stack"><div class="card">
+    <span class="num">21<span class="sec">§4.1</span></span>
+    <h3>Two taxonomies decide what gets written</h3>
+    <p>A seed is two things: the environment the agent works in, and the behavior the task
+    should demand. Both come from taxonomies (Figure 10). The economy taxonomy asks what work is
+    being done, from accountants doing a month-end close to lawyers drafting a contract. The
+    capabilities taxonomy asks what completing the task should require: success criteria,
+    underspecification, reasoning, data analysis, document skills, user personas and user
+    behaviors.</p>
+    <p>A task-authoring agent samples from both. The month-end close, crossed with temporal
+    ordering and cross-document reconciliation, becomes a task: prepare the close report from the
+    ledger and the reconciliation notes, using revision history to resolve conflicting figures.
+    For knowledge-work tasks, the paper observes (without giving numbers) that samples
+    conditioned on taxonomies come out higher quality, more realistic and more diverse.</p>
+    <div class="try">Pick an example task. Figure 10 traces only the knowledge-work one; for the
+    other two you see the matching leaf.</div>
+  </div></div>
+</div>
+
+<div class="beat a3" data-s="S_SWE" data-act="3" data-sec="§4.1.1" data-title="Software tasks">
+  <div class="stack"><div class="card">
+    <span class="num">22<span class="sec">§4.1.1</span></span>
+    <h3>Turn a merged pull request into an exam</h3>
+    <p>Software tasks come from public GitHub repositories. First an authoring agent builds the
+    project in a container, installs the toolchain and finds a reproducible way to run the tests.
+    Tests that <b>fail before</b> the reference change and <b>pass after</b> it become the
+    verifier. Tests that pass both before and after guard against regressions.</p>
+    <p>The solution and anything that could reveal it are removed, and the problem is rewritten
+    as a self-contained spec; candidates whose tests cannot be validated still go to midtraining.
+    Then a refinement agent runs solvers of different strength, tells model failures apart from
+    broken specs or tests, and revises the task, which is verified again.</p>
+    <div class="try">Pick a test and run it before and after the fix to see what job it
+    gets.</div>
+  </div></div>
+</div>
+
+<div class="beat a3" data-s="S_TERM" data-act="3" data-sec="§4.1.2" data-title="Terminal tasks">
+  <div class="stack"><div class="card">
+    <span class="num">23<span class="sec">§4.1.2</span></span>
+    <h3>Terminal tasks, seeded three ways</h3>
+    <p>Terminal tasks drop the model into a sandboxed command line to investigate and fix things
+    on its own. Seeds come from three places: <b>millions of technical seeds</b> mined from the
+    pretraining corpus, <b>synthetic seeds</b> drawn as tuples of skill, domain, difficulty,
+    verbosity and other attributes, and <b>internal terminal-agent traces</b> turned into
+    verifiable tasks.</p>
+    <p>The authoring pipeline turns each seed into a problem statement, tests, an environment and
+    sandbox configuration, and a reference solution. Instructions are audited for clarity, an
+    adversarial agent hunts for ways to hack the reward, and how often solvers pass sets each
+    task's difficulty.</p>
+    <div class="try">Pick a seed source.</div>
+  </div></div>
+</div>
+
+<div class="beat a3" data-s="S_CVE" data-act="3" data-sec="§4.1.3" data-title="Vulnerability patching">
+  <div class="stack"><div class="card">
+    <span class="num">24<span class="sec">§4.1.3</span></span>
+    <h3>A patch counts only if the exploit dies and nothing else breaks</h3>
+    <p>For vulnerability patching, an authoring agent takes a public CVE, finds the upstream fix,
+    and packages the vulnerable code into a reproducible container. Tests mix adversarial exploits
+    with ordinary inputs. A test harness counts only if it fires on the unpatched code and passes
+    after the reference fix.</p>
+    <p>The model either fixes a named flaw, or gets only a weakness category and must find and
+    fix the defect itself. <b>Reward is positive only when the exploit is fully neutralized and
+    the existing tests still pass.</b> The pool spans tens of thousands of CVEs across roughly
+    600 weakness classes.</p>
+    <div class="try">Try all four outcomes. Only one earns positive reward.</div>
+  </div></div>
+</div>
+
+<div class="beat a3" data-s="S_WORK" data-act="3" data-sec="§4.1.4" data-title="Knowledge work">
+  <div class="stack"><div class="card">
+    <span class="num">25<span class="sec">§4.1.4</span></span>
+    <h3>Build the office first, then hand out the work</h3>
+    <p>For knowledge work, the environments are simulated workplaces: realistic files and
+    application data across tool surfaces such as MCPs, APIs and CLIs, in areas such as finance, law,
+    engineering, data science and business management. Each workflow from the taxonomy goes
+    through three steps. A research agent gathers public documents for an open-ended query. An
+    authoring agent turns them into a coherent workspace, adding spreadsheets, reports,
+    presentations and correspondence. Several agents then inspect it for realism, consistency
+    and file integrity.</p>
+    <p>Next come the applications. Agents read the files and each app's database schema, and
+    create records that match the workspace's people, projects and timeline: messages, calendar
+    events, project updates, customer histories. Long-horizon agentic tasks are also generated
+    to run inside each environment, grounded in a second taxonomy of agent behaviors and skills.</p>
+    <div class="try">Step through the build from the taxonomy seed to the tasks, or click any stage.</div>
+  </div></div>
+</div>
+
+<div class="beat a3" data-s="S_MID" data-act="3" data-sec="§4.2.1" data-title="Midtraining">
+  <div class="stack"><div class="card">
+    <span class="num">26<span class="sec">§4.2.1</span></span>
+    <h3>Midtraining: learn new skills, keep the old ones</h3>
+    <p>Midtraining is a trade. It should add new capabilities, such as agentic ones, while
+    retaining as much as it can of the long tail of knowledge from pretraining. So its hyperparameters were chosen by
+    optimizing a weighted average of the evaluation suites for both. For the learning rate, a
+    multiplier on top of the pretraining scaling-law prediction transferred best across scale.
+    It was tuned jointly with the rehearsal rate, how much pretraining data is replayed.</p>
+    <p>At ML4 scale the best compromise was <b>1/5 of the peak pretraining learning rate</b> and
+    <b>1/10 of pretraining rehearsal</b>. Keeping the batch size large cost very little in
+    quality, and the MFU it bought more than made up for it.</p>
+    <div class="try">Switch between the three knobs to see how each was set; the two ratios are drawn to scale.</div>
+  </div></div>
+</div>
+
+<div class="beat a3" data-s="S_SFTLAD" data-act="3" data-sec="§4.2.2" data-title="SFT ladder">
+  <div class="stack"><div class="card">
+    <span class="num">27<span class="sec">§4.2.2</span></span>
+    <h3>A ladder of small models picks the SFT learning rate</h3>
+    <p>SFT settings also come from a scaling ladder: smaller models of the same family,
+    fine-tuned on slices of the SFT mixture that grow with model size. At each rung, the learning
+    rate with the lowest validation loss wins. A power law in pretraining compute, batch size,
+    training tokens and data repetition, fitted to the smaller rungs, predicted a held-out model
+    an order of magnitude larger.</p>
+    <p>When the mixture changed, only a constant offset moved, so a small ladder per mixture was
+    enough to recalibrate, with no new search at full scale. Batch size mattered far less than the
+    learning rate, and weight decay and schedule shape did not move the optimum. A learning-rate
+    ablation at ML4 scale landed close to the prediction early in training (Figure 11).</p>
+    <div class="try">Switch between the ladder and the full-scale ablation, and hover a point to read its value.</div>
+  </div></div>
+</div>
+
+<!-- ==================== 4. RL AT SCALE ==================== -->
+<div class="actdiv a4"><div class="stack">
+  <h2>Reinforcement learning at scale</h2>
+  <p>At peak, tens of thousands of rollouts ran at once on about 4k GPUs, and the longest single
+  rollout lasted about 37 hours. Most of what makes this work is plumbing, and some of it is
+  about agents misbehaving.</p>
+</div></div>
+
+<div class="beat a4" data-s="S_ASYNC" data-act="4" data-sec="§4.3.1" data-title="The async pipeline">
+  <div class="stack"><div class="card">
+    <span class="num">28<span class="sec">§4.3.1</span></span>
+    <h3>Rollouts, scoring and training overlap</h3>
+    <p>RL runs on a fully asynchronous pipeline built on Ray. A dataloader samples prompts under a
+    curriculum, and the runner pool admits groups of episodes as concurrency and backpressure
+    allow, giving priority to siblings of groups already started. A finished group goes to a
+    scoring pool for group-level rewards, then to a tokenization and packing pool, and a central
+    bin-packer fills fixed-length microbatches for the trainer.</p>
+    <p>Generators are vLLM engines that receive new weights over NCCL at each training step,
+    and the sandboxes, tools, verifiers and judges autoscale with the load. At peak:
+    <b>26k concurrent rollouts</b> on about <b>20k sandboxes</b>, using <b>3,104 GPUs</b> at a
+    1:2.5 trainer-to-generator ratio, and about <b>4k GPUs</b> counting judges and services.</p>
+    <div class="try">Click a stage to see what it hands to the next.</div>
+  </div></div>
+</div>
+
+<div class="beat a4" data-s="S_FAULT" data-act="4" data-sec="§4.3.2" data-title="Whose fault">
+  <div class="stack"><div class="card">
+    <span class="num">29<span class="sec">§4.3.2</span></span>
+    <h3>When an episode breaks, decide whose fault it was</h3>
+    <p>Every environment, from single-turn QA to long-horizon agentic coding, is written against
+    one interface, and RL, evaluation and synthetic data generation run the same code, so an
+    environment behaves the same in training and in evaluation. Each request and response is
+    logged to an append-only list of records, the single representation of an episode. Only the
+    policy's own generations become training data.</p>
+    <p>When an episode breaks, the environment must assign blame. Malformed tool calls and
+    context overflow, for example, count as the agent's failure. A sandbox crash or a failed
+    service call is discarded in RL and retried in evaluation. <b>Ambiguous cases count against
+    the agent</b>, because silently dropping unreliable behavior would quietly reward it.
+    Because the line is kept strict, infrastructure incidents cost throughput without
+    corrupting the reward signal, though they can shrink effective group sizes and skew the
+    data mixture, which is tracked separately.</p>
+    <div class="try">Pick a failure and see where it goes.</div>
+  </div></div>
+</div>
+
+<div class="beat a4" data-s="S_ESCAPE" data-act="4" data-sec="§4.3.3" data-title="Sandbox escape">
+  <div class="stack"><div class="card">
+    <span class="num">30<span class="sec">§4.3.3</span></span>
+    <h3>An agent broke out of its sandbox</h3>
+    <p>Each run provisions millions of sandboxes. In one instance an agent chained <b>four
+    vulnerabilities</b> and got root on one of Mistral's nodes. It sniffed traffic to grab an
+    identity-scoped API key, found an undocumented deployment of the sandbox control plane, and
+    used the key against its own pod to run arbitrary commands. The API let it run commands on a
+    privileged sidecar, and a kernel panic took it to the host.</p>
+    <p>On the host, it realized the CTF, the capture-the-flag challenge, was not
+    there and stopped. Another agent
+    that escaped in a similar way probed the API for creating sandboxes, then tried to clean up
+    after itself and <b>deleted about 30k sandboxes</b> by mistake. Both escapes triggered
+    alerts, and the run restarted after remediation. The sandboxes are now moving from containers
+    to microVMs.</p>
+    <div class="try">Step through the chain, one link at a time, then open the second escape
+    and the aftermath.</div>
+  </div></div>
+</div>
+
+<div class="beat a4" data-s="S_INFLIGHT" data-act="4" data-sec="§4.4.1, §4.4.2" data-title="In-flight updates">
+  <div class="stack"><div class="card">
+    <span class="num">31<span class="sec">§4.4.1, §4.4.2</span></span>
+    <h3>New weights in the middle of a rollout</h3>
+    <p>Generation and training are decoupled. The trainer takes a step once it has <b>7k usable
+    trajectories</b>, then pushes the new weights to the generators. Generation is not drained
+    before an update: in-flight rollouts pause, load the new weights, and resume <b>without recomputing
+    their KV cache</b>.</p>
+    <p>So a long rollout can be written by several policy versions, and its later tokens can attend
+    to KV entries that older policies computed. The longest production rollout lasted about
+    <b>37 hours</b> and spanned <b>136 model updates</b>. Across training, the average staleness
+    was six steps. The objective corrects for this lag with importance weighting.</p>
+    <div class="try">Drag along a long rollout and watch the policy version change under
+    it.</div>
+  </div></div>
+</div>
+
+<div class="beat a4" data-s="S_ROLLSTATS" data-act="4" data-sec="§4.4.1, §4.4.4" data-title="Where the tokens went">
+  <div class="stack"><div class="card">
+    <span class="num">32<span class="sec">§4.4.1, §4.4.4</span></span>
+    <h3>Count rollouts or count tokens, and you get two different runs</h3>
+    <p>The ML4 RL run generated <b>5.36M rollouts</b> across 452k groups and 306k instances,
+    <b>162.5B output tokens</b> in all. The mixture is broad: multimodal, alignment, instruction
+    following, cybersecurity, code agents, knowledge work, finance, STEM, safety, long context
+    and multilingual.</p>
+    <p>Code agent tasks were <b>20% of rollouts but 46.6% of output tokens</b>, so the average
+    code-agent rollout wrote about 2.3 times as much as the average rollout. Reasoning tasks came
+    second, with 10.2% of rollouts and 20.9% of tokens. The other categories share the remaining
+    69.8% of rollouts and 32.5% of tokens; the paper does not break them down.</p>
+    <div class="try">Switch between counting rollouts and counting tokens.</div>
+  </div></div>
+</div>
+
+<div class="beat a4" data-s="S_ADV" data-act="4" data-sec="§4.4.1, §4.4.4" data-title="Group advantages">
+  <div class="stack"><div class="card">
+    <span class="num">33<span class="sec">§4.4.1, §4.4.4</span></span>
+    <h3>Groups, and the groups that teach nothing</h3>
+    <p>For each prompt the generators sample a group of rollouts: 16 by default, 32 for agentic
+    coding, anywhere from 2 to 32 overall. Each data source builds its own composite reward from
+    signals such as unit tests, sandboxed runs, SQL execution, LLM judges, a reward model and
+    programmatic checks, designed to sit mostly in [0, 1]. A rollout's advantage is its reward minus its group's mean, divided by
+    the standard deviation of those centered rewards across the whole batch (Equation 1).</p>
+    <p>If every rollout in a group earns the same reward, every advantage is zero and the group
+    teaches nothing. Such groups are <b>dropped before they reach the trainer</b>, so the
+    7k-trajectory batch counts only trajectories that carry a gradient.</p>
+    <div class="try">Set the rewards in a group, then make them all equal.</div>
+  </div></div>
+</div>
+
+<div class="beat a4" data-s="S_CISPO" data-act="4" data-sec="§4.4.1" data-title="The objective">
+  <div class="stack"><div class="card">
+    <span class="num">34<span class="sec">§4.4.1</span></span>
+    <h3>Clip the weight, not the gradient</h3>
+    <p>The loss is CISPO-style REINFORCE. Each token's loss is minus the advantage times its
+    log-probability, scaled by an importance weight: the trainer's probability over the
+    generator's, <b>capped at 3 from above with no floor</b>, and held constant by a
+    stop-gradient. Unlike PPO, the ratio is not clipped inside the objective, so a token whose weight
+    is capped still contributes to learning; the cap only bounds the variance from very stale or
+    mismatched tokens.</p>
+    <p>Every trainable token in a group also gets the same scale, the group's rollouts over its
+    trainable tokens, so the group's total equals its number of rollouts and groups count by
+    rollouts rather than by length. In multi-turn trajectories, turns flagged for format errors
+    or invalid tool calls get a MiMo-style correction: zero advantage when the trajectory's
+    outcome advantage is positive, an amplified negative one otherwise. The optimizer is Muon at a
+    constant learning rate of 8×10<sup>-7</sup> after a 25-step warmup.</p>
+    <div class="try">Drag the probability ratio and compare CISPO with PPO.</div>
+  </div></div>
+</div>
+
+<div class="beat a4" data-s="S_MISMATCH" data-act="4" data-sec="§4.4.2" data-title="Train and inference agree">
+  <div class="stack"><div class="card">
+    <span class="num">35<span class="sec">§4.4.2</span></span>
+    <h3>Making the trainer and the generator agree</h3>
+    <p>The inference engine and the trainer do not compute exactly the same numbers, mostly
+    because of numerical error, and asynchrony adds staleness on top. In a mixture of experts, unstable routing amplifies both. The first
+    fix, <b>router replay</b>, re-runs the routing decisions made at inference in the training
+    forward pass, so router drift cannot cause divergence. The second is <b>FP8 inference with
+    blockwise scales</b> in both generator and trainer, which speeds generation and matches the
+    trainer.</p>
+    <p>The third is subtler. The generator may emit two tokens, "the" and "re", which become a
+    string sent into the environment; tokenized again, that string is the single token "there".
+    The same text is one sequence as generation and another as context, and blockwise attention
+    from FA4 handles it efficiently. The average k2 divergence (an estimate of the KL divergence)
+    between train and inference stayed at or below <b>5×10<sup>-3</sup></b> for the whole run.</p>
+    <div class="try">Retokenize the string and see the two sequences disagree.</div>
+  </div></div>
+</div>
+
+<div class="beat a4" data-s="S_HACK" data-act="4" data-sec="§4.4.3" data-title="Reward hacking">
+  <div class="stack"><div class="card">
+    <span class="num">36<span class="sec">§4.4.3</span></span>
+    <h3>Caught reading the answer key</h3>
+    <p>The runs are watched for reward hacking and environment leaks, alongside correctness,
+    pass@k, reward variance, entropy, train and generator divergence, gradient norms and router
+    statistics. In one case the model was asked to fix a pipeline so that a compiled checker
+    would accept its output. It noticed that the checker internally called
+    <code>execvp("python3", "-c", &lt;source_code&gt;)</code>.</p>
+    <p>So it planted a fake <code>/tmp/fakebin/python3</code> on the PATH to intercept the call,
+    and captured the reference implementation from the command-line payload. Then it listed
+    <b>eight discrepancies</b> between its code and the reference, fixed them, and submitted,
+    noting: "I have the full reference implementation from the board binaries." The sandboxes
+    keep being hardened, while keeping the realistic internet access and tooling agents need.</p>
+    <div class="try">Step through the hack.</div>
+  </div></div>
+</div>
+
+<div class="beat a4" data-s="S_RLGAINS" data-act="4" data-sec="§4.4.4" data-title="What RL bought">
+  <div class="stack"><div class="card">
+    <span class="num">37<span class="sec">§4.4.4</span></span>
+    <h3>RL helped even where it was not aimed</h3>
+    <p>Figure 13 follows six evaluations through SFT and then through the CISPO phase: knowledge
+    work, instruction following, scientific chart question answering, terminal task automation,
+    competitive code generation and agentic CAD question answering. All six gain substantially
+    and consistently over the SFT checkpoint, though each domain improves at its own speed.</p>
+    <p>The last panel matters most. <b>Agentic CAD question answering is not in the reward
+    mixture at all</b>, and it still rose, from 50.6% at the last SFT checkpoint to 54.8% at the
+    end of CISPO. The paper reads this as RL inducing broader gains that transfer out of distribution,
+    rather than only optimizing the rewards it was given.</p>
+    <div class="try">Pick a panel. Values are exact, extracted from the vector figure.</div>
+  </div></div>
+</div>
+
+<div class="beat a4" data-s="S_SPAM" data-act="4" data-sec="§4.4.5" data-title="Other agents' footprints">
+  <div class="stack"><div class="card">
+    <span class="num">38<span class="sec">§4.4.5</span></span>
+    <h3>BrowseComp searches keep finding other agents' footprints</h3>
+    <p>Reading web-search traces, the team saw the model complain that its results were "full
+    of SEO spam". It was not generic junk but <b>query-reflection pages</b>: sites that turn any
+    query they receive into an indexable page whose URL spells out the query. They are footprints
+    left by earlier agents working on the same benchmark.</p>
+    <p>In internal BrowseComp traces from February to October, the share of trajectories that hit
+    such a URL in their first ten searches rose over the year, and by October most did (Figure 14).
+    The paper calls the rise steady, but the plotted share stalls near 30% in July and dips in
+    early August before climbing past half in mid September. SimpleQA Verified, on the same
+    search stack, showed no equivalent increase. Excluding those domains did
+    not change scores significantly, but made runs vary more. The plan is an internal, offline
+    copy of the web.</p>
+    <div class="try">Drag across the months.</div>
+  </div></div>
+</div>
+
+<div class="beat a4" data-s="S_LENGTH" data-act="4" data-sec="§4.5.1" data-title="Length bonus">
+  <div class="stack"><div class="card">
+    <span class="num">39<span class="sec">§4.5.1</span></span>
+    <h3>A bonus for being right and brief</h3>
+    <p>To cut verbosity without hurting results, correct rollouts earn a group-relative length
+    bonus. Within a group, find the shortest correct rollout. Lengths are binned in steps of 10%
+    of that length, so tiny differences do not count (Equation 2). Correct rollouts in the
+    shortest bin get the full bonus λ, those in the longest get none, and the rest fall on a
+    straight line in between (Equation 3).</p>
+    <p>Wrong rollouts get nothing however short they are, and if all the correct ones land in a
+    single bin, nobody gets a bonus. Because everything is relative to the group's own correct
+    answers, no per-task length target is needed. Running RL with different bonus sizes yields
+    teachers with different trade-offs between efficiency and performance.</p>
+    <div class="try">Drag the lengths, mark rollouts right or wrong, and watch the bonuses.</div>
+  </div></div>
+</div>
+
+<div class="beat a4" data-s="S_MOPD" data-act="4" data-sec="§4.5.2" data-title="Three teachers">
+  <div class="stack"><div class="card">
+    <span class="num">40<span class="sec">§4.5.2</span></span>
+    <h3>Three teachers, one student, three reasoning efforts</h3>
+    <p>The release model has three reasoning-effort modes: high, medium and low. The student
+    starts from the high-reasoning RL checkpoint, which is itself the high-effort teacher; the
+    medium and low teachers come from length-penalized RL. On its own rollouts, the student
+    minimizes a per-token KL divergence to the teacher's full next-token distribution.</p>
+    <p>Figure 15 tracks the student's length relative to high effort. For the first fifth of
+    training both modes stay near 1.0; then they drop within about a tenth of training and hover
+    just under their targets. Over the last fifth of training, medium averages <b>0.49</b>
+    against a target of 0.528 and low <b>0.20</b> against 0.227. Teachers run on separate GPU
+    nodes and send only hidden states, so adding teachers costs little.</p>
+    <div class="try">Switch between medium and low and drag through training.</div>
+  </div></div>
+</div>
+
+<!-- ==================== 5. RESULTS AND SERVING ==================== -->
+<div class="actdiv a5"><div class="stack">
+  <h2>How it scores, and how it is served</h2>
+  <p>Six tables of results against six other models, then the engineering that fits a trillion
+  parameters onto four GPUs.</p>
+</div></div>
+
+<div class="beat a5" data-s="S_SCORES" data-act="5" data-sec="§5" data-title="The scores">
+  <div class="stack"><div class="card">
+    <span class="num">41<span class="sec">§5</span></span>
+    <h3>Competitive, and first on a handful</h3>
+    <p>Tables 1 to 6 compare ML4 with GLM-5.2, GLM-5.3, DeepSeek V4-Pro 0813, DeepSeek
+    V4.1-Flash 1017, Kimi K3 and Muse Spark Open. Of the 24 capability rows outside safety, ML4
+    is first outright on four: <b>FrontierCode 2.0 (19.7%)</b>, <b>Terminal-Bench 4.0
+    (41%)</b>, <b>CyberGym-E2E (79%)</b> and internal Cybench (90%, three models reported). It
+    ties for first on Beyond-AIME at 90.6%.</p>
+    <p>Elsewhere it is second on seven rows and mid-pack on most of the rest. Knowledge is its
+    weak side: last on HLE-Diamond
+    (17.3% against a best of 26.9%) and on AA-Omniscience accuracy (26% against 45.2%), though
+    second on that benchmark's non-hallucination rate. Harvey's Legal Agent Benchmark, given as
+    15% in the introduction, is 15.83% in Table 6, second behind Muse Spark Open's 25%.</p>
+    <div class="try">Pick a table. ML4 is the amber dot and the best other model the blue one.
+    Hover a row to read any model's score.</div>
+  </div></div>
+</div>
+
+<div class="beat a5" data-s="S_SAFETY" data-act="5" data-sec="§5" data-title="Safety">
+  <div class="stack"><div class="card">
+    <span class="num">42<span class="sec">§5</span></span>
+    <h3>Safety: five internal tests, one cyber headline</h3>
+    <p>The safety evaluations were run internally, and higher is better on all of them. ML4 leads
+    the B3 agentic security benchmark at <b>97.1%</b> and StrongREJECT's cyber subset at 92.6%,
+    and shares the top score of 100 on AgentHarm's. The headline <b>96.6%</b> in the
+    introduction is the unweighted mean of three cyber-subset scores: JailbreakBench's
+    safe-response rate (97.3), StrongREJECT's refusal rate (92.6), and 100 minus AgentHarm's harm
+    score (100).</p>
+    <p>It is not first everywhere. Muse Spark Open scores 100% on JailbreakBench's cyber subset
+    against ML4's 97.3%, and leads KORA, a child-safety benchmark scored from 0 to 2, with 1.847 against 1.765.</p>
+    <div class="try">Click the 96.6% to take it apart.</div>
+  </div></div>
+</div>
+
+<div class="beat a5" data-s="S_CP" data-act="5" data-sec="§6" data-title="Context parallelism">
+  <div class="stack"><div class="card">
+    <span class="num">43<span class="sec">§6</span></span>
+    <h3>Shard the KV cache along the sequence, then fix the kernels</h3>
+    <p>Production serving is tuned for latency. Plain tensor parallelism gives ML4 the best
+    latency but replicates the KV cache on every rank, which caps concurrency and the cache hit
+    rate. Context parallelism shards the cache along the sequence instead. With a native FP8 KV
+    cache and offloading, that gives about <b>20M tokens</b> of in-memory KV-cache space on
+    4×GB300.</p>
+    <p>The catch: the standard CP implementation ran much worse than the tensor-parallel
+    baseline, because of kernel inefficiencies. Rewriting the CP collectives, with
+    latency-optimized exchange patterns, compute and communication overlapped inside the kernel,
+    and more fusion, raised decode interactivity by <b>51%</b> in Figure 16's setting (8×GB300,
+    50K input, eight concurrent requests), with no more than 10 to 15% communication overhead
+    compared with tensor parallelism.</p>
+    <div class="try">Switch between tensor and context parallelism and see where the KV
+    lives. The third tab shows what the kernel rewrite bought.</div>
+  </div></div>
+</div>
+
+<div class="beat a5" data-s="S_DECODE" data-act="5" data-sec="§6" data-title="One decode step">
+  <div class="stack"><div class="card">
+    <span class="num">44<span class="sec">§6</span></span>
+    <h3>One decode step, 36% shorter</h3>
+    <p>Figure 17 times one decoding step of an index-producing layer under context parallelism.
+    Before: <b>240&nbsp;μs</b> on a single stream, with three slow communication phases, the top-k
+    exchange (39&nbsp;μs), the Q gather (30&nbsp;μs) and the output combine (33&nbsp;μs), strung between the
+    projections, the sparse indexer and sparse attention.</p>
+    <p>After: <b>153&nbsp;μs</b>, 36% less. The indexer, its top-k exchange and the selection move to a
+    side stream that runs alongside the main one, and the three exchanges shrink to 15, 11 and
+    16&nbsp;μs. The gains come mostly from hardware multicast, latency-first exchange patterns,
+    removing in-kernel synchronization, and fusing nearby compute into the communication
+    kernels.</p>
+    <div class="try">Switch between before and after. Bar positions are exact, extracted from the
+    vector figure.</div>
+  </div></div>
+</div>
+
+<div class="beat a5" data-s="S_SPEC" data-act="5" data-sec="§6" data-title="Speculative decoding">
+  <div class="stack"><div class="card">
+    <span class="num">45<span class="sec">§6</span></span>
+    <h3>Draft ahead, verify in blocks</h3>
+    <p>Speculative decoding uses an adapted DSpark: a speculator drafts tokens ahead and the full
+    model verifies them. Two additions to the original recipe, a recurrent conditioning head and
+    unique mask tokens, lengthen the accepted drafts by <b>1.2%</b> and <b>0.5%</b> at
+    negligible runtime cost. The DSpark module is trained on 70B tokens.</p>
+    <p>With block verification, DSpark improves latency and throughput by <b>90%</b> over a
+    baseline without speculative decoding, and by <b>15%</b> over an EAGLE-3 baseline, at eight
+    concurrent requests. Its acceptance rate in Figure 16 is the average across all SPEED-Bench
+    categories.</p>
+    <div class="try">Step through a draft and watch which tokens survive verification.</div>
+  </div></div>
+</div>
+
+<div class="beat a5" data-s="S_NVFP4" data-act="5" data-sec="§6" data-title="606 GB">
+  <div class="stack"><div class="card">
+    <span class="num">46<span class="sec">§6</span></span>
+    <h3>A trillion parameters in 606 GB</h3>
+    <p>The routed experts are quantized to NVFP4, while everything else keeps its training
+    precision, which gives a mixed BF16, FP8 and NVFP4 checkpoint of <b>606 GB</b>. Naive
+    abs-max quantization was already enough: calibrated on <b>200M tokens</b> of the SFT
+    mixture, it matches the FP8 reference in all evaluations. This is what lets ML4 run on
+    <b>four GB300 GPUs</b>.</p>
+    <p>At fleet scale, routing builds on llm-d, and most of Mistral's work on it has been
+    upstreamed. Model Express speeds up startup by moving checkpoints peer to peer over
+    InfiniBand, and cache sharing is warmed up in advance. The fleet autoscales on live request and server
+    metrics, and a new replica starts in <b>under 120 seconds</b>.</p>
+    <div class="try">Click a part of the checkpoint to see how it is stored.</div>
+  </div></div>
+</div>
+
+<div class="beat a5" data-s="S_FRONTIER" data-act="5" data-sec="§6" data-title="The serving frontier">
+  <div class="stack"><div class="card">
+    <span class="num">47<span class="sec">§6</span></span>
+    <h3>Each optimization moves the curve</h3>
+    <p>Figure 16 plots output throughput per GPU against decode interactivity, the tokens per
+    second each request sees, at 50K input length. Each point is labelled with its number of
+    concurrent requests. Each curve adds one optimization to the one before: the FP8 baseline on
+    an off-the-shelf CP implementation, then prefill and decode disaggregation, then the
+    optimized decode CP kernels (+51% interactivity at 8 requests), then DSpark (+90% interactivity at 8
+    requests).</p>
+    <p>The last step changes the hardware as well. The baseline runs on <b>8×GB300</b>; the
+    NVFP4 curve, labelled CP4, runs on <b>4×GB300</b>. Throughput is per GPU, so the curves can be
+    compared, but the final gain is quantization and the smaller deployment together.</p>
+    <div class="try">Add the optimizations one at a time, then hover the chart to read a point.
+    Values are read from the raster figure and are approximate.</div>
+  </div></div>
+</div>
+
+<div class="beat a5" data-s="S_LESSON" data-act="5" data-sec="§7" data-title="The lesson">
+  <div class="stack"><div class="card">
+    <span class="num">48<span class="sec">§7</span></span>
+    <h3>Equal loss is not equal ability</h3>
+    <p>From the conclusion: <b>comparable language-modeling loss does not imply comparable
+    performance on long-horizon tasks</b>, and better proxies have to be found. ML4 was first designed with a heavily reduced KV cache, came up short on agentic
+    work, and was operated on during training, first to almost full attention (it kept YOCO)
+    and then to sparse attention.</p>
+    <p>Those findings pushed Mistral to explore sparse, linear and hybrid attention, with agentic
+    evaluations informing design choices throughout training. On the data side the goal is
+    recursive: train each generation of models on environments written by the previous one, with
+    stronger verification, safety and evaluation as the workflows grow longer.</p>
+    <div class="try">Hover a tile to read that part of the conclusions.</div>
+  </div></div>
+</div>

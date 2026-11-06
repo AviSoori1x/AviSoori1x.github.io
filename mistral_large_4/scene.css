@@ -1,0 +1,6 @@
+/* Figure controls are SVG groups with tabindex. A mouse click must not leave the
+   browser's black focus box on them; a keyboard user still gets a clear ring.
+   engine.js puts .kbd on <body> after Tab and takes it off on any pointer press. */
+.scene [tabindex]:focus { outline: none; }
+body.kbd .scene [tabindex]:focus { outline: 2px solid var(--blue); outline-offset: 3px; border-radius: 8px; }
+.scene [role=button] { cursor: pointer; }

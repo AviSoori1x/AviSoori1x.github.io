@@ -1,0 +1,831 @@
+{
+ "source": "Mistral Large 4 technical report, v3 (alphaxiv 2611.mistral-large-4)",
+ "cols": [
+  "GLM-5.2",
+  "GLM-5.3",
+  "DeepSeek V4-Pro 0813",
+  "DeepSeek V4.1-Flash 1017",
+  "Kimi K3",
+  "Muse Spark Open",
+  "Mistral Large 4"
+ ],
+ "ml4": 6,
+ "tables": [
+  {
+   "n": 1,
+   "title": "General agent evaluations",
+   "caption": "General agent evaluations.",
+   "rows": [
+    {
+     "name": "AA-Briefcase (AA)",
+     "cite_name": "AA-Briefcase (AA) [50]",
+     "vals": [
+      37.0,
+      51.0,
+      38.0,
+      53.5,
+      50.0,
+      39.0,
+      42.5
+     ],
+     "raw": [
+      "37.0%",
+      "51.0%",
+      "38.0%",
+      "53.5%",
+      "50.0%",
+      "39.0%",
+      "42.5%"
+     ]
+    },
+    {
+     "name": "AutomationBench (AA)",
+     "cite_name": "AutomationBench (AA) [51]",
+     "vals": [
+      28.4,
+      62.2,
+      56.7,
+      66.6,
+      58.3,
+      49.7,
+      57.8
+     ],
+     "raw": [
+      "28.4%",
+      "62.2%",
+      "56.7%",
+      "66.6%",
+      "58.3%",
+      "49.7%",
+      "57.8%"
+     ]
+    },
+    {
+     "name": "GDP.pdf (AA)",
+     "cite_name": "GDP.pdf (AA) [52]",
+     "vals": [
+      10.4,
+      11.2,
+      11.4,
+      17.2,
+      22.0,
+      18.6,
+      17.6
+     ],
+     "raw": [
+      "10.4%",
+      "11.2%",
+      "11.4%",
+      "17.2%",
+      "22.0%",
+      "18.6%",
+      "17.6%"
+     ]
+    },
+    {
+     "name": "BrowseComp subset (internal)",
+     "cite_name": "BrowseComp subset (internal) [24]",
+     "vals": [
+      null,
+      82.5,
+      null,
+      null,
+      86.83,
+      null,
+      85.0
+     ],
+     "raw": [
+      "—",
+      "82.50%",
+      "—",
+      "—",
+      "86.83%",
+      "—",
+      "85.00%"
+     ]
+    }
+   ]
+  },
+  {
+   "n": 2,
+   "title": "Reasoning and knowledge evaluations",
+   "caption": "Reasoning and knowledge evaluations.",
+   "rows": [
+    {
+     "name": "HLE-Diamond (AA)",
+     "cite_name": "HLE-Diamond (AA) [53, 54]",
+     "vals": [
+      null,
+      17.9,
+      19.5,
+      25.3,
+      26.9,
+      26.3,
+      17.3
+     ],
+     "raw": [
+      "—",
+      "17.9%",
+      "19.5%",
+      "25.3%",
+      "26.9%",
+      "26.3%",
+      "17.3%"
+     ]
+    },
+    {
+     "name": "CritPt v2 (Hard Subset, AA)",
+     "cite_name": "CritPt v2 (Hard Subset, AA) [55, 56]",
+     "vals": [
+      null,
+      33.5,
+      23.5,
+      24.0,
+      39.5,
+      27.5,
+      26.0
+     ],
+     "raw": [
+      "—",
+      "33.5%",
+      "23.5%",
+      "24.0%",
+      "39.5%",
+      "27.5%",
+      "26.0%"
+     ]
+    },
+    {
+     "name": "AA-Omniscience v1.1 Accuracy (AA)",
+     "cite_name": "AA-Omniscience v1.1 Accuracy (AA) [57]",
+     "vals": [
+      null,
+      32.3,
+      45.2,
+      39.6,
+      null,
+      42.0,
+      26.0
+     ],
+     "raw": [
+      "—",
+      "32.3%",
+      "45.2%",
+      "39.6%",
+      "—",
+      "42.0%",
+      "26.0%"
+     ]
+    },
+    {
+     "name": "AA-Omniscience v1.1 Non-Hallucination Rate (AA)",
+     "cite_name": "AA-Omniscience v1.1 Non-Hallucination Rate (AA) [57]",
+     "vals": [
+      null,
+      61.1,
+      5.9,
+      35.9,
+      null,
+      72.0,
+      71.8
+     ],
+     "raw": [
+      "—",
+      "61.1%",
+      "5.9%",
+      "35.9%",
+      "—",
+      "72.0%",
+      "71.8%"
+     ]
+    },
+    {
+     "name": "ArXivMath 03/26 to 05/26 (internal)",
+     "cite_name": "ArXivMath 03/26–05/26 (internal) [58]",
+     "vals": [
+      39.4,
+      58.4,
+      58.6,
+      61.2,
+      50.5,
+      56.2,
+      53.9
+     ],
+     "raw": [
+      "39.4%",
+      "58.4%",
+      "58.6%",
+      "61.2%",
+      "50.5%",
+      "56.2%",
+      "53.9%"
+     ]
+    },
+    {
+     "name": "ArXivMath 06/26 to 09/26 (internal)",
+     "cite_name": "ArXivMath 06/26–09/26 (internal) [58]",
+     "vals": [
+      16.4,
+      32.7,
+      29.4,
+      38.8,
+      28.8,
+      31.8,
+      30.5
+     ],
+     "raw": [
+      "16.4%",
+      "32.7%",
+      "29.4%",
+      "38.8%",
+      "28.8%",
+      "31.8%",
+      "30.5%"
+     ]
+    },
+    {
+     "name": "Beyond-AIME (internal)",
+     "cite_name": "Beyond-AIME (internal) [59, 60]",
+     "vals": [
+      76.1,
+      90.6,
+      90.1,
+      90.6,
+      87.9,
+      84.9,
+      90.6
+     ],
+     "raw": [
+      "76.1%",
+      "90.6%",
+      "90.1%",
+      "90.6%",
+      "87.9%",
+      "84.9%",
+      "90.6%"
+     ]
+    }
+   ]
+  },
+  {
+   "n": 3,
+   "title": "Code evaluations",
+   "caption": "Code evaluations.",
+   "rows": [
+    {
+     "name": "AA Coding Agent Index v2 (AA)",
+     "cite_name": "AA Coding Agent Index v2 (AA) [61]",
+     "vals": [
+      null,
+      48.9,
+      null,
+      46.3,
+      41.4,
+      26.3,
+      48.3
+     ],
+     "raw": [
+      "—",
+      "48.9%",
+      "—",
+      "46.3%",
+      "41.4%",
+      "26.3%",
+      "48.3%"
+     ]
+    },
+    {
+     "name": "FrontierCode 2.0 (Cognition)",
+     "cite_name": "FrontierCode 2.0 (Cognition) [2]",
+     "vals": [
+      null,
+      17.8,
+      null,
+      19.3,
+      17.3,
+      null,
+      19.7
+     ],
+     "raw": [
+      "—",
+      "17.8%",
+      "—",
+      "19.3%",
+      "17.3%",
+      "—",
+      "19.7%"
+     ]
+    },
+    {
+     "name": "Terminal-Bench 2.1",
+     "cite_name": "Terminal-Bench 2.1 [62, 63]",
+     "vals": [
+      81.0,
+      88.2,
+      87.9,
+      90.6,
+      88.3,
+      76.4,
+      90.2
+     ],
+     "raw": [
+      "81.0%",
+      "88.2%",
+      "87.9%",
+      "90.6%",
+      "88.3%",
+      "76.4%",
+      "90.2%"
+     ]
+    },
+    {
+     "name": "Terminal-Bench 4.0 (AA Coding Agent Index)",
+     "cite_name": "Terminal-Bench 4.0 (AA Coding Agent Index) [4, 61]",
+     "vals": [
+      null,
+      40.0,
+      null,
+      31.0,
+      21.0,
+      6.0,
+      41.0
+     ],
+     "raw": [
+      "—",
+      "40.0%",
+      "—",
+      "31.0%",
+      "21.0%",
+      "6.0%",
+      "41.0%"
+     ]
+    },
+    {
+     "name": "DeepSWE 1.1",
+     "cite_name": "DeepSWE 1.1 [64]",
+     "vals": [
+      46.2,
+      66.9,
+      null,
+      74.2,
+      67.5,
+      60.0,
+      65.2
+     ],
+     "raw": [
+      "46.2%",
+      "66.9%",
+      "—",
+      "74.2%",
+      "67.5%",
+      "60.0%",
+      "65.2%"
+     ]
+    }
+   ]
+  },
+  {
+   "n": 4,
+   "title": "Cybersecurity evaluations",
+   "caption": "Cybersecurity evaluations.",
+   "rows": [
+    {
+     "name": "AA Cyber Index (AA)",
+     "cite_name": "AA Cyber Index (AA) [5]",
+     "vals": [
+      null,
+      36.0,
+      null,
+      56.8,
+      41.0,
+      null,
+      50.9
+     ],
+     "raw": [
+      "—",
+      "36.0%",
+      "—",
+      "56.8%",
+      "41.0%",
+      "—",
+      "50.9%"
+     ]
+    },
+    {
+     "name": "CWE-Bench-AA (AA)",
+     "cite_name": "CWE-Bench-AA (AA) [65, 66]",
+     "vals": [
+      null,
+      56.0,
+      null,
+      69.2,
+      53.0,
+      null,
+      58.0
+     ],
+     "raw": [
+      "—",
+      "56.0%",
+      "—",
+      "69.2%",
+      "53.0%",
+      "—",
+      "58.0%"
+     ]
+    },
+    {
+     "name": "DeepsecBench-AA (AA)",
+     "cite_name": "DeepsecBench-AA (AA) [67, 68]",
+     "vals": [
+      null,
+      24.0,
+      null,
+      24.9,
+      12.0,
+      null,
+      16.0
+     ],
+     "raw": [
+      "—",
+      "24.0%",
+      "—",
+      "24.9%",
+      "12.0%",
+      "—",
+      "16.0%"
+     ]
+    },
+    {
+     "name": "CyberGym-E2E-AA (AA)",
+     "cite_name": "CyberGym-E2E-AA (AA) [69–71]",
+     "vals": [
+      null,
+      29.0,
+      null,
+      76.3,
+      58.0,
+      null,
+      79.0
+     ],
+     "raw": [
+      "—",
+      "29.0%",
+      "—",
+      "76.3%",
+      "58.0%",
+      "—",
+      "79.0%"
+     ]
+    },
+    {
+     "name": "Cybench (internal)",
+     "cite_name": "Cybench (internal) [72]",
+     "vals": [
+      null,
+      87.5,
+      null,
+      null,
+      87.5,
+      null,
+      90.0
+     ],
+     "raw": [
+      "—",
+      "87.5%",
+      "—",
+      "—",
+      "87.5%",
+      "—",
+      "90.0%"
+     ]
+    }
+   ]
+  },
+  {
+   "n": 5,
+   "title": "Safety evaluations run internally; higher is better for all",
+   "caption": "Safety evaluations run internally; higher is better for all. KORA: mean score on a 0–2 scale. The cyber safety aggregate is the unweighted mean of JailbreakBench’s safe-response rate, StrongREJECT’s refusal rate, and 100 minus AgentHarm’s harm score.",
+   "rows": [
+    {
+     "name": "KORA Benchmark",
+     "cite_name": "KORA Benchmark [73]",
+     "vals": [
+      1.383,
+      1.586,
+      1.433,
+      1.632,
+      1.628,
+      1.847,
+      1.765
+     ],
+     "raw": [
+      "1.383",
+      "1.586",
+      "1.433",
+      "1.632",
+      "1.628",
+      "1.847",
+      "1.765"
+     ]
+    },
+    {
+     "name": "B3 agentic security benchmark",
+     "cite_name": "B3 agentic security benchmark [74]",
+     "vals": [
+      88.6,
+      94.8,
+      84.8,
+      91.9,
+      86.2,
+      93.8,
+      97.1
+     ],
+     "raw": [
+      "88.6%",
+      "94.8%",
+      "84.8%",
+      "91.9%",
+      "86.2%",
+      "93.8%",
+      "97.1%"
+     ]
+    },
+    {
+     "name": "JailbreakBench (cyber subset): safe-response rate",
+     "cite_name": "JailbreakBench (cyber subset): safe-response rate [6]",
+     "vals": [
+      91.9,
+      81.1,
+      64.9,
+      94.6,
+      86.5,
+      100.0,
+      97.3
+     ],
+     "raw": [
+      "91.9%",
+      "81.1%",
+      "64.9%",
+      "94.6%",
+      "86.5%",
+      "100.0%",
+      "97.3%"
+     ]
+    },
+    {
+     "name": "StrongREJECT (cyber subset): refusal rate",
+     "cite_name": "StrongREJECT (cyber subset): refusal rate [7]",
+     "vals": [
+      83.3,
+      87.0,
+      77.4,
+      87.0,
+      77.8,
+      90.7,
+      92.6
+     ],
+     "raw": [
+      "83.3%",
+      "87.0%",
+      "77.4%",
+      "87.0%",
+      "77.8%",
+      "90.7%",
+      "92.6%"
+     ]
+    },
+    {
+     "name": "AgentHarm (cyber subset): 100 minus harm score",
+     "cite_name": "AgentHarm (cyber subset): 100 minus harm score [8]",
+     "vals": [
+      95.0,
+      92.2,
+      95.0,
+      100.0,
+      100.0,
+      99.4,
+      100.0
+     ],
+     "raw": [
+      "95.0%",
+      "92.2%",
+      "95.0%",
+      "100.0%",
+      "100.0%",
+      "99.4%",
+      "100.0%"
+     ]
+    }
+   ]
+  },
+  {
+   "n": 6,
+   "title": "Finance and law agent evaluations",
+   "caption": "Finance and law agent evaluations.",
+   "rows": [
+    {
+     "name": "Vals Finance Agent v2.1",
+     "cite_name": "Vals Finance Agent v2.1 [75, 76]",
+     "vals": [
+      null,
+      65.0,
+      57.12,
+      62.93,
+      60.01,
+      60.66,
+      61.72
+     ],
+     "raw": [
+      "—",
+      "65.00%",
+      "57.12%",
+      "62.93%",
+      "60.01%",
+      "60.66%",
+      "61.72%"
+     ]
+    },
+    {
+     "name": "Finch (internal)",
+     "cite_name": "Finch (internal) [77]",
+     "vals": [
+      61.05,
+      65.12,
+      67.44,
+      null,
+      77.33,
+      74.3,
+      73.3
+     ],
+     "raw": [
+      "61.05%",
+      "65.12%",
+      "67.44%",
+      "—",
+      "77.33%",
+      "74.30%",
+      "73.30%"
+     ]
+    },
+    {
+     "name": "HLAB-v1.1 (Vals)",
+     "cite_name": "HLAB-v1.1 (Vals) [3, 78]",
+     "vals": [
+      null,
+      14.58,
+      10.83,
+      14.17,
+      12.92,
+      25.0,
+      15.83
+     ],
+     "raw": [
+      "—",
+      "14.58%",
+      "10.83%",
+      "14.17%",
+      "12.92%",
+      "25.00%",
+      "15.83%"
+     ]
+    }
+   ]
+  }
+ ],
+ "facts": {
+  "size.active_b": 52.0,
+  "size.total_t": 1.0,
+  "pre.gpus": 3840.0,
+  "pre.days": 45.0,
+  "pre.gpu_hours_m": 4.15,
+  "pre.mfu": 36.0,
+  "pre.goodput": 94.1,
+  "mix.p1_share": 65.0,
+  "mix.p2_share": 35.0,
+  "mix.seq_from_k": 4.0,
+  "mix.seq_to_k": 40.0,
+  "mix.p1_web": 56.3,
+  "mix.p1_docs": 18.7,
+  "mix.p1_code": 16.9,
+  "mix.p1_misc": 8.1,
+  "mix.p2_web": 32.0,
+  "mix.p2_docs": 19.0,
+  "mix.p2_code": 39.0,
+  "mix.p2_misc": 10.0,
+  "img.mfu_kept": 99.0,
+  "gran.g": 4.0,
+  "gran.g_alt": 8.0,
+  "gran.flops_saved": 4.3,
+  "gran.flops_unc": 0.5,
+  "gran.slowdown": 5.0,
+  "adam.b1": 0.975,
+  "adam.b2": 0.975,
+  "batch.last_share": 50.0,
+  "batch.penult_share": 25.0,
+  "batch.opt_from": 0.25,
+  "batch.opt_to": 2.0,
+  "batch.chosen_from": 1.0,
+  "batch.chosen_to": 4.0,
+  "batch.b1_m": 40.0,
+  "batch.b2_m": 80.0,
+  "batch.b3_m": 160.0,
+  "vis.params_b": 1.6,
+  "vis.tokens_t": 8.0,
+  "vis.res_w": 1540.0,
+  "vis.res_h": 1540.0,
+  "vis.sft_b": 20.0,
+  "vis.pe_m": 400.0,
+  "kv.swa_window": 512.0,
+  "kv.long_every": "four",
+  "kv.yoco_prefill": 1.7,
+  "kv.yoco_ctx_m": 1.0,
+  "kv.reduction": 16.0,
+  "surg.small_exp": 22.0,
+  "surg.big_exp": 23.0,
+  "surg.yarn": 8.0,
+  "surg.f1": 1.5,
+  "surg.f2": 1.8,
+  "surg.wl1": 35.0,
+  "surg.wl2": 44.0,
+  "surg.phase2_part": "two-thirds",
+  "mass.probe_k": "32",
+  "mass.sources": "six",
+  "mass.converted": 55.0,
+  "mass.far": 512.0,
+  "mass.native": 67.0,
+  "dsa.topk": 2048.0,
+  "dsa.stage1_b": 15.1,
+  "dsa.stage2_b": 198.0,
+  "dsa.share_from": 16.0,
+  "cve.classes": 600.0,
+  "mid.lr_div": 5.0,
+  "mid.rehearsal_div": 10.0,
+  "sftlad.batch_m": 8.0,
+  "rlinf.rollouts_k": 26.0,
+  "rlinf.sandboxes_k": 20.0,
+  "rlinf.gpus": 3104.0,
+  "rlinf.gen_ratio": 2.5,
+  "rlinf.all_gpus_k": 4.0,
+  "rlinf.longest_h": 37.0,
+  "rlinf.updates": 136.0,
+  "esc.vulns": "four",
+  "esc.deleted_k": 30.0,
+  "rl.step_traj_k": 7.0,
+  "rl.group_default": 16.0,
+  "rl.group_code": 32.0,
+  "rl.group_min": 2.0,
+  "rl.group_max": 32.0,
+  "rl.rollouts_m": 5.36,
+  "rl.groups_k": 452.0,
+  "rl.instances_k": 306.0,
+  "rl.out_tokens_b": 162.5,
+  "rl.code_roll": 20.0,
+  "rl.code_tok": 46.6,
+  "rl.reason_roll": 10.2,
+  "rl.reason_tok": 20.9,
+  "rl.clip": 3.0,
+  "muon.mom": 0.95,
+  "muon.ns_iters": 10.0,
+  "muon.lr_m": 8.0,
+  "muon.lr_e": 7.0,
+  "muon.warmup": 25.0,
+  "muon.clipnorm": 10.0,
+  "muon.kl": 0.005,
+  "mis.k2_m": "5",
+  "mis.k2_e": "3",
+  "mis.stale": "six",
+  "hack.discrepancies": "eight",
+  "hack.quote": "I have the full reference implementation from the board binaries.",
+  "len.bin": 0.1,
+  "cp.kv_m": 20.0,
+  "cp.gpus": 4.0,
+  "cp.dcp_gain": 51.0,
+  "cp.ovh_lo": 10.0,
+  "cp.ovh_hi": 15.0,
+  "spec.head": 1.2,
+  "spec.mask": 0.5,
+  "spec.train_b": 70.0,
+  "spec.gain": 90.0,
+  "spec.conc": 8.0,
+  "spec.vs_eagle": 15.0,
+  "fig16.input_k": 50.0,
+  "fig16.base_gpus": 8.0,
+  "q.gb": 606.0,
+  "q.calib_m": 200.0,
+  "ops.start_s": 120.0,
+  "f17.b_topk": 39.0,
+  "f17.b_qg": 30.0,
+  "f17.b_oc": 33.0,
+  "f17.a_qg": 11.0,
+  "f17.a_oc": 16.0,
+  "f17.a_topk": 15.0,
+  "f17.before": 240.0,
+  "f17.after": 153.0,
+  "f17.cut": 36.0,
+  "intro.frontiercode": 19.7,
+  "intro.hlab": 15.0,
+  "intro.tb4": 41.0,
+  "intro.aacyber": 50.9,
+  "intro.safety": 96.6
+ }
+}
