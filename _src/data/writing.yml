@@ -7,7 +7,7 @@ items:
     sort: "2026-11-05"
     url: /mistral_large_4/
     note: >-
-      A visual breakdown of the Mistral Large 4 paper, which I contributed to. Forty-eight
+      A visual breakdown of the Mistral Large 4 paper. Forty-eight
       scenes you scroll through: the pretraining recipe, the surgery that rebuilt its attention
       in the middle of training, agents that write their own training environments, RL across
       millions of sandboxes, serving, and the results, including where it trails.
