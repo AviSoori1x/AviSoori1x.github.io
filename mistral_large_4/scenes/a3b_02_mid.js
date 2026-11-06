@@ -8,7 +8,7 @@ window.SCENES.S_MID = function (host, api) {
   var K = api.KIT, C = K.C, CH = window.CH, F = api.D.facts;
   var LRD = F['mid.lr_div'], RHD = F['mid.rehearsal_div'];
   var svg = K.board(host, { alt: 'Midtraining hyperparameters: the objective, and the learning rate (1/' +
-    LRD + ' of the pretraining peak), rehearsal (1/' + RHD + ' of pretraining) and batch size choices' });
+    LRD + ' of the pretraining peak), rehearsal (1/' + RHD + ' of pretraining rehearsal) and batch size choices' });
   K.head(svg, 'Midtraining: three knobs', '§4.2.1 · one objective · values at ML4 scale · schematic');
 
   // a white box with a bold first line and a quieter second line
@@ -53,8 +53,8 @@ window.SCENES.S_MID = function (host, api) {
   var FX = [0, FW + FG, 2 * (FW + FG)];
 
   // a reference bar cut into div equal segments, and the chosen value as one of them
-  function ratio(g, y, div, valText) {
-    K.mono(g, 0, y + 18, 'pretraining', { size: 13.5, color: C.ink2 });
+  function ratio(g, y, div, valText, refName) {
+    K.mono(g, 0, y + 18, refName || 'pretraining', { size: 13.5, color: C.ink2 });
     K.mono(g, 0, y + 56, 'midtraining', { size: 13.5, color: C.ink, weight: 600 });
     g.appendChild(K.n('rect', { x: BX, y: y, width: BW, height: 26, rx: 5, fill: CH.GREY2 }));
     for (var i = 1; i < div; i++) {
@@ -92,9 +92,9 @@ window.SCENES.S_MID = function (host, api) {
     'At ML4 scale, midtraining uses 1/' + LRD + ' of the peak pretraining learning rate. The ' +
       'multiplier is fitted on top of the scaling-law prediction, the form that transferred best ' +
       'across scale.',
-    'Rehearsal, the replay of pretraining data, drops to 1/' + RHD + ' of its pretraining level. ' +
-      'Tuned together with the learning rate, this pair gave the best compromise between gaining ' +
-      'and keeping at ML4 scale.',
+    'The paper says "1/' + RHD + ' of pretraining rehearsal" without naming the reference, so the ' +
+      'bar shows only the ratio. Tuned with the learning rate, this pair was the best compromise ' +
+      'at ML4 scale.',
     'Keeping the batch large cost a very small regret on the objective, and the MFU gains ' +
       'more than offset it. The paper gives no midtraining batch size, so none is drawn.'
   ];
@@ -108,12 +108,14 @@ window.SCENES.S_MID = function (host, api) {
       flow(body, 334, [['scaling-law LR', 'from pretraining'], ['a fitted multiplier', 'transferred best'],
         ['midtraining LR', '1/' + LRD + ' of peak at ML4']], ['x', '='], 2);
     } else if (s === 1) {
-      K.label(body, 0, 222, 'rehearsal of pretraining data, drawn to scale');
-      ratio(body, 234, RHD, '1/' + RHD + ' of pretraining');
+      // the paper gives the ratio but never says what it is a fraction of, so the top
+      // bar is a generic reference, not a pretraining rehearsal level
+      K.label(body, 0, 222, 'rehearsal rate, the ratio drawn to scale');
+      ratio(body, 234, RHD, '1/' + RHD + ' of the reference', 'reference');
       K.label(body, 0, 322, 'tuned jointly with the learning rate');
       // a bracket, not + and =: the two rates are chosen together, not added
       flow(body, 334, [['learning rate', '1/' + LRD + ' of the peak'],
-        ['rehearsal rate', '1/' + RHD + ' of pretraining'], ['best compromise', 'at ML4 scale']],
+        ['rehearsal rate', '1/' + RHD + ' of the reference'], ['best compromise', 'at ML4 scale']],
         null, 2);
     } else {
       K.label(body, 0, 222, 'batch size: kept large');

@@ -12,20 +12,19 @@ window.SCENES.S_SPEC = function (host, api) {
 
   var CTX = 'Speculative decoding lets a small model';
   var DRAFT = ['guess', 'the', 'next', 'words', 'for', 'it'];
-  var OWN = 'tokens', NACC = 3;          // three accepted, the fourth replaced by ML4's own token
+  var OWN = 'tokens', NACC = 3;          // three accepted, the fourth replaced by the full model's token
   var SW = 96, SG = (640 - 6 * SW) / 5;
   function sx(i) { return i * (SW + SG); }
   function mid(i) { return sx(i) + SW / 2; }
 
   var STEP = [
-    'DSpark, the speculator, drafts tokens ahead of the full model, six in this made-up ' +
-      'example. Nothing it writes is final until ML4 has checked it.',
-    'ML4 scores all six drafts in one pass and accepts the first three here. Two additions to ' +
-      'DSpark, a recurrent conditioning head (+' + F['spec.head'] + '% acceptance length) and unique ' +
-      'mask tokens (+' + F['spec.mask'] + '%), lengthen accepted runs.',
-    'The accepted tokens are kept, the same pass supplies the next token itself, and the rest ' +
-      'is thrown away. In this example that is four tokens for one pass of ML4, where plain ' +
-      'decoding gets one.'
+    'A small speculator drafts tokens ahead of the full model, six in this made-up example; ' +
+      'ML4 uses DSpark. Nothing drafted is final until the full model has checked it.',
+    'In the usual scheme the full model checks the draft in one pass and keeps a prefix, three ' +
+      'tokens here. ML4 adds a recurrent conditioning head (+' + F['spec.head'] + '% acceptance ' +
+      'length) and unique mask tokens (+' + F['spec.mask'] + '%) to DSpark.',
+    'Accepted tokens are kept, the same pass gives one more token from the full model, and the ' +
+      'rest is thrown away: four tokens for one pass here, against one for plain decoding.'
   ];
 
   function check(p, cx, cy) {
@@ -94,7 +93,7 @@ window.SCENES.S_SPEC = function (host, api) {
     var on = s >= 1;
     body.appendChild(n('rect', { x: 0, y: 222, width: 640, height: 36, rx: 8, fill: on ? K.TINT.amber : '#fff',
       stroke: on ? C.amber : CH.GREY2, 'stroke-opacity': on ? 0.5 : 1, 'stroke-dasharray': on ? null : '4 3' }));
-    K.mono(body, 320, 245, (on ? 'ML4 checks' : 'Next, ML4 checks') + ' all six positions in one forward pass',
+    K.mono(body, 320, 245, (on ? 'The full model checks' : 'Next, the full model checks') + ' all six positions in one pass',
       { size: 13.5, anchor: 'middle', color: on ? C.ink : C.ink3, weight: on ? 600 : 400 });
     // before verification: one empty slot per drafted token, nothing decided yet
     if (!on) DRAFT.forEach(function (w, i) {
@@ -112,7 +111,7 @@ window.SCENES.S_SPEC = function (host, api) {
       fill: 'none', stroke: CH.GREY2, 'stroke-dasharray': '4 3' }));
     K.mono(v, (sx(NACC + 1) + 640) / 2, 296, 'thrown away', { size: 13, anchor: 'middle', color: C.ink3 });
     K.mono(v, mid(1), 334, 'accepted, ' + NACC + ' of ' + DRAFT.length, { size: 13, anchor: 'middle', color: C.ink2 });
-    K.mono(v, mid(NACC), 334, 'ML4\'s own token', { size: 13, anchor: 'middle', color: C.ink2 });
+    K.mono(v, mid(NACC), 334, 'the full model\'s token', { size: 13, anchor: 'middle', color: C.ink2 });
 
     K.callout(body, 0, 352, 640, STEP[s], { cols: 74 });
   }
@@ -125,8 +124,8 @@ window.SCENES.S_SPEC = function (host, api) {
   K.mono(svg, 330, 530, 'over an EAGLE-3 speculator', { size: 13, color: C.ink2 });
 
   K.switcher(svg, 0, 0, ['1 draft', '2 verify', '3 keep'], draw, { tint: 'amber' });
-  K.foot(svg, 'Schematic of speculative decoding in general. The paper names DSpark and block ' +
-    'verification but gives no draft length or acceptance pattern, so the sentence, the draft and ' +
-    'which tokens survive are made up. Block verification judges the whole draft at once to decide ' +
-    'how many tokens to keep, instead of checking one token at a time.');
+  K.foot(svg, 'Schematic of speculative decoding in general, not ML4\'s exact procedure: the paper ' +
+    'gives no draft length, acceptance pattern or verification details, so the sentence and which ' +
+    'tokens survive are made up. Block verification, in the work it cites, checks the draft as a ' +
+    'whole rather than token by token.');
 };

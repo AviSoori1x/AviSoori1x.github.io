@@ -56,7 +56,7 @@ window.SCENES.S_YOCOKEPT = function (host, api) {
       // the last surgery checkpoint: the later of the two surgery runs' final points
       var e = last(2), stop = Math.max(last(0)[0], last(1)[0]), m = at(2, stop);
       var lowerThanBoth = m != null && m < last(0)[1] && m < last(1)[1];
-      return 'The baseline is the unmodified model, the only run drawn to ' + e[0] + '%. At ' + stop +
+      return 'The run labelled Baseline, which the paper does not describe further, is the only one drawn to ' + e[0] + '%. At ' + stop +
         '%, where the last surgery run stops, it is at ' + CH.fmt(m, 1) + (lowerThanBoth ?
         ', lower than either surgery run\'s last point. ' : '. ') +
         'At ' + e[0] + '% it is at ' + CH.fmt(e[1], 1) + '.';

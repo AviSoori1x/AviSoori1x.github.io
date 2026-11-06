@@ -29,8 +29,8 @@
     The design leans on Blackwell: FP8 tensor cores for low-precision training, the large NVLink
     domain for wide expert parallelism, and the fast link to the Grace CPU for offloading
     activations.</p>
-    <p>Two efficiency numbers come with it. <b>MFU was 36%</b>, counted strictly: against peak
-    BF16 throughput, including matrix-multiply and attention FLOPs, excluding recomputation.
+    <p>Two efficiency numbers come with it. <b>MFU was 36%</b>, measured against peak
+    BF16 throughput, counting matrix-multiply and attention FLOPs but not recomputation.
     <b>Goodput was 94.1%</b>, the share of the run that turned into training progress.</p>
     <div class="try">Switch between the three numbers to see what each one counts.</div>
   </div></div>
@@ -70,9 +70,9 @@
 <div class="beat a1" data-s="S_IMAGES" data-act="1" data-sec="§2.2" data-title="Images from the start">
   <div class="stack"><div class="card">
     <span class="num">05<span class="sec">§2.2</span></span>
-    <h3>Images from the very first step, at almost no cost to text</h3>
+    <h3>Images from the very first step, at a small cost to text</h3>
     <p>ML4 is trained from scratch on interleaved image and text data, and with careful dataset
-    design this costs the text side very little. Matched on the number of <i>text</i> tokens seen,
+    design the cost to text is small. Matched on the number of <i>text</i> tokens seen,
     text perplexity shows no regret at all. Matched on the total training horizon, where images
     use up part of the token budget, the regret is modest.</p>
     <p>The payoff is <b>over an order of magnitude more images</b> than Mistral's previous
@@ -187,8 +187,8 @@
     after midtraining and SFT, <b>dropped when full attention became sliding windows, and dropped
     again when CLA was added</b>. Figure 4 follows five attention designs through midtraining
     and on into SFT. Read off the figure, full attention ends near 66 and the design with all
-    three tricks near 56. YOCO on its own costs almost nothing by the end of SFT, which matters
-    later.</p>
+    three tricks near 56. Adding YOCO to sliding windows costs almost nothing by the end of SFT, which
+    matters later.</p>
     <div class="try">Pick a design to trace its curve.</div>
   </div></div>
 </div>
@@ -253,7 +253,7 @@
     <b>SSMax</b>, which learns a per-head scaling of the queries. Together they beat fixed YaRN
     downstream at almost the same training loss: one more case where loss alone would have hidden
     the difference.</p>
-    <p>The learned frequencies did not simply drift. In an intermediate phase-2 checkpoint the
+    <p>In an intermediate phase-2 checkpoint the
     largest changes sat in two bands near the 4K training context, where frequencies rose about
     <b>1.5× and 1.8×</b> relative to YaRN, making their wavelengths <b>35% and 44% shorter</b>.
     Most other bands moved less. The model retuned a few bands rather than rescaling them
@@ -290,7 +290,8 @@
     <p>So it gained many independent full-context layers while keeping part of the old sharing
     layout. The paper's section title says it plainly: "Why ML4 is (almost) a full-attention
     model". It does not give the total layer count; the figure here follows the paper's Figure 3,
-    which draws each half with its middle layers left out.</p>
+    which draws layers 0 to 7 and 32 to 35 of the first half and only layers 36 to 43 of the
+    second.</p>
     <div class="try">Switch between the original design and the converted one.</div>
   </div></div>
 </div>
@@ -411,7 +412,7 @@
 <div class="beat a3" data-s="S_CVE" data-act="3" data-sec="§4.1.3" data-title="Vulnerability patching">
   <div class="stack"><div class="card">
     <span class="num">24<span class="sec">§4.1.3</span></span>
-    <h3>A patch counts only if the exploit dies and nothing else breaks</h3>
+    <h3>A patch counts only if the exploit dies and the existing tests still pass</h3>
     <p>For vulnerability patching, an authoring agent takes a public CVE, finds the upstream fix,
     and packages the vulnerable code into a reproducible container. Tests mix adversarial exploits
     with ordinary inputs. A test harness counts only if it fires on the unpatched code and passes
@@ -610,12 +611,12 @@
   </div></div>
 </div>
 
-<div class="beat a4" data-s="S_MISMATCH" data-act="4" data-sec="§4.4.2" data-title="Train and inference agree">
+<div class="beat a4" data-s="S_MISMATCH" data-act="4" data-sec="§4.4.2" data-title="Narrowing the mismatch">
   <div class="stack"><div class="card">
     <span class="num">35<span class="sec">§4.4.2</span></span>
     <h3>Making the trainer and the generator agree</h3>
-    <p>The inference engine and the trainer do not compute exactly the same numbers, mostly
-    because of numerical error, and asynchrony adds staleness on top. In a mixture of experts, unstable routing amplifies both. The first
+    <p>The inference engine and the trainer do not compute exactly the same numbers. The mismatch
+    comes mainly from two sources: numerical error, and the staleness that asynchronous training adds. In a mixture of experts, unstable routing amplifies both. The first
     fix, <b>router replay</b>, re-runs the routing decisions made at inference in the training
     forward pass, so router drift cannot cause divergence. The second is <b>FP8 inference with
     blockwise scales</b> in both generator and trainer, which speeds generation and matches the
@@ -711,7 +712,8 @@
     training both modes stay near 1.0; then they drop within about a tenth of training and hover
     just under their targets. Over the last fifth of training, medium averages <b>0.49</b>
     against a target of 0.528 and low <b>0.20</b> against 0.227. Teachers run on separate GPU
-    nodes and send only hidden states, so adding teachers costs little.</p>
+    nodes, so their number does not depend on the trainer hardware, and they send only hidden
+    states, which cuts communication with the trainer.</p>
     <div class="try">Switch between medium and low and drag through training.</div>
   </div></div>
 </div>

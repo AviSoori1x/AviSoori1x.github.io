@@ -54,7 +54,7 @@ window.SCENES.S_EQUALLOSS = function (host, api) {
       var lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals);
       return { names: names, vals: vals, msg: 'Pretraining, a knowledge test: at perplexity ' + Q.at.toFixed(2) +
         ' the five fitted lines read ' + CH.fmt(lo, 1) + ' to ' + CH.fmt(hi, 1) + ' on MMLU Redux. ' +
-        'At equal loss, the knowledge scores stay close together, whatever the attention design.' };
+        'At equal loss, the knowledge scores of all five designs stay close together.' };
     }
     // the best checkpoint of each longer or shorter run: the highest dot it reached
     var best = function (nm) {

@@ -42,7 +42,7 @@ window.SCENES.S_CVE = function (host, api) {
       'This is the only outcome with positive reward.',
      'The exploit no longer fires, but tests that used to pass now fail: the patch broke the ' +
       'code it was meant to protect. No positive reward.'],
-    ['Everything that worked still works, and so does the exploit. The patch must neutralize ' +
+    ['The existing tests still pass, but the exploit still works. The patch must neutralize ' +
       'it completely. No positive reward.',
      'The exploit still works and the patch also broke existing tests: it fails on both counts. ' +
       'No positive reward.']

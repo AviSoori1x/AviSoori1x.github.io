@@ -246,7 +246,7 @@ body.kbd .scene [tabindex]:focus { outline: 2px solid var(--blue); outline-offse
       <p>What was built, what it was fed, and how its settings were predicted rather than searched.</p></div>
     <div class="a2"><h4>The attention U-turn</h4>
       <p>Three tricks that shrank the KV cache, the agentic penalty they caused, and the surgery that
-      undid most of them mid-training.</p></div>
+      undid most of them between the two pretraining phases.</p></div>
     <div class="a3"><h4>Agents write the tasks</h4>
       <p>Taxonomies, agent pipelines and verifiers that generate training environments, then
       midtraining and SFT.</p></div>
@@ -296,8 +296,8 @@ body.kbd .scene [tabindex]:focus { outline: 2px solid var(--blue); outline-offse
     The design leans on Blackwell: FP8 tensor cores for low-precision training, the large NVLink
     domain for wide expert parallelism, and the fast link to the Grace CPU for offloading
     activations.</p>
-    <p>Two efficiency numbers come with it. <b>MFU was 36%</b>, counted strictly: against peak
-    BF16 throughput, including matrix-multiply and attention FLOPs, excluding recomputation.
+    <p>Two efficiency numbers come with it. <b>MFU was 36%</b>, measured against peak
+    BF16 throughput, counting matrix-multiply and attention FLOPs but not recomputation.
     <b>Goodput was 94.1%</b>, the share of the run that turned into training progress.</p>
     <div class="try">Switch between the three numbers to see what each one counts.</div>
   </div></div>
@@ -337,9 +337,9 @@ body.kbd .scene [tabindex]:focus { outline: 2px solid var(--blue); outline-offse
 <div class="beat a1" data-s="S_IMAGES" data-act="1" data-sec="§2.2" data-title="Images from the start">
   <div class="stack"><div class="card">
     <span class="num">05<span class="sec">§2.2</span></span>
-    <h3>Images from the very first step, at almost no cost to text</h3>
+    <h3>Images from the very first step, at a small cost to text</h3>
     <p>ML4 is trained from scratch on interleaved image and text data, and with careful dataset
-    design this costs the text side very little. Matched on the number of <i>text</i> tokens seen,
+    design the cost to text is small. Matched on the number of <i>text</i> tokens seen,
     text perplexity shows no regret at all. Matched on the total training horizon, where images
     use up part of the token budget, the regret is modest.</p>
     <p>The payoff is <b>over an order of magnitude more images</b> than Mistral's previous
@@ -454,8 +454,8 @@ body.kbd .scene [tabindex]:focus { outline: 2px solid var(--blue); outline-offse
     after midtraining and SFT, <b>dropped when full attention became sliding windows, and dropped
     again when CLA was added</b>. Figure 4 follows five attention designs through midtraining
     and on into SFT. Read off the figure, full attention ends near 66 and the design with all
-    three tricks near 56. YOCO on its own costs almost nothing by the end of SFT, which matters
-    later.</p>
+    three tricks near 56. Adding YOCO to sliding windows costs almost nothing by the end of SFT, which
+    matters later.</p>
     <div class="try">Pick a design to trace its curve.</div>
   </div></div>
 </div>
@@ -520,7 +520,7 @@ body.kbd .scene [tabindex]:focus { outline: 2px solid var(--blue); outline-offse
     <b>SSMax</b>, which learns a per-head scaling of the queries. Together they beat fixed YaRN
     downstream at almost the same training loss: one more case where loss alone would have hidden
     the difference.</p>
-    <p>The learned frequencies did not simply drift. In an intermediate phase-2 checkpoint the
+    <p>In an intermediate phase-2 checkpoint the
     largest changes sat in two bands near the 4K training context, where frequencies rose about
     <b>1.5× and 1.8×</b> relative to YaRN, making their wavelengths <b>35% and 44% shorter</b>.
     Most other bands moved less. The model retuned a few bands rather than rescaling them
@@ -557,7 +557,8 @@ body.kbd .scene [tabindex]:focus { outline: 2px solid var(--blue); outline-offse
     <p>So it gained many independent full-context layers while keeping part of the old sharing
     layout. The paper's section title says it plainly: "Why ML4 is (almost) a full-attention
     model". It does not give the total layer count; the figure here follows the paper's Figure 3,
-    which draws each half with its middle layers left out.</p>
+    which draws layers 0 to 7 and 32 to 35 of the first half and only layers 36 to 43 of the
+    second.</p>
     <div class="try">Switch between the original design and the converted one.</div>
   </div></div>
 </div>
@@ -678,7 +679,7 @@ body.kbd .scene [tabindex]:focus { outline: 2px solid var(--blue); outline-offse
 <div class="beat a3" data-s="S_CVE" data-act="3" data-sec="§4.1.3" data-title="Vulnerability patching">
   <div class="stack"><div class="card">
     <span class="num">24<span class="sec">§4.1.3</span></span>
-    <h3>A patch counts only if the exploit dies and nothing else breaks</h3>
+    <h3>A patch counts only if the exploit dies and the existing tests still pass</h3>
     <p>For vulnerability patching, an authoring agent takes a public CVE, finds the upstream fix,
     and packages the vulnerable code into a reproducible container. Tests mix adversarial exploits
     with ordinary inputs. A test harness counts only if it fires on the unpatched code and passes
@@ -877,12 +878,12 @@ body.kbd .scene [tabindex]:focus { outline: 2px solid var(--blue); outline-offse
   </div></div>
 </div>
 
-<div class="beat a4" data-s="S_MISMATCH" data-act="4" data-sec="§4.4.2" data-title="Train and inference agree">
+<div class="beat a4" data-s="S_MISMATCH" data-act="4" data-sec="§4.4.2" data-title="Narrowing the mismatch">
   <div class="stack"><div class="card">
     <span class="num">35<span class="sec">§4.4.2</span></span>
     <h3>Making the trainer and the generator agree</h3>
-    <p>The inference engine and the trainer do not compute exactly the same numbers, mostly
-    because of numerical error, and asynchrony adds staleness on top. In a mixture of experts, unstable routing amplifies both. The first
+    <p>The inference engine and the trainer do not compute exactly the same numbers. The mismatch
+    comes mainly from two sources: numerical error, and the staleness that asynchronous training adds. In a mixture of experts, unstable routing amplifies both. The first
     fix, <b>router replay</b>, re-runs the routing decisions made at inference in the training
     forward pass, so router drift cannot cause divergence. The second is <b>FP8 inference with
     blockwise scales</b> in both generator and trainer, which speeds generation and matches the
@@ -978,7 +979,8 @@ body.kbd .scene [tabindex]:focus { outline: 2px solid var(--blue); outline-offse
     training both modes stay near 1.0; then they drop within about a tenth of training and hover
     just under their targets. Over the last fifth of training, medium averages <b>0.49</b>
     against a target of 0.528 and low <b>0.20</b> against 0.227. Teachers run on separate GPU
-    nodes and send only hidden states, so adding teachers costs little.</p>
+    nodes, so their number does not depend on the trainer hardware, and they send only hidden
+    states, which cuts communication with the trainer.</p>
     <div class="try">Switch between medium and low and drag through training.</div>
   </div></div>
 </div>
@@ -2042,8 +2044,8 @@ window.SCENES.S_LADDER = function (host, api) {
       'repeats. It feeds the learning-rate predictor too.',
     'Expansion rate, total experts over active experts, is the other input the batch size ' +
       'depends on primarily.',
-    'Batch size is not set by hand. It is predicted first, and the learning-rate prediction is ' +
-      'conditioned on the predicted value.'
+    'The batch size is predicted first, and the learning-rate prediction is conditioned on ' +
+      'that prediction. The ramp-up later scales it from 1× to 4×, chosen for wall-clock speed.'
   ];
   function wire(x1, y1, x2, y2, how) {
     var on = how > 0;
@@ -2069,19 +2071,22 @@ window.SCENES.S_LADDER = function (host, api) {
   }
   var pk = CH.pick(svg, 0, 25, INS, draw, { w: IX, h: 32, gap: 14 });
 
-  // the scaling ladder, schematic
-  var LYB = 470, sizes = [22, 34, 50, 74], x = 0;
-  K.label(svg, 0, 366, 'scaling ladder (schematic)');
-  sizes.forEach(function (s, i) {
-    var last = i === sizes.length - 1;
+  // the scaling ladder, schematic: every rung is a smaller proxy, and ML4, the
+  // reference model, stands apart as the run the rungs extrapolate to
+  var LYB = 470, sizes = [18, 26, 36, 48], x = 0;
+  K.label(svg, 0, 366, 'scaling ladder, then the full run (schematic)');
+  sizes.forEach(function (s) {
     svg.appendChild(K.n('rect', { x: x, y: LYB - s, width: s, height: s, rx: 4,
-      fill: last ? K.TINT.amber : '#fff', stroke: last ? C.amber : CH.GREY, 'stroke-width': last ? 2 : 1.2 }));
-    if (last) K.mono(svg, x + s / 2, LYB + 22, 'ML4', { size: 13, anchor: 'middle', weight: 600, color: C.amber });
-    x += s + 20;
+      fill: '#fff', stroke: CH.GREY, 'stroke-width': 1.2 }));
+    x += s + 12;
   });
   K.mono(svg, 0, LYB + 22, 'smaller proxies', { size: 13, color: C.ink3 });
-  K.para(svg, 290, 410, 'Every rung uses the same predictors and multipliers: tokens per ' +
-    'parameter, learning rate, batch size. The ladder differs from the real model "in scale only".',
+  K.arrow(svg, x - 2, LYB - 24, x + 24, LYB - 24, { color: C.ink3, dash: '4 4' });
+  svg.appendChild(K.n('rect', { x: x + 32, y: LYB - 62, width: 62, height: 62, rx: 4,
+    fill: K.TINT.amber, stroke: C.amber, 'stroke-width': 2 }));
+  K.mono(svg, x + 63, LYB + 22, 'ML4', { size: 13, anchor: 'middle', weight: 600, color: C.amber });
+  K.para(svg, 290, 410, 'Every rung uses the same predictors and multipliers as ML4: tokens per ' +
+    'parameter, learning rate, batch size. The ladder differs from it "in scale only".',
     40, { size: 13.5, lh: 20 });
 
   K.foot(svg, 'Which input matters to which predictor follows §2.1 of the paper. The ladder\'s ' +
@@ -2230,8 +2235,8 @@ window.SCENES.S_VISION = function (host, api) {
         'Images keep their own aspect ratio, up to ' + F['vis.res_w'] + ' by ' + F['vis.res_h'] + ' pixels.',
       'Each 2 by 2 block of neighboring patches is merged: its four embeddings are laid end to ' +
         'end into one vector, 4d wide.',
-      'A linear projection brings the 4d vector back down. Four patches now cost the language ' +
-        'model one position instead of four.',
+      'A linear projection turns the 4d vector into one merged embedding; the paper does ' +
+        'not give its width. Four patches now cost the language model one position instead of four.',
       'An MLP maps the merged embedding into the language model\'s input embedding space. Here ' +
         'the 16 patches become 4 tokens.'
     ];
@@ -2316,7 +2321,7 @@ window.SCENES.S_VISION = function (host, api) {
   K.switcher(svg, 0, 0, ['patch merger', 'Figure 2: ten benchmarks'], function (i) {
     CH.clear(body); views[i]();
   }, { tint: 'amber' });
-  K.foot(svg, 'The patch merger is a schematic of §2.3.2; d is not given. Figure 2 is a raster ' +
+  K.foot(svg, 'The patch merger is a schematic of §2.3.2; neither d nor the merged width is given. Figure 2 is a raster ' +
     'image, so its values are read from pixels and approximate, to about ±0.003.');
 };
 /* ---- a1_07_gran ---- */
@@ -2880,7 +2885,7 @@ window.SCENES.S_EQUALLOSS = function (host, api) {
       var lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals);
       return { names: names, vals: vals, msg: 'Pretraining, a knowledge test: at perplexity ' + Q.at.toFixed(2) +
         ' the five fitted lines read ' + CH.fmt(lo, 1) + ' to ' + CH.fmt(hi, 1) + ' on MMLU Redux. ' +
-        'At equal loss, the knowledge scores stay close together, whatever the attention design.' };
+        'At equal loss, the knowledge scores of all five designs stay close together.' };
     }
     // the best checkpoint of each longer or shorter run: the highest dot it reached
     var best = function (nm) {
@@ -3455,7 +3460,7 @@ window.SCENES.S_YOCOKEPT = function (host, api) {
       // the last surgery checkpoint: the later of the two surgery runs' final points
       var e = last(2), stop = Math.max(last(0)[0], last(1)[0]), m = at(2, stop);
       var lowerThanBoth = m != null && m < last(0)[1] && m < last(1)[1];
-      return 'The baseline is the unmodified model, the only run drawn to ' + e[0] + '%. At ' + stop +
+      return 'The run labelled Baseline, which the paper does not describe further, is the only one drawn to ' + e[0] + '%. At ' + stop +
         '%, where the last surgery run stops, it is at ' + CH.fmt(m, 1) + (lowerThanBoth ?
         ', lower than either surgery run\'s last point. ' : '. ') +
         'At ' + e[0] + '% it is at ' + CH.fmt(e[1], 1) + '.';
@@ -3880,7 +3885,7 @@ window.SCENES.S_PIPE = function (host, api) {
       'The candidate goes back to its seed with feedback.',
     'The expensive checks, an agentic verifier and a check for reward hacking, find a flaw. ' +
       'The candidate goes back to its seed with feedback.',
-    'Every check passes, but the task gives too little learning signal for training. ' +
+    'The quality checks pass, but difficulty calibration finds too little learning signal for training. ' +
       'It goes back to its seed with feedback.'
   ];
 
@@ -4381,7 +4386,7 @@ window.SCENES.S_CVE = function (host, api) {
       'This is the only outcome with positive reward.',
      'The exploit no longer fires, but tests that used to pass now fail: the patch broke the ' +
       'code it was meant to protect. No positive reward.'],
-    ['Everything that worked still works, and so does the exploit. The patch must neutralize ' +
+    ['The existing tests still pass, but the exploit still works. The patch must neutralize ' +
       'it completely. No positive reward.',
      'The exploit still works and the patch also broke existing tests: it fails on both counts. ' +
       'No positive reward.']
@@ -4708,7 +4713,7 @@ window.SCENES.S_MID = function (host, api) {
   var K = api.KIT, C = K.C, CH = window.CH, F = api.D.facts;
   var LRD = F['mid.lr_div'], RHD = F['mid.rehearsal_div'];
   var svg = K.board(host, { alt: 'Midtraining hyperparameters: the objective, and the learning rate (1/' +
-    LRD + ' of the pretraining peak), rehearsal (1/' + RHD + ' of pretraining) and batch size choices' });
+    LRD + ' of the pretraining peak), rehearsal (1/' + RHD + ' of pretraining rehearsal) and batch size choices' });
   K.head(svg, 'Midtraining: three knobs', '§4.2.1 · one objective · values at ML4 scale · schematic');
 
   // a white box with a bold first line and a quieter second line
@@ -4753,8 +4758,8 @@ window.SCENES.S_MID = function (host, api) {
   var FX = [0, FW + FG, 2 * (FW + FG)];
 
   // a reference bar cut into div equal segments, and the chosen value as one of them
-  function ratio(g, y, div, valText) {
-    K.mono(g, 0, y + 18, 'pretraining', { size: 13.5, color: C.ink2 });
+  function ratio(g, y, div, valText, refName) {
+    K.mono(g, 0, y + 18, refName || 'pretraining', { size: 13.5, color: C.ink2 });
     K.mono(g, 0, y + 56, 'midtraining', { size: 13.5, color: C.ink, weight: 600 });
     g.appendChild(K.n('rect', { x: BX, y: y, width: BW, height: 26, rx: 5, fill: CH.GREY2 }));
     for (var i = 1; i < div; i++) {
@@ -4792,9 +4797,9 @@ window.SCENES.S_MID = function (host, api) {
     'At ML4 scale, midtraining uses 1/' + LRD + ' of the peak pretraining learning rate. The ' +
       'multiplier is fitted on top of the scaling-law prediction, the form that transferred best ' +
       'across scale.',
-    'Rehearsal, the replay of pretraining data, drops to 1/' + RHD + ' of its pretraining level. ' +
-      'Tuned together with the learning rate, this pair gave the best compromise between gaining ' +
-      'and keeping at ML4 scale.',
+    'The paper says "1/' + RHD + ' of pretraining rehearsal" without naming the reference, so the ' +
+      'bar shows only the ratio. Tuned with the learning rate, this pair was the best compromise ' +
+      'at ML4 scale.',
     'Keeping the batch large cost a very small regret on the objective, and the MFU gains ' +
       'more than offset it. The paper gives no midtraining batch size, so none is drawn.'
   ];
@@ -4808,12 +4813,14 @@ window.SCENES.S_MID = function (host, api) {
       flow(body, 334, [['scaling-law LR', 'from pretraining'], ['a fitted multiplier', 'transferred best'],
         ['midtraining LR', '1/' + LRD + ' of peak at ML4']], ['x', '='], 2);
     } else if (s === 1) {
-      K.label(body, 0, 222, 'rehearsal of pretraining data, drawn to scale');
-      ratio(body, 234, RHD, '1/' + RHD + ' of pretraining');
+      // the paper gives the ratio but never says what it is a fraction of, so the top
+      // bar is a generic reference, not a pretraining rehearsal level
+      K.label(body, 0, 222, 'rehearsal rate, the ratio drawn to scale');
+      ratio(body, 234, RHD, '1/' + RHD + ' of the reference', 'reference');
       K.label(body, 0, 322, 'tuned jointly with the learning rate');
       // a bracket, not + and =: the two rates are chosen together, not added
       flow(body, 334, [['learning rate', '1/' + LRD + ' of the peak'],
-        ['rehearsal rate', '1/' + RHD + ' of pretraining'], ['best compromise', 'at ML4 scale']],
+        ['rehearsal rate', '1/' + RHD + ' of the reference'], ['best compromise', 'at ML4 scale']],
         null, 2);
     } else {
       K.label(body, 0, 222, 'batch size: kept large');
@@ -5115,9 +5122,9 @@ window.SCENES.S_ASYNC = function (host, api) {
   // what each box does and hands on, in the paper's words (§4.3.1); [handoff, detail]
   var SAY = [
     ['Dataloader: hands prompts to the runner pool',
-      'Data loading is curriculum-driven, steered by feedback from the trainer. For ' +
-      'each prompt the pipeline samples a group of rollouts, so a prompt enters the ' +
-      'runner pool as a group of episodes.'],
+      'Data loading is curriculum-driven, with feedback from the packing pool ' +
+      '(Figure 12). For each prompt the pipeline samples a group of rollouts, so a ' +
+      'prompt enters the runner pool as a group of episodes.'],
     ['Runner pool: hands each complete group to scoring',
       'Groups are admitted up to a maximum concurrency and as backpressure allows. An ' +
       'episode starts as soon as a slot is free, with priority for siblings of ' +
@@ -5126,13 +5133,12 @@ window.SCENES.S_ASYNC = function (host, api) {
       'Only complete groups arrive here. Groupwise verification applies pairwise ' +
       'rewards and groupwise penalties. Verifiers, LLM judges and pairwise reward models ' +
       'run as supporting services.'],
-    ['Packing pool: hands fixed-length batches to the trainer',
+    ['Packing pool: batches to the trainer, feedback to the dataloader',
       'Trie-based tokenization handles possible re-tokenization events. A centralized ' +
       'bin-packer then packs individual trajectories into fixed-length microbatches, ' +
       'sent to each data-parallel rank.'],
     ['Trainer: hands new weights to the generators',
-      'Each training step sends updated weights to the generators via NCCL, and ' +
-      'curriculum feedback goes back to the dataloader. At peak: ' + CH.comma(GPU) + ' GPUs with a ' +
+      'Each training step sends updated weights to the generators via NCCL. At peak: ' + CH.comma(GPU) + ' GPUs with a ' +
       '1:' + RATIO + ' trainer-to-generator ratio, about ' + ALL + 'k with judges and services.'],
     ['Generators: hand model outputs back to the runners',
       'vLLM engines on Ray. Concurrency adapts to backpressure from generators, ' +
@@ -5189,13 +5195,14 @@ window.SCENES.S_ASYNC = function (host, api) {
     [GX + 2, RY, -1, 0], { dash: '7 4', color: CH.GREY });
   LABS.push({ owner: 4, t: K.mono(body, SX + SW + 34, TY - 9, 'updated policy weights (NCCL)',
     { size: 12.5, color: C.ink3 }) });
-  // curriculum feedback: trainer back to the dataloader, around the left edge
-  edge('M' + SX + ' ' + TY + ' H26 V' + (SY[0] + BH / 2) + ' H' + (SX - 2), 4,
+  // curriculum feedback: as in Figure 12, from the packing pool back to the
+  // dataloader, around the left edge
+  var PY = SY[3] + BH / 2, CY = (SY[0] + SY[3] + BH) / 2;
+  edge('M' + SX + ' ' + PY + ' H26 V' + (SY[0] + BH / 2) + ' H' + (SX - 2), 3,
     [SX - 2, SY[0] + BH / 2, 1, 0], { dash: '3 4', color: CH.GREY });
-  var cf = K.mono(body, 17, (SY[0] + SY[4] + BH) / 2, 'curriculum feedback',
-    { size: 12.5, color: C.ink3, anchor: 'middle' });
-  cf.setAttribute('transform', 'rotate(-90 17 ' + (SY[0] + SY[4] + BH) / 2 + ')');
-  LABS.push({ owner: 4, t: cf });
+  var cf = K.mono(body, 17, CY, 'curriculum feedback', { size: 12.5, color: C.ink3, anchor: 'middle' });
+  cf.setAttribute('transform', 'rotate(-90 17 ' + CY + ')');
+  LABS.push({ owner: 3, t: cf });
 
   // --- the boxes, each one a button --------------------------------------
   var TINTED = '#fcf1e8';
@@ -5300,7 +5307,7 @@ window.SCENES.S_FAULT = function (host, api) {
     fill: K.TINT.ink, stroke: C.line }));
   K.mono(svg, 14, 22, 'RL, evaluation and synthetic data generation share one environment interface.',
     { size: 12.5, color: C.ink2 });
-  K.mono(svg, 14, 42, 'Episodes are append-only records; only the policy\'s own outputs are trained on.',
+  K.mono(svg, 14, 42, 'Each episode is one append-only record list; only policy outputs are trained on.',
     { size: 12.5, color: C.ink3 });
 
   K.label(svg, 0, 94, 'pick a failure');
@@ -7720,20 +7727,19 @@ window.SCENES.S_SPEC = function (host, api) {
 
   var CTX = 'Speculative decoding lets a small model';
   var DRAFT = ['guess', 'the', 'next', 'words', 'for', 'it'];
-  var OWN = 'tokens', NACC = 3;          // three accepted, the fourth replaced by ML4's own token
+  var OWN = 'tokens', NACC = 3;          // three accepted, the fourth replaced by the full model's token
   var SW = 96, SG = (640 - 6 * SW) / 5;
   function sx(i) { return i * (SW + SG); }
   function mid(i) { return sx(i) + SW / 2; }
 
   var STEP = [
-    'DSpark, the speculator, drafts tokens ahead of the full model, six in this made-up ' +
-      'example. Nothing it writes is final until ML4 has checked it.',
-    'ML4 scores all six drafts in one pass and accepts the first three here. Two additions to ' +
-      'DSpark, a recurrent conditioning head (+' + F['spec.head'] + '% acceptance length) and unique ' +
-      'mask tokens (+' + F['spec.mask'] + '%), lengthen accepted runs.',
-    'The accepted tokens are kept, the same pass supplies the next token itself, and the rest ' +
-      'is thrown away. In this example that is four tokens for one pass of ML4, where plain ' +
-      'decoding gets one.'
+    'A small speculator drafts tokens ahead of the full model, six in this made-up example; ' +
+      'ML4 uses DSpark. Nothing drafted is final until the full model has checked it.',
+    'In the usual scheme the full model checks the draft in one pass and keeps a prefix, three ' +
+      'tokens here. ML4 adds a recurrent conditioning head (+' + F['spec.head'] + '% acceptance ' +
+      'length) and unique mask tokens (+' + F['spec.mask'] + '%) to DSpark.',
+    'Accepted tokens are kept, the same pass gives one more token from the full model, and the ' +
+      'rest is thrown away: four tokens for one pass here, against one for plain decoding.'
   ];
 
   function check(p, cx, cy) {
@@ -7802,7 +7808,7 @@ window.SCENES.S_SPEC = function (host, api) {
     var on = s >= 1;
     body.appendChild(n('rect', { x: 0, y: 222, width: 640, height: 36, rx: 8, fill: on ? K.TINT.amber : '#fff',
       stroke: on ? C.amber : CH.GREY2, 'stroke-opacity': on ? 0.5 : 1, 'stroke-dasharray': on ? null : '4 3' }));
-    K.mono(body, 320, 245, (on ? 'ML4 checks' : 'Next, ML4 checks') + ' all six positions in one forward pass',
+    K.mono(body, 320, 245, (on ? 'The full model checks' : 'Next, the full model checks') + ' all six positions in one pass',
       { size: 13.5, anchor: 'middle', color: on ? C.ink : C.ink3, weight: on ? 600 : 400 });
     // before verification: one empty slot per drafted token, nothing decided yet
     if (!on) DRAFT.forEach(function (w, i) {
@@ -7820,7 +7826,7 @@ window.SCENES.S_SPEC = function (host, api) {
       fill: 'none', stroke: CH.GREY2, 'stroke-dasharray': '4 3' }));
     K.mono(v, (sx(NACC + 1) + 640) / 2, 296, 'thrown away', { size: 13, anchor: 'middle', color: C.ink3 });
     K.mono(v, mid(1), 334, 'accepted, ' + NACC + ' of ' + DRAFT.length, { size: 13, anchor: 'middle', color: C.ink2 });
-    K.mono(v, mid(NACC), 334, 'ML4\'s own token', { size: 13, anchor: 'middle', color: C.ink2 });
+    K.mono(v, mid(NACC), 334, 'the full model\'s token', { size: 13, anchor: 'middle', color: C.ink2 });
 
     K.callout(body, 0, 352, 640, STEP[s], { cols: 74 });
   }
@@ -7833,10 +7839,10 @@ window.SCENES.S_SPEC = function (host, api) {
   K.mono(svg, 330, 530, 'over an EAGLE-3 speculator', { size: 13, color: C.ink2 });
 
   K.switcher(svg, 0, 0, ['1 draft', '2 verify', '3 keep'], draw, { tint: 'amber' });
-  K.foot(svg, 'Schematic of speculative decoding in general. The paper names DSpark and block ' +
-    'verification but gives no draft length or acceptance pattern, so the sentence, the draft and ' +
-    'which tokens survive are made up. Block verification judges the whole draft at once to decide ' +
-    'how many tokens to keep, instead of checking one token at a time.');
+  K.foot(svg, 'Schematic of speculative decoding in general, not ML4\'s exact procedure: the paper ' +
+    'gives no draft length, acceptance pattern or verification details, so the sentence and which ' +
+    'tokens survive are made up. Block verification, in the work it cites, checks the draft as a ' +
+    'whole rather than token by token.');
 };
 /* ---- a5b_02_nvfp4 ---- */
 /* S_NVFP4: which parts of the checkpoint are quantized. §6: the routed experts go

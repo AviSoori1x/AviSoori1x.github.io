@@ -24,8 +24,8 @@ window.SCENES.S_VISION = function (host, api) {
         'Images keep their own aspect ratio, up to ' + F['vis.res_w'] + ' by ' + F['vis.res_h'] + ' pixels.',
       'Each 2 by 2 block of neighboring patches is merged: its four embeddings are laid end to ' +
         'end into one vector, 4d wide.',
-      'A linear projection brings the 4d vector back down. Four patches now cost the language ' +
-        'model one position instead of four.',
+      'A linear projection turns the 4d vector into one merged embedding; the paper does ' +
+        'not give its width. Four patches now cost the language model one position instead of four.',
       'An MLP maps the merged embedding into the language model\'s input embedding space. Here ' +
         'the 16 patches become 4 tokens.'
     ];
@@ -110,6 +110,6 @@ window.SCENES.S_VISION = function (host, api) {
   K.switcher(svg, 0, 0, ['patch merger', 'Figure 2: ten benchmarks'], function (i) {
     CH.clear(body); views[i]();
   }, { tint: 'amber' });
-  K.foot(svg, 'The patch merger is a schematic of §2.3.2; d is not given. Figure 2 is a raster ' +
+  K.foot(svg, 'The patch merger is a schematic of §2.3.2; neither d nor the merged width is given. Figure 2 is a raster ' +
     'image, so its values are read from pixels and approximate, to about ±0.003.');
 };

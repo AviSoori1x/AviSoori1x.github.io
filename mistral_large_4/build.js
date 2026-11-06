@@ -76,7 +76,7 @@ const HERO = `
       <p>What was built, what it was fed, and how its settings were predicted rather than searched.</p></div>
     <div class="a2"><h4>The attention U-turn</h4>
       <p>Three tricks that shrank the KV cache, the agentic penalty they caused, and the surgery that
-      undid most of them mid-training.</p></div>
+      undid most of them between the two pretraining phases.</p></div>
     <div class="a3"><h4>Agents write the tasks</h4>
       <p>Taxonomies, agent pipelines and verifiers that generate training environments, then
       midtraining and SFT.</p></div>

@@ -32,8 +32,8 @@ window.SCENES.S_LADDER = function (host, api) {
       'repeats. It feeds the learning-rate predictor too.',
     'Expansion rate, total experts over active experts, is the other input the batch size ' +
       'depends on primarily.',
-    'Batch size is not set by hand. It is predicted first, and the learning-rate prediction is ' +
-      'conditioned on the predicted value.'
+    'The batch size is predicted first, and the learning-rate prediction is conditioned on ' +
+      'that prediction. The ramp-up later scales it from 1× to 4×, chosen for wall-clock speed.'
   ];
   function wire(x1, y1, x2, y2, how) {
     var on = how > 0;
@@ -59,19 +59,22 @@ window.SCENES.S_LADDER = function (host, api) {
   }
   var pk = CH.pick(svg, 0, 25, INS, draw, { w: IX, h: 32, gap: 14 });
 
-  // the scaling ladder, schematic
-  var LYB = 470, sizes = [22, 34, 50, 74], x = 0;
-  K.label(svg, 0, 366, 'scaling ladder (schematic)');
-  sizes.forEach(function (s, i) {
-    var last = i === sizes.length - 1;
+  // the scaling ladder, schematic: every rung is a smaller proxy, and ML4, the
+  // reference model, stands apart as the run the rungs extrapolate to
+  var LYB = 470, sizes = [18, 26, 36, 48], x = 0;
+  K.label(svg, 0, 366, 'scaling ladder, then the full run (schematic)');
+  sizes.forEach(function (s) {
     svg.appendChild(K.n('rect', { x: x, y: LYB - s, width: s, height: s, rx: 4,
-      fill: last ? K.TINT.amber : '#fff', stroke: last ? C.amber : CH.GREY, 'stroke-width': last ? 2 : 1.2 }));
-    if (last) K.mono(svg, x + s / 2, LYB + 22, 'ML4', { size: 13, anchor: 'middle', weight: 600, color: C.amber });
-    x += s + 20;
+      fill: '#fff', stroke: CH.GREY, 'stroke-width': 1.2 }));
+    x += s + 12;
   });
   K.mono(svg, 0, LYB + 22, 'smaller proxies', { size: 13, color: C.ink3 });
-  K.para(svg, 290, 410, 'Every rung uses the same predictors and multipliers: tokens per ' +
-    'parameter, learning rate, batch size. The ladder differs from the real model "in scale only".',
+  K.arrow(svg, x - 2, LYB - 24, x + 24, LYB - 24, { color: C.ink3, dash: '4 4' });
+  svg.appendChild(K.n('rect', { x: x + 32, y: LYB - 62, width: 62, height: 62, rx: 4,
+    fill: K.TINT.amber, stroke: C.amber, 'stroke-width': 2 }));
+  K.mono(svg, x + 63, LYB + 22, 'ML4', { size: 13, anchor: 'middle', weight: 600, color: C.amber });
+  K.para(svg, 290, 410, 'Every rung uses the same predictors and multipliers as ML4: tokens per ' +
+    'parameter, learning rate, batch size. The ladder differs from it "in scale only".',
     40, { size: 13.5, lh: 20 });
 
   K.foot(svg, 'Which input matters to which predictor follows §2.1 of the paper. The ladder\'s ' +

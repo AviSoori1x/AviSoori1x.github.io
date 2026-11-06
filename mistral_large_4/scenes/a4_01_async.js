@@ -30,9 +30,9 @@ window.SCENES.S_ASYNC = function (host, api) {
   // what each box does and hands on, in the paper's words (§4.3.1); [handoff, detail]
   var SAY = [
     ['Dataloader: hands prompts to the runner pool',
-      'Data loading is curriculum-driven, steered by feedback from the trainer. For ' +
-      'each prompt the pipeline samples a group of rollouts, so a prompt enters the ' +
-      'runner pool as a group of episodes.'],
+      'Data loading is curriculum-driven, with feedback from the packing pool ' +
+      '(Figure 12). For each prompt the pipeline samples a group of rollouts, so a ' +
+      'prompt enters the runner pool as a group of episodes.'],
     ['Runner pool: hands each complete group to scoring',
       'Groups are admitted up to a maximum concurrency and as backpressure allows. An ' +
       'episode starts as soon as a slot is free, with priority for siblings of ' +
@@ -41,13 +41,12 @@ window.SCENES.S_ASYNC = function (host, api) {
       'Only complete groups arrive here. Groupwise verification applies pairwise ' +
       'rewards and groupwise penalties. Verifiers, LLM judges and pairwise reward models ' +
       'run as supporting services.'],
-    ['Packing pool: hands fixed-length batches to the trainer',
+    ['Packing pool: batches to the trainer, feedback to the dataloader',
       'Trie-based tokenization handles possible re-tokenization events. A centralized ' +
       'bin-packer then packs individual trajectories into fixed-length microbatches, ' +
       'sent to each data-parallel rank.'],
     ['Trainer: hands new weights to the generators',
-      'Each training step sends updated weights to the generators via NCCL, and ' +
-      'curriculum feedback goes back to the dataloader. At peak: ' + CH.comma(GPU) + ' GPUs with a ' +
+      'Each training step sends updated weights to the generators via NCCL. At peak: ' + CH.comma(GPU) + ' GPUs with a ' +
       '1:' + RATIO + ' trainer-to-generator ratio, about ' + ALL + 'k with judges and services.'],
     ['Generators: hand model outputs back to the runners',
       'vLLM engines on Ray. Concurrency adapts to backpressure from generators, ' +
@@ -104,13 +103,14 @@ window.SCENES.S_ASYNC = function (host, api) {
     [GX + 2, RY, -1, 0], { dash: '7 4', color: CH.GREY });
   LABS.push({ owner: 4, t: K.mono(body, SX + SW + 34, TY - 9, 'updated policy weights (NCCL)',
     { size: 12.5, color: C.ink3 }) });
-  // curriculum feedback: trainer back to the dataloader, around the left edge
-  edge('M' + SX + ' ' + TY + ' H26 V' + (SY[0] + BH / 2) + ' H' + (SX - 2), 4,
+  // curriculum feedback: as in Figure 12, from the packing pool back to the
+  // dataloader, around the left edge
+  var PY = SY[3] + BH / 2, CY = (SY[0] + SY[3] + BH) / 2;
+  edge('M' + SX + ' ' + PY + ' H26 V' + (SY[0] + BH / 2) + ' H' + (SX - 2), 3,
     [SX - 2, SY[0] + BH / 2, 1, 0], { dash: '3 4', color: CH.GREY });
-  var cf = K.mono(body, 17, (SY[0] + SY[4] + BH) / 2, 'curriculum feedback',
-    { size: 12.5, color: C.ink3, anchor: 'middle' });
-  cf.setAttribute('transform', 'rotate(-90 17 ' + (SY[0] + SY[4] + BH) / 2 + ')');
-  LABS.push({ owner: 4, t: cf });
+  var cf = K.mono(body, 17, CY, 'curriculum feedback', { size: 12.5, color: C.ink3, anchor: 'middle' });
+  cf.setAttribute('transform', 'rotate(-90 17 ' + CY + ')');
+  LABS.push({ owner: 3, t: cf });
 
   // --- the boxes, each one a button --------------------------------------
   var TINTED = '#fcf1e8';

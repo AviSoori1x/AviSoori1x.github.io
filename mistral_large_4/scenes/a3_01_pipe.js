@@ -30,7 +30,7 @@ window.SCENES.S_PIPE = function (host, api) {
       'The candidate goes back to its seed with feedback.',
     'The expensive checks, an agentic verifier and a check for reward hacking, find a flaw. ' +
       'The candidate goes back to its seed with feedback.',
-    'Every check passes, but the task gives too little learning signal for training. ' +
+    'The quality checks pass, but difficulty calibration finds too little learning signal for training. ' +
       'It goes back to its seed with feedback.'
   ];
 

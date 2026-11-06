@@ -40,7 +40,7 @@ window.SCENES.S_FAULT = function (host, api) {
     fill: K.TINT.ink, stroke: C.line }));
   K.mono(svg, 14, 22, 'RL, evaluation and synthetic data generation share one environment interface.',
     { size: 12.5, color: C.ink2 });
-  K.mono(svg, 14, 42, 'Episodes are append-only records; only the policy\'s own outputs are trained on.',
+  K.mono(svg, 14, 42, 'Each episode is one append-only record list; only policy outputs are trained on.',
     { size: 12.5, color: C.ink3 });
 
   K.label(svg, 0, 94, 'pick a failure');
