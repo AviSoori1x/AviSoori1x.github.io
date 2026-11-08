@@ -3,7 +3,8 @@ items:
     role: Research Scientist
     org: Mistral AI
     note: >-
-      Robotics foundation models, mostly manipulation and navigation. Contributor on the
+      Post-training and evals for vision-language models in embodied reasoning and
+      robotics, mostly manipulation and navigation. Contributor on the
       Robostral Navigate release, and a lead contributor on Shieldstral and Mistral Small
       Creative. I joined in 2024 on the applied side and led the US applied science team
       before moving to research.
